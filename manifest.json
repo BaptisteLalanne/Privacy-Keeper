@@ -1,13 +1,19 @@
 {
   "name": "Cookiiiiies",
-  "description": "Ou sont les croissants?",
+  "description": "Miam",
   "version": "1.0",
   "manifest_version": 3,
   "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": ["cookies"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content-script.js"]
+    }
+  ],
+  "permissions": ["cookies", "tabs", "scripting", "storage"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {

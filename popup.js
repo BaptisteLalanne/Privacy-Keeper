@@ -8,3 +8,4 @@ document.getElementById("getCookies").addEventListener("click", async function()
 	});
 	console.log(cookies)
 });
+

@@ -34,3 +34,10 @@ document.getElementById("getCookies").addEventListener("click", async function()
 	  }
 	});*/
 });
+
+document.querySelector("#popup-db-button").addEventListener("click", () => {
+
+	console.log("button #popup-db-button clicked");
+	chrome.tabs.create({ url: chrome.runtime.getURL("dashboard/index.html") });
+	
+});

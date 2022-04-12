@@ -1,80 +1,133 @@
-.soft-circle {
-    height: var(--general-score-size);
-    width: var(--general-score-size);
-    position: relative;  
-    border-radius: 50%;
+// -- vars
+$default-size: 6em;
+$default-outline: 10;
+$label-font-size: $default-size * 0.42;
+$label-font-size-redo: $default-size * 0.38;
+$posColor: #7DDE6D;
+$negColor: #e2370c;
+$percent: 60;
+$animation-duration: 500ms;
+$animation-ease: cubic-bezier(0.32, 0.29, 0.1, 0.92);
+
+@mixin size($width, $height) {
+    height: $height;
+    width: $width;
 }
-.soft-circle .inside {
-    position: absolute;
-    z-index: 6;
-    top: 50%;
-    left: 50%;
-    height: calc(var(--general-score-size)*var(--general-score-outline));
-    width: calc(var(--general-score-size)*var(--general-score-outline));
-    margin: calc(-1*var(--general-score-size)*var(--general-score-outline)/2)
-            0
-            0
-            calc(-1*var(--general-score-size)*var(--general-score-outline)/2);
-    background: white;
-    border-radius: 100%;
+
+// -- selectors
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
 }
-.soft-circle .key {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 10;
-    display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    gap: 2px;
-    color: black;
+
+.pie-wrapper {
+
+    @include size($default-size, $default-size);
+    position: relative;
+    font-family: oswaldFont;
+    font-weight: bold;
+
+    .pie {
+
+        @include size(100%, 100%);
+        clip: rect(0, $default-size, $default-size, $default-size / 2);
+        left: 0;
+        position: absolute;
+        top: 0;
+
+        .half-circle {
+            @include size(100%, 100%);
+            border: ($default-size / $default-outline) solid #3498db;
+            border-radius: 50%;
+            clip: rect(0, $default-size / 2, $default-size, 0);
+            left: 0;
+            position: absolute;
+            top: 0;
+
+        }
+
+    }
+
+    .label {
+
+        background: none;
+        border-radius: 50%;
+        text-align: center;
+        color: black;
+        cursor: default;
+        display: block;
+        position: absolute;
+        font-size: $label-font-size;
+        line-height: $label-font-size-redo*0.7;
+        left: $label-font-size-redo / $default-outline;
+        right: $label-font-size-redo / $default-outline;
+        top: $label-font-size-redo / $default-outline;
+
+        .smaller {
+            color: black;
+            font-size: .45em;
+            padding-bottom: 20px;
+            vertical-align: super;
+        }
+
+    }
+
+    .shadow {
+        @include size(100%, 100%);
+        border: $default-size / $default-outline solid #dadada;
+        border-radius: 50%;
+    }
+
 }
-.soft-circle .shade {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    background: #eee;
-    border-radius: 100%;
-    clip: rect( 
-            0, 
-            var(--general-score-size), 
-            var(--general-score-size), 
-            calc(var(--general-score-size)/2)
-          );
+
+.left-side {
+    animation: left-side-progression $animation-duration $animation-ease both;
 }
-.circle .shade .progressing {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    border-radius: 100%;
-    clip: rect(
-            0, 
-            calc(var(--general-score-size)/2), 
-            var(--general-score-size), 
-            0
-          );
-    background: #7DDE6D;
+
+.right-side {
+    animation: right-side-progression $animation-duration $animation-ease both; 
 }
-.circle .left .progressing {
-    z-index: 1;
-    animation: left var(--animation-duration) linear both;
+
+.pie {
+    animation: pie-progression $animation-duration $animation-ease both;
 }
-@keyframes left {
+
+@keyframes pie-progression {
+    0% {
+        clip: rect(auto, auto, auto, auto);
+    }
     100% {
-        transform: rotate(180deg);
+        @if $percent > 50 {
+          clip: rect(auto, auto, auto, auto);
+        }
+
     }
 }
-.circle .right {
-    transform: rotate(180deg);
-    z-index: 3;
-}
-.circle .right .progressing {
-    animation: right var(--animation-duration) cubic-bezier(0.32, 0.29, 0.1, 0.92) both;
-    animation-delay: var(--animation-duration);
-}
-@keyframes right {
+
+@keyframes right-side-progression {
+    0% {
+        transform: rotate(180deg);
+        border-color: $posColor;
+    }
     100% {
-        transform: rotate(54deg);
+        @if $percent <= 50 {
+            display: none;
+        }
+        @else {
+            transform: rotate(180deg);
+        }
+        border-color: mix($posColor, $negColor, $percent);
+    }
+}
+
+@keyframes left-side-progression {
+    0% {
+        transform: rotate(360deg);
+        border-color: $posColor;
+    }
+    100% {
+        transform: rotate($percent * 3.6deg);
+        border-color: mix($posColor, $negColor, $percent);
     }
 }

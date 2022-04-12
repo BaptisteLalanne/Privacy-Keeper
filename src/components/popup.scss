@@ -6,7 +6,6 @@
     --general-score-size: 75px;
     --detailed-score-size: 50px;
     --general-score-outline: 0.8;
-    --animation-duration: 0.25s;
 }
 
 .wrapper {
@@ -15,7 +14,7 @@
     display: flex;
     flex-direction: column;
     font-family: interFont;
-    gap: 18px;
+    gap: 14px;
     background-color: #f3f3f3;
     box-sizing: border-box;
     padding: 1em;

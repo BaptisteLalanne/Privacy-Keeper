@@ -72,6 +72,10 @@ function Popup() {
     return url.replace('http://', '').replace('https://','').split(/[/?#]/)[0];
   }
 
+  // Compute scores
+  let score = 60;
+  const root = document.documentElement;
+  root?.style.setProperty("$percent", score);
 
   return (
     <div className="wrapper">
@@ -110,20 +114,13 @@ function Popup() {
             {/* General score graphic wheel */}
             <div className="score-graphic">
 
-              <div className="soft-circle">
-                <div className="inside"></div>
-                <div className="key">
-                  <div className="score" id="general-score">65</div>
-                  <div className="percent-symbol">%</div>
+              <div class="pie-wrapper">
+                <span class="label">{score}<span class="smaller">%</span></span>
+                <div class="pie">
+                  <div class="left-side half-circle"></div>
+                  <div class="right-side half-circle"></div>
                 </div>
-                <div className="circle">
-                  <div className="shade left">
-                    <div className="progressing"></div>
-                  </div>
-                  <div className="shade right">
-                    <div className="progressing"></div>
-                  </div>
-                </div>
+                <div class="shadow"></div>
               </div>
 
             </div>

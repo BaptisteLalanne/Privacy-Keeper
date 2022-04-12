@@ -23,7 +23,11 @@ List of actives actions:
 
 ### Trackers
 
-TODO
+For each website, the extension analyses its content, its script to determine if the website try to track you with your digital fingerprints or try to run some unwanted script. 
+
+The extension makes it possible to make you untracable by spoofing your details with randoms one on each website (details configurable). 
+
+It can block pixel script, tracking parameters, beacon requests, individual thresholds (to track you down). Blocking everything might lead into breaking some website. 
 
 ### Popup
 
@@ -43,13 +47,12 @@ In a chromium based browser (i.e.: Chrome), load the folder as an extension. You
 
 Open the settings menu, then go the "Extensions" section. On the top right of the windows, turn on "Developer mode". Then you can click on the "Load unpacked" button, and select the extension folder (root). The cookie extension must appear in your extensions.
 
-## Authors
+## Contributors
 
-Arthur DURAND \
-Tom PERRILLAT-COLLOMB \
-Baptiste LALANNE \
-Loann LARGERON \
-Laetitia DODO \
-David-Marcus TOMA \
-Bastien BARBE \
-Amine LBATH
+
+
+```
+Privacy Keeper Copyright (C) 2022  Bastien BARBE, Arthur DURAND, Laetitia DODO, Baptiste LALANNE, Loann LARGERON, Amine LBATH, Tom PERRILLAT-COLLOMB, David-Marcus TOMA
+This is free software, and you are welcome to redistribute it
+under certain conditions
+```

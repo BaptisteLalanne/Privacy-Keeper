@@ -1,0 +1,80 @@
+.soft-circle {
+    height: var(--general-score-size);
+    width: var(--general-score-size);
+    position: relative;  
+    border-radius: 50%;
+}
+.soft-circle .inside {
+    position: absolute;
+    z-index: 6;
+    top: 50%;
+    left: 50%;
+    height: calc(var(--general-score-size)*var(--general-score-outline));
+    width: calc(var(--general-score-size)*var(--general-score-outline));
+    margin: calc(-1*var(--general-score-size)*var(--general-score-outline)/2)
+            0
+            0
+            calc(-1*var(--general-score-size)*var(--general-score-outline)/2);
+    background: white;
+    border-radius: 100%;
+}
+.soft-circle .key {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 2px;
+    color: black;
+}
+.soft-circle .shade {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background: #eee;
+    border-radius: 100%;
+    clip: rect( 
+            0, 
+            var(--general-score-size), 
+            var(--general-score-size), 
+            calc(var(--general-score-size)/2)
+          );
+}
+.circle .shade .progressing {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    border-radius: 100%;
+    clip: rect(
+            0, 
+            calc(var(--general-score-size)/2), 
+            var(--general-score-size), 
+            0
+          );
+    background: #7DDE6D;
+}
+.circle .left .progressing {
+    z-index: 1;
+    animation: left var(--animation-duration) linear both;
+}
+@keyframes left {
+    100% {
+        transform: rotate(180deg);
+    }
+}
+.circle .right {
+    transform: rotate(180deg);
+    z-index: 3;
+}
+.circle .right .progressing {
+    animation: right var(--animation-duration) cubic-bezier(0.32, 0.29, 0.1, 0.92) both;
+    animation-delay: var(--animation-duration);
+}
+@keyframes right {
+    100% {
+        transform: rotate(54deg);
+    }
+}

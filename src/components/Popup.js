@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './popup.scss';
+
 /*global chrome*/
 function Popup() {
 
@@ -60,38 +61,154 @@ function Popup() {
   const clickIndex = () => {
     console.log("button #popup-db-button clicked");
     chrome.tabs.create({ url: chrome.runtime.getURL("options.html") });
-
   };
 
   const clickAbout = () => {
-
     console.log("button #popup-about clicked");
     chrome.tabs.create({ url: chrome.runtime.getURL("options.html") });
-
   };
 
+  function extractDomain(fullUrl) {
+    return url.replace('http://', '').replace('https://','').split(/[/?#]/)[0];
+  }
 
-  return <div className="app">
-    <p>URL:</p>
-    <p>
-      {url}
-    </p>
-    <div id="counter" className="counter"></div>
-    <div className="button-container">
-      <button id="decrementBtn" className="button" onClick={clickIndex}>Index</button>
-      <button id="incrementBtn" className="button" onClick={clickAbout}>About</button>
-      <button onClick={sendTestMessage}>SEND MESSAGE</button>
+
+  return (
+    <div className="wrapper">
+
+      {/* Top banner */}
+      <div className="top-component">
+        <div className="top-item" onClick={clickAbout}>
+          <i className="bi bi-info-circle"></i>
+        </div>
+        <div className="top-item" onClick={clickIndex}>
+          <i className="bi bi-gear"></i>
+        </div>
+      </div>
+
+      {/* Popup body */}
+      <div className="body-component">
+
+        {/* Name of website */}
+        <div className="body-item" id="website-title">
+          {extractDomain(url)}
+        </div>
+
+        <div className="horizontal-line"></div>
+
+        {/* General score */}
+        <div className="body-item card general-score">
+
+          {/* General score graphic (left side) */}
+          <div className="general-score-left">
+
+            {/* General score graphic label */}
+            <div className="general-score-label">
+              Privacy Score
+            </div>
+
+            {/* General score graphic wheel */}
+            <div className="score-graphic">
+
+              <div className="soft-circle">
+                <div className="inside"></div>
+                <div className="key">
+                  <div className="score" id="general-score">65</div>
+                  <div className="percent-symbol">%</div>
+                </div>
+                <div className="circle">
+                  <div className="shade left">
+                    <div className="progressing"></div>
+                  </div>
+                  <div className="shade right">
+                    <div className="progressing"></div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          {/* General score explanation (right side) */}
+          <div className="general-score-right">
+            This website has some hardware trackers.
+          </div>
+
+        </div>
+
+        {/* Detailed scores */}
+        <div className="body-item card detailed-scores">
+
+          {/* Cookie score */}
+          <div className="detailed-score-item">
+
+            {/* Cookie score graphic wheel (left side) */}
+            <div className="detailed-score-item-left">
+              <div className="score-graphic">
+                <div id="cookie-score">
+                  90%
+                </div>
+              </div>
+            </div>
+
+            {/* Cookie score description (right side) */}
+            <div className="detailed-score-item-right">
+
+              {/* Cookie score title (label + arrow) */}
+              <div className="detailed-score-item-right-top">
+                <div className="detailed-score-label">
+                  Cookie score
+                </div>
+                <i className="bi bi-chevron-down"></i>
+              </div>
+
+              {/* Cookie score details (hidden at first) */}
+              <div className="detailed-score-item-right-details">
+
+              </div>
+
+            </div>
+          </div>
+
+          {/* Tracker score */}
+          <div className="detailed-score-item">
+
+            {/* Tracker score graphic wheel (left side) */}
+            <div className="detailed-score-item-left">
+              <div className="score-graphic">
+                <div id="tracker-score">
+                  40%
+                </div>
+              </div>
+            </div>
+
+            {/* Cookie score description (right side) */}
+            <div className="detailed-score-item-right">
+
+              {/* Tracker score title (label + arrow) */}
+              <div className="detailed-score-item-right-top">
+                <div className="detailed-score-label">
+                  Tracker score
+                </div>
+                <i className="bi bi-chevron-down"></i>
+              </div>
+
+              {/* Tracker score details (hidden at first) */}
+              <div className="detailed-score-item-right-details">
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
     </div>
-
-    <hr className="divider" />
-    <p>Response from content:</p>
-    <p>
-      {responseFromContent}
-    </p>
-    <p className="title">Chrome Extension is Ready!</p>
-    <p className="subtitle">Start by updating <code>popup.html</code></p>
-  </div>
-    ;
+    );
 }
 
 export default Popup;

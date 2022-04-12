@@ -14,11 +14,12 @@
   },
   "action": {
     "default_title": "Open the popup",
-    "default_popup": "index.html"
+    "default_popup": "popup.html"
   },
   "permissions": [
     "storage",  "activeTab"
   ],
+  "options_page": "./options.html",
   "content_scripts": [
     {
       "matches": [

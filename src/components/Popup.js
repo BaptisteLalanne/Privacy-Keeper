@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import './App.scss';
+import './popup.css';
 /*global chrome*/
-function App() {
+function Popup() {
 
   const [url, setUrl] = useState('');
   const [responseFromContent, setResponseFromContent] = useState('');
@@ -59,14 +59,14 @@ function App() {
   // Opening dashboard on button click
   const clickIndex = () => {
     console.log("button #popup-db-button clicked");
-    chrome.tabs.create({ url: chrome.runtime.getURL("dashboard/index.html") });
+    chrome.tabs.create({ url: chrome.runtime.getURL("options.html") });
 
   };
 
   const clickAbout = () => {
 
     console.log("button #popup-about clicked");
-    chrome.tabs.create({ url: chrome.runtime.getURL("dashboard/about.html") });
+    chrome.tabs.create({ url: chrome.runtime.getURL("options.html") });
 
   };
 
@@ -94,4 +94,4 @@ function App() {
     ;
 }
 
-export default App;
+export default Popup;

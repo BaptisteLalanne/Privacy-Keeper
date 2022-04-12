@@ -1,13 +1,13 @@
 .app {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  text-align: center;
-  padding: 20px;
-}
-
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+  }
+  
 .title {
   font-size: 18px;
   font-weight: 600;
@@ -68,4 +68,5 @@ code {
   width: 50px;
   border: .5px dashed #000;
   opacity: .1;
-}
+  }
+  

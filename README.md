@@ -23,11 +23,11 @@ List of actives actions:
 
 ### Trackers
 
-For each website, the extension analyses its content, its script to determine if the website try to track you with your digital fingerprints or try to run some unwanted script. 
+For each website, the extension analyses its content, its scripts to determine if the website try to track you with your digital fingerprint or try to run some unwanted script. 
 
-The extension makes it possible to make you untracable by spoofing your details with randoms one on each website (details configurable). 
+The extension makes it possible to make you untracable by spoofing your details with random ones on each website (configurable details). 
 
-It can block pixel script, tracking parameters, beacon requests, individual thresholds (to track you down). Blocking everything might lead into breaking some website. 
+It can block pixel script, tracking parameters, beacon requests, individual thresholds (to track you down). Blocking everything might lead into breaking some websites. 
 
 ### Popup
 
@@ -39,7 +39,7 @@ As the popup is too small to display all our explanations, a full page dashboard
 
 ## Installation
 
-Download the projet and put in a folder.
+Download the projet and put it in a folder.
 
 In a chromium based browser (i.e.: Chrome), load the folder as an extension. You may have to turn on developer mode on your browser to be able to do so.
 

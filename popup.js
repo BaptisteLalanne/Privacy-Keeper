@@ -34,3 +34,19 @@ document.getElementById("getCookies").addEventListener("click", async function()
 	  }
 	});*/
 });
+
+// Opening dashboard on button click
+document.querySelector("#popup-db-button").addEventListener("click", () => {
+
+	console.log("button #popup-db-button clicked");
+	chrome.tabs.create({ url: chrome.runtime.getURL("dashboard/index.html") });
+
+});
+
+// Opening "about" page on button click
+document.querySelector("#popup-about").addEventListener("click", () => {
+
+	console.log("button #popup-about clicked");
+	chrome.tabs.create({ url: chrome.runtime.getURL("dashboard/about.html") });
+
+});

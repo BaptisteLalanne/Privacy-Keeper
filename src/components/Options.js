@@ -6,7 +6,7 @@ import {
     Link,
     Redirect
 } from "react-router-dom";
-import "./options.css";
+import "./options.scss";
 import Popup from './Popup.js';
 import Foreground from './Foreground.js';
 

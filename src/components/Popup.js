@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './popup.css';
+import './popup.scss';
 /*global chrome*/
 function Popup() {
 

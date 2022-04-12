@@ -4,6 +4,9 @@
   "version": "1.0",
   "manifest_version": 3,
   "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
   "permissions": ["cookies"],
   "action": {
     "default_popup": "popup.html",

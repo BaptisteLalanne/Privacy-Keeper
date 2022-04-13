@@ -7,12 +7,6 @@
   "background": {
     "service_worker": "background.js"
   },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content-script.js"]
-    }
-  ],
   "permissions": ["cookies", "tabs", "scripting", "storage", "unlimitedStorage"],
   "action": {
     "default_popup": "popup.html",

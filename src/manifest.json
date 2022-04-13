@@ -17,7 +17,7 @@
     "default_popup": "popup.html"
   },
   "permissions": [
-    "storage",  "activeTab", "scripting"
+    "storage",  "activeTab", "scripting", "unlimitedStorage", "cookies", "tabs"
   ],
   "options_page": "./options.html"
 }

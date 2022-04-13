@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from 'react';
+import { styled } from '@mui/material/styles';
+import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
+import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
+import MuiAccordionSummary, {
+  AccordionSummaryProps,
+} from '@mui/material/AccordionSummary';
+import MuiAccordionDetails from '@mui/material/AccordionDetails';
+import Typography from '@mui/material/Typography';
 import './popup.scss';
 
-/*global chrome*/
+/* global chrome */
 function Popup() {
 
   const [url, setUrl] = useState('');
@@ -42,11 +50,44 @@ function Popup() {
     });
   };
 
-
-  /**
-   * Get current URL
-   * UseEffect is a hook, ask BaptisteLalanne
-   */
+  // Collapsable items
+  const Accordion = styled((props) => (
+    <MuiAccordion disableGutters elevation={0} square {...props} />
+  ))(({ theme }) => ({
+    border: `1px solid ${theme.palette.divider}`,
+    '&:not(:last-child)': {
+      borderBottom: 0,
+    },
+    '&:before': {
+      display: 'none',
+    },
+  }));
+  
+  const AccordionSummary = styled((props) => (
+    <MuiAccordionSummary
+      expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: '0.9rem' }} />}
+      {...props}
+    />
+  ))(({ theme }) => ({
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, .05)'
+        : 'rgba(0, 0, 0, .03)',
+    flexDirection: 'row-reverse',
+    '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
+      transform: 'rotate(90deg)',
+    },
+    '& .MuiAccordionSummary-content': {
+      marginLeft: theme.spacing(1),
+    },
+  }));
+  
+  const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
+    padding: theme.spacing(2),
+    borderTop: '1px solid rgba(0, 0, 0, .125)',
+  }));
+  
+  // Get current URL (UseEffect is a hook, ask BaptisteLalanne)
   useEffect(() => {
     const queryInfo = { active: true, lastFocusedWindow: true };
 
@@ -56,18 +97,24 @@ function Popup() {
     });
   }, []);
 
+  // Handle click on collapsable items
+  const [expanded, setExpanded] = React.useState<string | false>('panel1');
+  const handleChange =
+    (panel) => (event, newExpanded) => {
+      setExpanded(newExpanded ? panel : false);
+    };
 
-  // Opening dashboard on button click
+  // Opening dashboard on button clicks
   const clickIndex = () => {
     console.log("button #popup-db-button clicked");
     chrome.tabs.create({ url: chrome.runtime.getURL("options.html") });
   };
-
   const clickAbout = () => {
     console.log("button #popup-about clicked");
     chrome.tabs.create({ url: chrome.runtime.getURL("options.html") });
   };
 
+  // Extract domain from URL
   function extractDomain(fullUrl) {
     return url.replace('http://', '').replace('https://','').split(/[/?#]/)[0];
   }
@@ -138,67 +185,71 @@ function Popup() {
         <div className="body-item card detailed-scores">
 
           {/* Cookie score */}
-          <div className="detailed-score-item">
+          <Accordion expanded={expanded === 'cookieScoreAccordion'} onChange={handleChange('cookieScoreAccordion')}>
+            
+            {/* Header */}
+            <AccordionSummary aria-controls="cookieScoreAccordion-content" id="cookieScoreAccordion-header" className="detailed-score-header">
 
-            {/* Cookie score graphic wheel (left side) */}
-            <div className="detailed-score-item-left">
-              <div className="score-graphic">
-                <div id="cookie-score">
-                  90%
+              {/* Cookie score graphic wheel (left side) */}
+              <div className="detailed-score-header-graphic">
+                <div className="score-graphic">
+                  <div id="cookie-score">
+                    90%
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Cookie score description (right side) */}
-            <div className="detailed-score-item-right">
-
-              {/* Cookie score title (label + arrow) */}
-              <div className="detailed-score-item-right-top">
-                <div className="detailed-score-label">
+              {/* Cookie score label */}
+              <div className="detailed-score-header-label">
                   Cookie score
-                </div>
-                <i className="bi bi-chevron-down"></i>
               </div>
 
-              {/* Cookie score details (hidden at first) */}
-              <div className="detailed-score-item-right-details">
+            </AccordionSummary>
 
-              </div>
+            {/* Content */}
+            <AccordionDetails className="detailed-score-contents">
+              <Typography>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+                malesuada lacus ex, sit amet blandit leo lobortis eget. Lorem ipsum dolor
+                sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
+                sit amet blandit leo lobortis eget.
+              </Typography>
+            </AccordionDetails>
 
-            </div>
-          </div>
+          </Accordion>
 
           {/* Tracker score */}
-          <div className="detailed-score-item">
+          <Accordion expanded={expanded === 'trackerScoreAccordion'} onChange={handleChange('trackerScoreAccordion')}>
 
-            {/* Tracker score graphic wheel (left side) */}
-            <div className="detailed-score-item-left">
-              <div className="score-graphic">
-                <div id="tracker-score">
-                  40%
+            {/* Header */}
+            <AccordionSummary aria-controls="trackerScoreAccordion-content" id="trackerScoreAccordion-header" className="detailed-score-header">
+              
+              {/* Tracker score graphic wheel (left side) */}
+              <div className="detailed-score-header-graphic">
+                <div className="score-graphic">
+                  <div id="tracker-score">
+                    30%
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Cookie score description (right side) */}
-            <div className="detailed-score-item-right">
-
-              {/* Tracker score title (label + arrow) */}
-              <div className="detailed-score-item-right-top">
-                <div className="detailed-score-label">
+              {/* Tracker score label */}
+              <div className="detailed-score-header-label">
                   Tracker score
-                </div>
-                <i className="bi bi-chevron-down"></i>
               </div>
 
-              {/* Tracker score details (hidden at first) */}
-              <div className="detailed-score-item-right-details">
+            </AccordionSummary>
 
-              </div>
+            <AccordionDetails>
+              <Typography className="detailed-score-contents">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+                malesuada lacus ex, sit amet blandit leo lobortis eget. Lorem ipsum dolor
+                sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
+                sit amet blandit leo lobortis eget.
+              </Typography>
+            </AccordionDetails>
 
-            </div>
-
-          </div>
+          </Accordion>
 
         </div>
 
@@ -209,3 +260,52 @@ function Popup() {
 }
 
 export default Popup;
+
+
+export function CustomizedAccordions() {
+  
+
+  return (
+    <div>
+      <Accordion expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
+        <AccordionSummary aria-controls="panel1d-content" id="panel1d-header">
+          <Typography>Collapsible Group Item #1</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+            malesuada lacus ex, sit amet blandit leo lobortis eget. Lorem ipsum dolor
+            sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
+            sit amet blandit leo lobortis eget.
+          </Typography>
+        </AccordionDetails>
+      </Accordion>
+      <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')}>
+        <AccordionSummary aria-controls="panel2d-content" id="panel2d-header">
+          <Typography>Collapsible Group Item #2</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+            malesuada lacus ex, sit amet blandit leo lobortis eget. Lorem ipsum dolor
+            sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
+            sit amet blandit leo lobortis eget.
+          </Typography>
+        </AccordionDetails>
+      </Accordion>
+      <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
+        <AccordionSummary aria-controls="panel3d-content" id="panel3d-header">
+          <Typography>Collapsible Group Item #3</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+            malesuada lacus ex, sit amet blandit leo lobortis eget. Lorem ipsum dolor
+            sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
+            sit amet blandit leo lobortis eget.
+          </Typography>
+        </AccordionDetails>
+      </Accordion>
+    </div>
+  );
+}

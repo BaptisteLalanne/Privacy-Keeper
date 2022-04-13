@@ -121,31 +121,14 @@
     flex-direction: column;
 }
 
-.detailed-score-item {
-    box-sizing: border-box;
-    padding: 6px;
+.detailed-score-header {
     display: flex;
     flex-direction: row;
     gap: 6px;
 }
 
-.detailed-score-item-right {
-    flex-grow: 4;
-}
-
-.detailed-score-item-right-top {
-    display: flex;
-    flex-direction: row;
-    gap: 6px;
-}
-
-.detailed-score-item-right-top > i {
-    cursor: pointer;
-}
-.detailed-score-item-right-top > i:hover {
-    color: #919191
-}
-
-.detailed-score-item-right-details {
-    display: none;
+.detailed-score-header-label {
+    font-weight: bold;
+    font-size: 1.05em;
+    white-space: nowrap;
 }

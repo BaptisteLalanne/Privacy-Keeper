@@ -1,42 +1,50 @@
 @import "./common.scss";
 @import "./score-wheel.scss";
 
-:root {
-    --header-size: 1.5em;
-    --general-score-size: 75px;
-    --detailed-score-size: 50px;
-    --general-score-outline: 0.8;
+$font-size: 16px;
+$header-size: 18px;
+$general-score-size: 75px;
+$detailed-score-size: 50px;
+$general-score-outline: 0.8;
+$cookieScore: 100;
+$trackerScore: 100;
+
+body {
+    background-color: #f8f8f8;
+}
+body::-webkit-scrollbar { 
+    width: 0;
+    height: 0;
 }
 
 .wrapper {
-    width: 24em;
-    height: 28em;
+    width: 400px;
+    height: max-content;
     display: flex;
     flex-direction: column;
     font-family: interFont;
-    gap: 14px;
-    background-color: #f3f3f3;
+    gap: calc(0.875*$font-size);
     box-sizing: border-box;
-    padding: 1em;
+    padding: $font-size;
 }
 
 .top-component {
     width: 100%;
-    height: var(--header-size);
+    height: $header-size;
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
 }
 
 .top-item {
-    width: var(--header-size);
+    width: $header-size;
     margin: 0px 4px;
     cursor: pointer;
 }
 
 .top-item > i {
     line-height: 0;
-    font-size: var(--header-size);
+    font-size: $header-size;
     color: #2c2c2c;
 }
 
@@ -48,7 +56,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: calc(0.75*$font-size);
 }
 
 .body-item {
@@ -61,7 +69,7 @@
     border-radius: 5px;
     box-shadow: 1px 1px 4px #cccccc;
     box-sizing: border-box;
-    padding: 1em;
+    padding: $font-size;
 }
 
 .horizontal-line {
@@ -71,7 +79,7 @@
 }
 
 #website-title {
-    font-size: 1.5em;
+    font-size: calc(1.25*$font-size);
     text-align: center;
     font-weight: bold;
 }
@@ -79,7 +87,7 @@
 .general-score {
     display: flex;
     flex-direction: row;
-    gap: 18px;
+    gap: calc(1.125*$font-size);
 }
 
 .general-score-left {
@@ -88,12 +96,16 @@
     padding: 0;
 }
 
+.general-score-right {
+    font-size: calc(0.9*$font-size);
+}
+
 .general-score-label {
     font-weight: bold;
-    font-size: 1.05em;
+    font-size: calc(1.01*$font-size);
     text-align: center;
     white-space: nowrap;
-    margin-bottom: 0.75em;
+    margin-bottom: calc(0.75*$font-size);
 }
 
 .score-graphic {
@@ -105,12 +117,6 @@
     font-family: oswaldFont;
     line-height: 0;
 }
-#general-score {
-    font-size: 2.2em;
-}
-.percent-symbol {
-    font-size: 1.4em;
-}
 
 .general-score-right {
     margin: auto;
@@ -121,14 +127,46 @@
     flex-direction: column;
 }
 
-.detailed-score-header {
+.detailed-score-header-graphic {
+
+    .label {
+
+        font-family: oswaldFont;
+        font-weight: bold;
+        text-align: center;
+        display: block;
+        font-size: 1.6*$font-size;
+
+        .smaller {
+            font-size: (1.6*$font-size)*0.4;
+            padding-bottom: $font-size*0.7;
+            vertical-align: super;
+        }
+    
+    }
+
+    #tracker-score {
+        color: mix($posColor, $negColor, $trackerScore);
+    }
+    #cookie-score {
+        color: mix($posColor, $negColor, $cookieScore);
+    }
+
+}
+
+.detailed-score-header-label {
+    font-weight: bold;
+    font-size: calc(1.01*$font-size);
+    white-space: nowrap;
+    margin: auto 0.5*$font-size;
+}
+
+.MuiAccordionSummary-content {
     display: flex;
     flex-direction: row;
     gap: 6px;
 }
 
-.detailed-score-header-label {
-    font-weight: bold;
-    font-size: 1.05em;
-    white-space: nowrap;
+.Mui-expanded:before {
+    opacity: 1 !important;
 }

@@ -1,12 +1,13 @@
 // -- vars
-$default-size: 6em;
+$font-size: 16px;
+$default-size: 5.5 * $font-size;
 $default-outline: 10;
 $label-font-size: $default-size * 0.42;
-$label-font-size-redo: $default-size * 0.38;
+$label-font-size-redo: $default-size * 1;
 $posColor: #7DDE6D;
 $negColor: #e2370c;
-$percent: 60;
-$animation-duration: 500ms;
+$score: 60;
+$animation-duration: 1s;
 $animation-ease: cubic-bezier(0.32, 0.29, 0.1, 0.92);
 
 @mixin size($width, $height) {
@@ -51,11 +52,9 @@ $animation-ease: cubic-bezier(0.32, 0.29, 0.1, 0.92);
 
     .label {
 
-        background: none;
         border-radius: 50%;
         text-align: center;
         color: black;
-        cursor: default;
         display: block;
         position: absolute;
         font-size: $label-font-size;
@@ -65,8 +64,7 @@ $animation-ease: cubic-bezier(0.32, 0.29, 0.1, 0.92);
         top: $label-font-size-redo / $default-outline;
 
         .smaller {
-            color: black;
-            font-size: .45em;
+            font-size: $label-font-size*0.4;
             padding-bottom: 20px;
             vertical-align: super;
         }
@@ -84,11 +82,9 @@ $animation-ease: cubic-bezier(0.32, 0.29, 0.1, 0.92);
 .left-side {
     animation: left-side-progression $animation-duration $animation-ease both;
 }
-
 .right-side {
     animation: right-side-progression $animation-duration $animation-ease both; 
 }
-
 .pie {
     animation: pie-progression $animation-duration $animation-ease both;
 }
@@ -98,7 +94,7 @@ $animation-ease: cubic-bezier(0.32, 0.29, 0.1, 0.92);
         clip: rect(auto, auto, auto, auto);
     }
     100% {
-        @if $percent > 50 {
+        @if $score > 50 {
           clip: rect(auto, auto, auto, auto);
         }
 
@@ -111,13 +107,13 @@ $animation-ease: cubic-bezier(0.32, 0.29, 0.1, 0.92);
         border-color: $posColor;
     }
     100% {
-        @if $percent <= 50 {
+        @if $score <= 50 {
             display: none;
         }
         @else {
             transform: rotate(180deg);
         }
-        border-color: mix($posColor, $negColor, $percent);
+        border-color: mix($posColor, $negColor, $score);
     }
 }
 
@@ -127,7 +123,7 @@ $animation-ease: cubic-bezier(0.32, 0.29, 0.1, 0.92);
         border-color: $posColor;
     }
     100% {
-        transform: rotate($percent * 3.6deg);
-        border-color: mix($posColor, $negColor, $percent);
+        transform: rotate($score * 3.6deg);
+        border-color: mix($posColor, $negColor, $score);
     }
 }

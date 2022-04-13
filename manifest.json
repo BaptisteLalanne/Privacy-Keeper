@@ -13,7 +13,7 @@
       "js": ["content-script.js"]
     }
   ],
-  "permissions": ["cookies", "tabs", "scripting", "storage"],
+  "permissions": ["cookies", "tabs", "scripting", "storage", "unlimitedStorage"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {

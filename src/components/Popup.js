@@ -6,6 +6,11 @@ function Popup() {
   const [url, setUrl] = useState('');
   const [responseFromContent, setResponseFromContent] = useState('');
 
+  chrome.storage.sync.get(['beacons'], function(result) {
+    console.log(result);
+    console.log('[EXTENSION] beacons value is ' + result.beacons);
+  });
+
   /**
    * Listen to chrome.runtime messages
    */

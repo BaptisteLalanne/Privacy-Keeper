@@ -1,21 +1,21 @@
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+chrome.tabs.onActivated.addListener(function (tabId, changeInfo, tab) {
     console.log("[BACKGROUND] Tab updated");
-    if (changeInfo.status === 'complete' && tab.url) {
-        console.log("[BACKGROUND] Active tab");
-        chrome.scripting.executeScript({
-            target: { tabId: tabId },
-            function: injectMe
-        });
-    }
+    chrome.scripting.executeScript({
+        target: { tabId: tabId },
+        function: injectMe
+    });
 })
+
 
 // Background listener
 chrome.runtime.onConnect.addListener(function (port) {
     console.log("[BACKGROUND] Port name: " + port.name);
     port.onMessage.addListener(function (msg) {
         switch (port.name) {
-            case "truc":
-                console.log("[BACKGROUND] received : " + msg.answer)
+            case "beacons":
+                console.log("[BACKGROUND] received nb beacons: " + msg.nb)
+                // save nb beacons
+                chrome.storage.sync.set({ beacons : msg.nb });
                 break;
         }
     });
@@ -42,8 +42,8 @@ const injectMe = () => {
     }
     console.log("Nb of beacons found: " + nbBeacon);
 
-    let port = chrome.runtime.connect({ name: "truc" });
-    port.postMessage({ answer: "yo" });
+    let port = chrome.runtime.connect({ name: "beacons" });
+    port.postMessage({ nb: nbBeacon });
     /*
     port.onMessage.addListener(function (msg) {
         console.log("[EXTENSIONS] Response: " + msg.answer);

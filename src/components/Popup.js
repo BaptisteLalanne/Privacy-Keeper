@@ -7,6 +7,18 @@ function Popup() {
   const [responseFromContent, setResponseFromContent] = useState('');
 
   /**
+   * Listen to chrome.runtime messages
+   */
+  chrome.runtime.onMessage.addListener(
+    function (request, sender, sendResponse) {
+      console.log("[EXTENSION] received")
+      if (request.function === "handleResultBeacon")
+        sendResponse("Popup received message from handleResultBeacon");
+    }
+  );
+
+
+  /**
    * Send message to the content script
    */
   const sendTestMessage = () => {

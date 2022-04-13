@@ -17,7 +17,11 @@
     "default_popup": "popup.html"
   },
   "permissions": [
-    "storage",  "activeTab"
+    "storage",  "activeTab", "scripting", "tabs"
+  ],
+  "host_permissions": [
+    "<all_urls>",
+    "*://*.google.com/"
   ],
   "options_page": "./options.html",
   "content_scripts": [

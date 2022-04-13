@@ -83,6 +83,7 @@ module.exports = {
                 { from: 'src/background.js', to: '[name].[ext]' },
                 { from: 'src/contentScript.js', to: '[name].[ext]' },
                 { from: 'src/inject_script.js', to: '[name].[ext]' },
+                { from: 'src/injectTrackerAnnalyser.js', to: '[name].[ext]' },
                 { from: 'src/icons/*.png', to: 'icons/[name].[ext]' }
             ]
         }),

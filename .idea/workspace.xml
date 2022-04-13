@@ -2,40 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="dfc9e4b9-e6e9-4ddc-ba1a-edd999d27f2f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.babelrc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.github/workflows/ci.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LICENSE.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/background.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/Foreground.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/Options.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/Popup.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/common.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/options.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/popup.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/foreground.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/icons/icon_128.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/icons/icon_16.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/icons/icon_32.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/icons/icon_48.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/index-foreground.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/index-options.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/index-popup.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/inject_script.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/options.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/popup.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webpack.config.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/get_started128.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/get_started16.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/get_started32.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/get_started48.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/popup.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/popup.js" beforeDir="false" afterPath="$PROJECT_DIR$/popup.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webpack.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/webpack.config.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,6 +28,7 @@
     "WebServerToolWindowFactoryState": "false",
     "last_opened_file_path": "/home/bastien/Bureau/cookie-extension",
     "nodejs_package_manager_path": "npm",
+    "ts.external.directory.path": "/snap/webstorm/254/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>

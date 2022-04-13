@@ -81,7 +81,6 @@ module.exports = {
             patterns: [
                 { from: 'src/manifest.json', to: '[name].[ext]' },
                 { from: 'src/background.js', to: '[name].[ext]' },
-                { from: 'src/contentScript.js', to: '[name].[ext]' },
                 { from: 'src/inject_script.js', to: '[name].[ext]' },
                 { from: 'src/icons/*.png', to: 'icons/[name].[ext]' }
             ]

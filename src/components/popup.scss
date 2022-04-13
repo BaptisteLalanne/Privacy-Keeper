@@ -6,8 +6,7 @@ $header-size: 18px;
 $general-score-size: 75px;
 $detailed-score-size: 50px;
 $general-score-outline: 0.8;
-$cookieScore: 100;
-$trackerScore: 100;
+
 
 body {
     background-color: #f8f8f8;
@@ -84,7 +83,7 @@ body::-webkit-scrollbar {
     font-weight: bold;
 }
 
-.general-score {
+.general-score-container {
     display: flex;
     flex-direction: row;
     gap: calc(1.125*$font-size);
@@ -125,6 +124,7 @@ body::-webkit-scrollbar {
 .detailed-scores {
     display: flex;
     flex-direction: column;
+    padding: 0 !important;
 }
 
 .detailed-score-header-graphic {
@@ -145,13 +145,6 @@ body::-webkit-scrollbar {
     
     }
 
-    #tracker-score {
-        color: mix($posColor, $negColor, $trackerScore);
-    }
-    #cookie-score {
-        color: mix($posColor, $negColor, $cookieScore);
-    }
-
 }
 
 .detailed-score-header-label {
@@ -169,4 +162,14 @@ body::-webkit-scrollbar {
 
 .Mui-expanded:before {
     opacity: 1 !important;
+    
+}
+
+.MuiAccordion-root:before {
+    left: $font-size !important;
+    right: $font-size !important;
+}
+
+.MuiTypography-root {
+    font-size: 0.9*$font-size !important;
 }

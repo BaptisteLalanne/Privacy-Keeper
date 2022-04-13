@@ -3,95 +3,114 @@ import MuiAccordion from '@mui/material/Accordion';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
-import style from './popup.scss';
+import './popup.scss';
+
+// Opening dashboard on button clicks
+function clickIndex() {
+  console.log("button #popup-db-button clicked");
+  chrome.tabs.create({ url: chrome.runtime.getURL("options.html") });
+}
+function clickAbout() {
+  console.log("button #popup-about clicked");
+  chrome.tabs.create({ url: chrome.runtime.getURL("options.html") });
+}
+
+// Extract domain from URL
+function extractDomain(fullUrl) {
+  return fullUrl.replace('http://', '').replace('https://', '').split(/[/?#]/)[0];
+}
+
+// Mix colors
+function hexToRgb(hex) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  if (result) {
+    let r = parseInt(result[1], 16);
+    let g = parseInt(result[2], 16);
+    let b = parseInt(result[3], 16);
+    return [r, g, b];
+  }
+  return null;
+}
+function mixColors(colorA, colorB, amount) {
+  let rgbA = hexToRgb(colorA);
+  let rgbB = hexToRgb(colorB);
+  let r = rgbA[0] * amount + rgbB[0] * (1 - amount);
+  let g = rgbA[1] * amount + rgbB[1] * (1 - amount);
+  let b = rgbA[2] * amount + rgbB[2] * (1 - amount);
+  return "rgb(" + r + "," + g + "," + b + ")";
+}
+
+// Update CSS
+function updateCSS(node, score, cookieScore, trackerScore) {
+
+  // Vars
+  let posColor = "#7DDE6D";
+  let negColor = "#fd6500"; 
+  let doc = node.ownerDocument;
+
+  // Update cookie score color
+  doc.getElementById("cookie-score").style.color = mixColors(posColor, negColor, cookieScore / 100);
+
+  // Update tracker score color
+  doc.getElementById("tracker-score").style.color = mixColors(posColor, negColor, trackerScore / 100);
+
+  // Update global score (configure final keyframe)
+  doc.documentElement.style.setProperty('--initial-wheel-color', (score <= 50) ? negColor : posColor);
+  doc.documentElement.style.setProperty('--final-wheel-color', mixColors(posColor, negColor, score / 100));
+  doc.documentElement.style.setProperty('--final-wheel-angle', 'rotate(' + score * 3.6 + 'deg)');
+
+  // Add animation classes
+  let animation = "animate-" + ((score <= 50) ? "small" : "big");
+  doc.getElementsByClassName("left-side")[0].classList.add(animation);
+  doc.getElementsByClassName("right-side")[0].classList.add(animation);
+  doc.getElementsByClassName("pie")[0].classList.add(animation);
+
+}
 
 /* global chrome */
 function Popup() {
 
+  let wrapperRef = React.createRef();
+
   const [url, setUrl] = useState('');
-  const [responseFromContent, setResponseFromContent] = useState('');
+  let [score, setScore] = useState('');
+  let [cookieScore, setCookieScore] = useState('');
+  let [trackerScore, setTrackerScore] = useState('');
 
-  /**
-   * Send message to the content script
-   */
-  const sendTestMessage = () => {
-    const message = {
-      message: "Hello from React",
-    }
-
-    const queryInfo = {
-      active: true,
-      currentWindow: true
-    };
-
-    /**
-     * We can't use "chrome.runtime.sendMessage" for sending messages from React.
-     * For sending messages from React we need to specify which tab to send it to.
-     */
-    chrome.tabs && chrome.tabs.query(queryInfo, tabs => {
-      const currentTabId = tabs[0].id;
-      /**
-       * Sends a single message to the content script(s) in the specified tab,
-       * with an optional callback to run when a response is sent back.
-       *
-       * The runtime.onMessage event is fired in each content script running
-       * in the specified tab for the current extension.
-       */
-      chrome.tabs.sendMessage(
-        currentTabId,
-        message,
-        (response) => {
-          setResponseFromContent(response);
-        });
-    });
-  };
-
-  // Get current URL (UseEffect is a hook, ask BaptisteLalanne)
+  // Main Hook
   useEffect(() => {
+
+    // Fetch URL
     const queryInfo = { active: true, lastFocusedWindow: true };
     chrome.tabs && chrome.tabs.query(queryInfo, tabs => {
       const url = tabs[0].url;
       setUrl(url);
-      // Update CSS
-      const root = document.documentElement;
-      root?.style.setProperty("--score", score);
-      root?.style.setProperty("--cookieScore", cookieScore);
-      root?.style.setProperty("--trackerScore", trackerScore);
     });
+
+    // Fetch scores from storage
+    cookieScore = 80;
+    trackerScore = 40;
+    score = Math.min(cookieScore, trackerScore);
+
+    // Save score states
+    setScore(score);
+    setCookieScore(cookieScore);
+    setTrackerScore(trackerScore);
+
+    // Update CSS
+    updateCSS(wrapperRef.current, score, cookieScore, trackerScore);
+
   }, []);
 
   // Handle click on collapsable items
-  const [expanded, setExpanded] = React.useState('panel1');
-  const handleChange =
-    (panel) => (event, newExpanded) => {
-      setExpanded(newExpanded ? panel : false);
-    };
-
-  // Opening dashboard on button clicks
-  const clickIndex = () => {
-    console.log("button #popup-db-button clicked");
-    chrome.tabs.create({ url: chrome.runtime.getURL("options.html") });
+  const [expanded, setExpanded] = React.useState('');
+  const handleChange = (panel) => (event, newExpanded) => {
+    setExpanded(newExpanded ? panel : false);
   };
-  const clickAbout = () => {
-    console.log("button #popup-about clicked");
-    chrome.tabs.create({ url: chrome.runtime.getURL("options.html") });
-  };
-
-  // Extract domain from URL
-  function extractDomain(fullUrl) {
-    return url.replace('http://', '').replace('https://', '').split(/[/?#]/)[0];
-  }
-
-  // Compute scores
-  let score = 60;
-  let cookieScore = 90;
-  let trackerScore = 30;
-
-  
 
   return (
     <>
-      <div className="wrapper">
+      <div className="wrapper" ref={wrapperRef}>
 
         {/* Top banner */}
         <div className="top-component">
@@ -108,13 +127,13 @@ function Popup() {
 
           {/* Name of website */}
           <div className="body-item" id="website-title">
-            {extractDomain(url)}
+            {extractDomain(url) || "This website"}
           </div>
 
           <div className="horizontal-line"></div>
 
           {/* General score */}
-          <div className="body-item card general-score">
+          <div className="body-item card general-score-container">
 
             {/* General score graphic (left side) */}
             <div className="general-score-left">
@@ -128,7 +147,7 @@ function Popup() {
               <div className="score-graphic">
 
                 <div className="pie-wrapper">
-                  <span className="label">{score}<span className="smaller">%</span></span>
+                  <span className="label" id="general-score">{score}<span className="smaller">%</span></span>
                   <div className="pie">
                     <div className="left-side half-circle"></div>
                     <div className="right-side half-circle"></div>

@@ -5,10 +5,6 @@
 name: Build Bundle
 on:
   push:
-    branches:
-      - source
-on:
-  push:
     branches: [ main ]
   pull_request:
     branches: [ main ]

@@ -1,13 +1,16 @@
 // -- vars
+:root {
+    --final-wheel-angle: transform(0deg);
+    --final-wheel-color: white;
+    --initial-wheel-color: white;
+}
+
 $font-size: 16px;
 $default-size: 5.5 * $font-size;
 $default-outline: 10;
 $label-font-size: $default-size * 0.42;
 $label-font-size-redo: $default-size * 1;
-$posColor: #7DDE6D;
-$negColor: #e2370c;
-$score: 60;
-$animation-duration: 1s;
+$animation-duration: 0.6s;
 $animation-ease: cubic-bezier(0.32, 0.29, 0.1, 0.92);
 
 @mixin size($width, $height) {
@@ -79,51 +82,55 @@ $animation-ease: cubic-bezier(0.32, 0.29, 0.1, 0.92);
 
 }
 
-.left-side {
-    animation: left-side-progression $animation-duration $animation-ease both;
+.left-side.animate-big {
+    animation: left-side-progression-big $animation-duration $animation-ease both;
 }
-.right-side {
-    animation: right-side-progression $animation-duration $animation-ease both; 
+.right-side.animate-big {
+    animation: right-side-progression-big $animation-duration $animation-ease both; 
 }
-.pie {
-    animation: pie-progression $animation-duration $animation-ease both;
-}
-
-@keyframes pie-progression {
-    0% {
-        clip: rect(auto, auto, auto, auto);
-    }
-    100% {
-        @if $score > 50 {
-          clip: rect(auto, auto, auto, auto);
-        }
-
-    }
+.pie.animate-big {
+    clip: rect(auto, auto, auto, auto);
 }
 
-@keyframes right-side-progression {
+.left-side.animate-small {
+    animation: left-side-progression-small $animation-duration $animation-ease both;
+}
+.right-side.animate-small {
+    display: none;
+}
+.pie.animate-small {
+    clip: rect(0, $default-size, $default-size, $default-size/2);
+}
+
+@keyframes right-side-progression-big {
     0% {
         transform: rotate(180deg);
-        border-color: $posColor;
+        border-color: var(--initial-wheel-color);
     }
     100% {
-        @if $score <= 50 {
-            display: none;
-        }
-        @else {
-            transform: rotate(180deg);
-        }
-        border-color: mix($posColor, $negColor, $score);
+        transform: rotate(180deg);
+        border-color: var(--final-wheel-color);
     }
 }
 
-@keyframes left-side-progression {
+@keyframes left-side-progression-big {
     0% {
         transform: rotate(360deg);
-        border-color: $posColor;
+        border-color: var(--initial-wheel-color);
     }
     100% {
-        transform: rotate($score * 3.6deg);
-        border-color: mix($posColor, $negColor, $score);
+        transform: var(--final-wheel-angle);
+        border-color: var(--final-wheel-color);
+    }
+}
+
+@keyframes left-side-progression-small {
+    0% {
+        transform: rotate(0deg);
+        border-color: var(--initial-wheel-color);
+    }
+    100% {
+        transform: var(--final-wheel-angle);
+        border-color: var(--final-wheel-color);
     }
 }

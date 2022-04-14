@@ -5,9 +5,9 @@ import Histogram from './Histogram.js';
 
 function Dashboard() {
     return (
-        <div className="main-wrapper">
+        <div className="main">
             <h1 className="title">Dashboard</h1>
-            <div id="histogram"></div>
+            <Histogram />
         </div>
     )
 }

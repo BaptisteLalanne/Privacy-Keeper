@@ -8,7 +8,7 @@ import {
 } from "react-router-dom";
 import "./options.scss";
 import Popup from './Popup.js';
-import Foreground from './Foreground.js';
+import Dashboard from './Dashboard.js';
 
 function Options() {
     return (
@@ -43,7 +43,7 @@ function Options() {
                                 <Link to="/popup">Popup</Link>
                             </li>
                             <li>
-                                <Link to="/foreground">Foreground</Link>
+                                <Link to="/dashboard">Dashboard</Link>
                             </li>
                         </ul>
                     </nav>
@@ -52,8 +52,8 @@ function Options() {
                     <Route exact path="/popup">
                         <Popup />
                     </Route>
-                    <Route exact path="/foreground">
-                        <Foreground />
+                    <Route exact path="/dashboard">
+                        <Dashboard />
                     </Route>
                     <Route exact path="/">
                         <Redirect to="/options.html" />

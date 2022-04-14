@@ -14,7 +14,7 @@ module.exports = {
     entry: {
         popup: path.resolve(__dirname, "./src/index-popup.js"),
         options: path.resolve(__dirname, "./src/index-options.js"),
-        foreground: path.resolve(__dirname, "./src/index-foreground.js")
+        dashboard: path.resolve(__dirname, "./src/index-dashboard.js")
     },
     output: {
         filename: '[name].bundle.js',
@@ -77,9 +77,9 @@ module.exports = {
             chunks: ['options']
         }),
         new HtmlWebpackPlugin({
-            filename: 'foreground.html',
-            template: 'src/foreground.html',
-            chunks: ['foreground']
+            filename: 'dashboard.html',
+            template: 'src/dashboard.html',
+            chunks: ['dashboard']
         }),
         new CopyWebpackPlugin({
             patterns: [

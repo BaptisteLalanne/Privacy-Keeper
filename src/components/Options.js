@@ -1,11 +1,4 @@
-import React from 'react';
-import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
-    Link,
-    Redirect
-} from "react-router-dom";
+import React, { useEffect, useState } from 'react';
 import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -19,76 +12,81 @@ import Foreground from './Foreground.js';
 import "./options.scss";
 
 function Options() {
+
+    const itemList = [
+        "Dashboard",
+        "Learn more",
+        "Controls",
+        "Settings",
+        "About us"
+    ]
+
+    let [currentComponent, setCurrentComponent] = useState(0);
+
     return (
-        <Router>
-            <div className="main-wrapper">
+        <div className="main-wrapper">
 
-                {/* Navigation bar */}
-                <div className="nav-bar">
+            {/* Navigation bar */}
+            <div className="nav-bar">
 
-                    {/* Title and logo */}
-                    <div className="header">
+                {/* Title and logo */}
+                <div className="header">
 
-                        <div className="logo">
-                            <img src="../icons/icon_128.png"></img>
-                        </div>
-
-                        <div className="title">
-                            Privacy Keeper
-                        </div>
-
+                    <div className="logo">
+                        <img src="../icons/icon_128.png"></img>
                     </div>
 
-                    <Divider />
-
-                    {/* Navigation items */}
-                    <List>
-
-                        <ListItem button key="Dashboard">
-                            <div className="nav-icon"><SpeedIcon/></div>
-                            <Link to="/" className="nav-item">Dashboard</Link>
-                        </ListItem>
-                        <ListItem button key="Learn more">
-                            <div className="nav-icon"><MenuBookIcon/></div>
-                            <Link to="/learn-more" className="nav-item">Learn more</Link>
-                        </ListItem>
-                        <ListItem button key="Controls">
-                            <div className="nav-icon"><BuildIcon/></div>
-                            <Link to="/controls" className="nav-item">Controls</Link>
-                        </ListItem>
-                        <ListItem button key="Settings">
-                            <div className="nav-icon"><SettingsIcon/></div>
-                            <Link to="/settings" className="nav-item">Settings</Link>
-                        </ListItem>
-                        <ListItem button key="About us">
-                            <div className="nav-icon"><InfoIcon/></div>
-                            <Link to="/about-us" className="nav-item">About us</Link>
-                        </ListItem>
-
-                    </List>
+                    <div className="title">
+                        Privacy Keeper
+                    </div>
 
                 </div>
 
-                <Switch>
-                    <Route exact path="/">
-                        <Redirect to="/options.html" />
-                    </Route>
-                    <Route exact path="/learn-more">
-                        <Redirect to="/options.html" />
-                    </Route>
-                    <Route exact path="/controls">
-                        <Redirect to="/options.html" />
-                    </Route>
-                    <Route exact path="/settings">
-                        <Redirect to="/options.html" />
-                    </Route>
-                    <Route exact path="/about-us">
-                        <Redirect to="/options.html" />
-                    </Route>
-                </Switch>
+                <Divider />
+
+                {/* Navigation items */}
+                <List>
+
+                    <ListItem button key={itemList[0]} onClick={() => {setCurrentComponent(0);}}>
+                        <div className="nav-icon"><SpeedIcon/></div>
+                        {itemList[0]}
+                    </ListItem>
+                    <ListItem button key={itemList[1]} onClick={() => {setCurrentComponent(1);}}>
+                        <div className="nav-icon"><MenuBookIcon/></div>
+                        {itemList[1]}
+                    </ListItem>
+                    <ListItem button key={itemList[2]} onClick={() => {setCurrentComponent(2);}}>
+                        <div className="nav-icon"><BuildIcon/></div>
+                        {itemList[2]}
+                    </ListItem>
+                    <ListItem button key={itemList[3]} onClick={() => {setCurrentComponent(3);}}>
+                        <div className="nav-icon"><SettingsIcon/></div>
+                        {itemList[3]}
+                    </ListItem>
+                    <ListItem button key={itemList[4]} onClick={() => {setCurrentComponent(4);}}>
+                        <div className="nav-icon"><InfoIcon/></div>
+                        {itemList[4]}
+                    </ListItem>
+
+                </List>
 
             </div>
-        </Router>
+
+            <div className="content-wrapper">
+
+                <div className="content-header">
+                    <div className="content-header-title">
+                        {itemList[currentComponent]}
+                    </div>
+                </div>
+                
+                <div className="content-body">
+                    
+                </div>
+
+            </div>
+
+        </div>
     )
 }
 

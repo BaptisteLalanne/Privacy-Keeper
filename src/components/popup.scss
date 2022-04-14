@@ -77,12 +77,6 @@ body::-webkit-scrollbar {
     padding: $font-size;
 }
 
-.horizontal-line {
-    width: 85%;
-    align-self: center;
-    border-bottom: 1px solid #cecece ;
-}
-
 #website-title {
     font-size: calc(1.25*$font-size);
     text-align: center;

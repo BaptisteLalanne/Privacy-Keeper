@@ -15,6 +15,12 @@ $background-color: #f8f8f8;
     text-decoration: none;
 }
 
+.horizontal-line {
+    width: 85%;
+    align-self: center;
+    border-bottom: 1px solid #cecece ;
+}
+
 @font-face {
     font-family: interFont;
     src: url('../resources/inter-font.ttf');

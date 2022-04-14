@@ -73,7 +73,7 @@ function Popup() {
   let wrapperRef = React.createRef();
   chrome.storage.sync.get(['beacons'], function(result) {
     console.log(result);
-    console.log('[EXTENSION] beacons value is ' + result.beacons);
+    console.log('[EXTENSION] Number of fingerprinter : ' + result.beacons);
   });
 
   const [url, setUrl] = useState('');

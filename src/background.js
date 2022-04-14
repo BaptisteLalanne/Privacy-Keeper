@@ -111,13 +111,13 @@ const injectScripts = (idTab, script) => {
 
 chrome.tabs.onActivated.addListener(function (tab, changeInfo) {
     console.log("[BACKGROUND] Tab activated");
-    injectScripts(tab.tabId, beaconsScript);
+    injectScripts(tab.tabId, fingerprinterScript);
 });
 
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     if (changeInfo.status === 'complete' && tab.url) {
         console.log("[BACKGROUND] Tab updated");
-        injectScripts(tabId, beaconsScript);
+        injectScripts(tabId, fingerprinterScript);
     }
 });
 
@@ -136,7 +136,7 @@ chrome.runtime.onConnect.addListener(function (port) {
     });
 });
 
-const beaconsScript = () => {
+const fingerprinterScript = () => {
     /**
      * Returns the number of times strings in an array are present in a text
      */
@@ -182,7 +182,6 @@ const beaconsScript = () => {
     let mimeTypePropertiesCount = 0;
     let audioPropertiesCount = 0;
 
-    let nbBeacon = 0;
     for (let i = 0; i < scripts.length; i++) {
         if (scripts[i].src) {
             externalSourceLink = scripts[i].src;
@@ -190,25 +189,23 @@ const beaconsScript = () => {
 
         }
         const scriptContent = scripts[i].text;
-        if (scriptContent.includes("sendBeacon")) {
-            console.log("FOUND Beacon!")
-            nbBeacon++;
-        }
+
         navigatorPropertiesCount += findElementFromArrayInText(navigatorProperties, scriptContent);
         navigatorPropertiesToInstrumentCount += findElementFromArrayInText(navigatorPropertiesToInstrument, scriptContent);
         pluginPropertiesCount += findElementFromArrayInText(pluginProperties, scriptContent);
         mimeTypePropertiesCount += findElementFromArrayInText(mimeTypeProperties, scriptContent);
         audioPropertiesCount += findElementFromArrayInText(audioProperties, scriptContent);
     }
-    console.log("Nb of beacons found: " + nbBeacon);
     console.log("navigatorPropertiesCount: " + navigatorPropertiesCount);
     console.log("navigatorPropertiesToInstrumentCount: " + navigatorPropertiesToInstrumentCount);
     console.log("pluginPropertiesCount: " + pluginPropertiesCount);
     console.log("mimeTypePropertiesCount: " + mimeTypePropertiesCount);
     console.log("audioPropertiesCount: " + audioPropertiesCount);
+    var total = (navigatorPropertiesCount+navigatorPropertiesToInstrumentCount+pluginPropertiesCount+mimeTypePropertiesCount+audioPropertiesCount);
+    console.log("Total = " + total);
 
-    let port = chrome.runtime.connect({ name: "beacons" });
-    port.postMessage({ nb: nbBeacon });
+    let port = chrome.runtime.connect({ name: "fingerprinter" });
+    port.postMessage({ nb: total });
     /*
     port.onMessage.addListener(function (msg) {
         console.log("[EXTENSIONS] Response: " + msg.answer);

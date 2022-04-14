@@ -17,22 +17,11 @@
     "default_popup": "popup.html"
   },
   "permissions": [
-    "storage",  "activeTab", "scripting", "tabs"
+    "storage",  "activeTab", "scripting", "unlimitedStorage", "cookies", "tabs"
   ],
   "host_permissions": [
     "<all_urls>",
     "*://*.google.com/"
   ],
-  "options_page": "./options.html",
-  "content_scripts": [
-    {
-      "matches": [
-        "<all_urls>"
-      ],
-      "run_at": "document_idle",
-      "js": [
-        "contentScript.js"
-      ]
-    }
-  ]
+  "options_page": "./options.html"
 }

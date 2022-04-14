@@ -1,0 +1,136 @@
+// -- vars
+:root {
+    --final-wheel-angle: transform(0deg);
+    --final-wheel-color: white;
+    --initial-wheel-color: white;
+}
+
+$font-size: 16px;
+$default-size: 5.5 * $font-size;
+$default-outline: 10;
+$label-font-size: $default-size * 0.42;
+$label-font-size-redo: $default-size * 1;
+$animation-duration: 0.6s;
+$animation-ease: cubic-bezier(0.32, 0.29, 0.1, 0.92);
+
+@mixin size($width, $height) {
+    height: $height;
+    width: $width;
+}
+
+// -- selectors
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+}
+
+.pie-wrapper {
+
+    @include size($default-size, $default-size);
+    position: relative;
+    font-family: oswaldFont;
+    font-weight: bold;
+
+    .pie {
+
+        @include size(100%, 100%);
+        clip: rect(0, $default-size, $default-size, $default-size / 2);
+        left: 0;
+        position: absolute;
+        top: 0;
+
+        .half-circle {
+            @include size(100%, 100%);
+            border: ($default-size / $default-outline) solid #3498db;
+            border-radius: 50%;
+            clip: rect(0, $default-size / 2, $default-size, 0);
+            left: 0;
+            position: absolute;
+            top: 0;
+
+        }
+
+    }
+
+    .label {
+
+        border-radius: 50%;
+        text-align: center;
+        color: black;
+        display: block;
+        position: absolute;
+        font-size: $label-font-size;
+        line-height: $label-font-size-redo*0.7;
+        left: $label-font-size-redo / $default-outline;
+        right: $label-font-size-redo / $default-outline;
+        top: $label-font-size-redo / $default-outline;
+
+        .smaller {
+            font-size: $label-font-size*0.4;
+            padding-bottom: 20px;
+            vertical-align: super;
+        }
+
+    }
+
+    .shadow {
+        @include size(100%, 100%);
+        border: $default-size / $default-outline solid #dadada;
+        border-radius: 50%;
+    }
+
+}
+
+.left-side.animate-big {
+    animation: left-side-progression-big $animation-duration $animation-ease both;
+}
+.right-side.animate-big {
+    animation: right-side-progression-big $animation-duration $animation-ease both; 
+}
+.pie.animate-big {
+    clip: rect(auto, auto, auto, auto);
+}
+
+.left-side.animate-small {
+    animation: left-side-progression-small $animation-duration $animation-ease both;
+}
+.right-side.animate-small {
+    display: none;
+}
+.pie.animate-small {
+    clip: rect(0, $default-size, $default-size, $default-size/2);
+}
+
+@keyframes right-side-progression-big {
+    0% {
+        transform: rotate(180deg);
+        border-color: var(--initial-wheel-color);
+    }
+    100% {
+        transform: rotate(180deg);
+        border-color: var(--final-wheel-color);
+    }
+}
+
+@keyframes left-side-progression-big {
+    0% {
+        transform: rotate(360deg);
+        border-color: var(--initial-wheel-color);
+    }
+    100% {
+        transform: var(--final-wheel-angle);
+        border-color: var(--final-wheel-color);
+    }
+}
+
+@keyframes left-side-progression-small {
+    0% {
+        transform: rotate(0deg);
+        border-color: var(--initial-wheel-color);
+    }
+    100% {
+        transform: var(--final-wheel-angle);
+        border-color: var(--final-wheel-color);
+    }
+}

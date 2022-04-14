@@ -1,66 +1,3 @@
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-    if (changeInfo.status === 'complete' && tab.url) {
-        chrome.scripting.executeScript(tabId, {file: './inject_script.js'}, function () {
-            chrome.scripting.executeScript(tabId, {file: './foreground.bundle.js'}, function () {
-                console.log('INJECTED AND EXECUTED');
-            });
-        });
-    }
-});
-
-chrome.tabs.onActivated.addListener(function (tabId, changeInfo, tab) {
-    console.log("[BACKGROUND] Tab updated");
-    chrome.scripting.executeScript({
-        target: { tabId: tabId },
-        function: injectMe
-    });
-})
-
-
-// Background listener
-chrome.runtime.onConnect.addListener(function (port) {
-    console.log("[BACKGROUND] Port name: " + port.name);
-    port.onMessage.addListener(function (msg) {
-        switch (port.name) {
-            case "beacons":
-                console.log("[BACKGROUND] received nb beacons: " + msg.nb)
-                // save nb beacons
-                chrome.storage.sync.set({ beacons : msg.nb });
-                break;
-        }
-    });
-});
-
-
-const injectMe = () => {
-    //This class implements all methods to analyse trackers whithin a web page
-    const scripts = document.scripts;
-    console.log("Nb of scripts: " + scripts.length);
-
-    let nbBeacon = 0;
-    for (let i = 0; i < scripts.length; i++) {
-        if (scripts[i].src) {
-            externalSourceLink = scripts[i].src;
-            console.log(externalSourceLink);
-
-        }
-        const scriptContent = scripts[i].text;
-        if (scriptContent.includes("sendBeacon")) {
-            console.log("FOUND Beacon!")
-            nbBeacon++;
-        }
-    }
-    console.log("Nb of beacons found: " + nbBeacon);
-
-    let port = chrome.runtime.connect({ name: "beacons" });
-    port.postMessage({ nb: nbBeacon });
-    /*
-    port.onMessage.addListener(function (msg) {
-        console.log("[EXTENSIONS] Response: " + msg.answer);
-    });
-    */
-}
-
 //Listen when the browser is opened
 chrome.windows.onCreated.addListener(function () {
     //Getting data
@@ -163,4 +100,68 @@ function setInfos() {
             });
         }
     });
+}
+
+const injectScripts = (idTab, script) => {
+    chrome.scripting.executeScript({
+        target: { tabId: idTab },
+        function: script
+    });
+}
+
+chrome.tabs.onActivated.addListener(function (tab, changeInfo) {
+    console.log("[BACKGROUND] Tab activated");
+    injectScripts(tab.tabId, beaconsScript);
+});
+
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+    if (changeInfo.status === 'complete' && tab.url) {
+        console.log("[BACKGROUND] Tab updated");
+        injectScripts(tabId, beaconsScript);
+    }
+});
+
+
+// Background listener
+chrome.runtime.onConnect.addListener(function (port) {
+    console.log("[BACKGROUND] Port name: " + port.name);
+    port.onMessage.addListener(function (msg) {
+        switch (port.name) {
+            case "beacons":
+                console.log("[BACKGROUND] received nb beacons: " + msg.nb)
+                // save nb beacons
+                chrome.storage.sync.set({ beacons : msg.nb });
+                break;
+        }
+    });
+});
+
+
+const beaconsScript = () => {
+    //This class implements all methods to analyse trackers whithin a web page
+    const scripts = document.scripts;
+    console.log("Nb of scripts: " + scripts.length);
+
+    let nbBeacon = 0;
+    for (let i = 0; i < scripts.length; i++) {
+        if (scripts[i].src) {
+            externalSourceLink = scripts[i].src;
+            console.log(externalSourceLink);
+
+        }
+        const scriptContent = scripts[i].text;
+        if (scriptContent.includes("sendBeacon")) {
+            console.log("FOUND Beacon!")
+            nbBeacon++;
+        }
+    }
+    console.log("Nb of beacons found: " + nbBeacon);
+
+    let port = chrome.runtime.connect({ name: "beacons" });
+    port.postMessage({ nb: nbBeacon });
+    /*
+    port.onMessage.addListener(function (msg) {
+        console.log("[EXTENSIONS] Response: " + msg.answer);
+    });
+    */
 }

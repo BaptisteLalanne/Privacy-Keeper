@@ -7,12 +7,10 @@ import './popup.scss';
 
 // Opening dashboard on button clicks
 function clickIndex() {
-  console.log("button #popup-db-button clicked");
-  chrome.tabs.create({ url: chrome.runtime.getURL("options.html") });
+  chrome.tabs.create({ url: chrome.runtime.getURL("options.html?page=dashboard") });
 }
 function clickAbout() {
-  console.log("button #popup-about clicked");
-  chrome.tabs.create({ url: chrome.runtime.getURL("options.html") });
+  chrome.tabs.create({ url: chrome.runtime.getURL("options.html?page=learn-more") });
 }
 
 // Extract domain from URL
@@ -73,9 +71,9 @@ function Popup() {
   let wrapperRef = React.createRef();
 
   const [url, setUrl] = useState('');
-  let [score, setScore] = useState('');
-  let [cookieScore, setCookieScore] = useState('');
-  let [trackerScore, setTrackerScore] = useState('');
+  let [score, setScore] = useState(100);
+  let [cookieScore, setCookieScore] = useState(100);
+  let [trackerScore, setTrackerScore] = useState(100);
 
   // Main Hook
   useEffect(() => {

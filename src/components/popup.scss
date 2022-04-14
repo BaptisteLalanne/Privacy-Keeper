@@ -29,7 +29,6 @@ body::-webkit-scrollbar {
     flex-direction: column;
     font-family: interFont;
     gap: calc(0.875*$font-size);
-    box-sizing: border-box;
     padding: $font-size;
 }
 
@@ -73,7 +72,6 @@ body::-webkit-scrollbar {
     background: white;
     border-radius: 5px;
     box-shadow: 1px 1px 4px #cccccc;
-    box-sizing: border-box;
     padding: $font-size;
 }
 

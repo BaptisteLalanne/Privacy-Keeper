@@ -7,81 +7,100 @@ import MenuBookIcon from '@mui/icons-material/MenuBook';
 import BuildIcon from '@mui/icons-material/Build';
 import SettingsIcon from '@mui/icons-material/Settings';
 import InfoIcon from '@mui/icons-material/Info';
-import Popup from './Popup.js';
-import Foreground from './Foreground.js';
+import Dashboard from './Dashboard.js';
+import LearnMore from './LearnMore.js';
+import Controls from './Controls.js';
+import Settings from './Settings.js';
+import AboutUs from './AboutUs.js';
 import "./options.scss";
 
-function Options() {
+function urlify(label) {
+    return label.replace(/\s+/g, '-').toLowerCase();
+}
+
+export default function Options() {
 
     const itemList = [
-        "Dashboard",
-        "Learn more",
-        "Controls",
-        "Settings",
-        "About us"
-    ]
+        {"name": "Dashboard",       "icon": <SpeedIcon/>,       "component": <Dashboard/>},
+        {"name": "Learn more",      "icon": <MenuBookIcon/>,    "component": <LearnMore/>}, 
+        {"name": "Controls",        "icon": <BuildIcon/>,       "component": <Controls/>}, 
+        {"name": "Settings",        "icon": <SettingsIcon/>,    "component": <Settings/>}, 
+        {"name": "About us",        "icon": <InfoIcon/>,        "component": <AboutUs/>}
+    ];
 
     let [currentComponent, setCurrentComponent] = useState(0);
+    
+    useEffect(() => {
+
+        // Redirect to appropriate page based on window param
+        let param = window.location.search.substring(1).split('=');
+        const currentPage = param[1];
+        console.log(param);
+        if (currentPage != null) {
+            for (let i = 0; i < itemList.length; i++) {
+                if (currentPage == urlify(itemList[i].name)) {
+                    if (currentComponent != i) setCurrentComponent(i);
+                    break;
+                }
+            }
+        }
+
+    }, []);
+
+    const clickItem = (index) => {
+
+        // Set current component index
+        setCurrentComponent(index);
+
+        // Update window param
+        window.history.replaceState(null, null, "?page="+urlify(itemList[index].name));
+
+    };
 
     return (
         <div className="main-wrapper">
 
             {/* Navigation bar */}
-            <div className="nav-bar">
+            <div className="nav-wrapper">
+                <div className="nav-bar">
 
-                {/* Title and logo */}
-                <div className="header">
-
-                    <div className="logo">
-                        <img src="../icons/icon_128.png"></img>
+                    {/* Title and logo */}
+                    <div className="header">
+                        <div className="logo"><img src="../icons/icon_128.png"></img></div>
+                        <div className="title">Privacy Keeper</div>
                     </div>
 
-                    <div className="title">
-                        Privacy Keeper
-                    </div>
+                    <Divider />
+
+                    {/* Navigation items */}
+                    <List>
+                    {
+                        itemList.map((item, index) => (
+                            <ListItem button key={item.name} onClick={() => { clickItem(index); }}>
+                                <div className="nav-icon">{item.icon}</div>
+                                {item.name}
+                            </ListItem>
+                        ))
+                    }
+                    </List>
 
                 </div>
-
-                <Divider />
-
-                {/* Navigation items */}
-                <List>
-
-                    <ListItem button key={itemList[0]} onClick={() => {setCurrentComponent(0);}}>
-                        <div className="nav-icon"><SpeedIcon/></div>
-                        {itemList[0]}
-                    </ListItem>
-                    <ListItem button key={itemList[1]} onClick={() => {setCurrentComponent(1);}}>
-                        <div className="nav-icon"><MenuBookIcon/></div>
-                        {itemList[1]}
-                    </ListItem>
-                    <ListItem button key={itemList[2]} onClick={() => {setCurrentComponent(2);}}>
-                        <div className="nav-icon"><BuildIcon/></div>
-                        {itemList[2]}
-                    </ListItem>
-                    <ListItem button key={itemList[3]} onClick={() => {setCurrentComponent(3);}}>
-                        <div className="nav-icon"><SettingsIcon/></div>
-                        {itemList[3]}
-                    </ListItem>
-                    <ListItem button key={itemList[4]} onClick={() => {setCurrentComponent(4);}}>
-                        <div className="nav-icon"><InfoIcon/></div>
-                        {itemList[4]}
-                    </ListItem>
-
-                </List>
-
             </div>
 
+            {/* Page */}
             <div className="content-wrapper">
 
+
+                 {/* Page header */}
                 <div className="content-header">
                     <div className="content-header-title">
-                        {itemList[currentComponent]}
+                        {itemList[currentComponent].name}
                     </div>
                 </div>
                 
+                 {/* Page body */}
                 <div className="content-body">
-                    
+                    <div>{itemList[currentComponent].component}</div>
                 </div>
 
             </div>
@@ -89,5 +108,3 @@ function Options() {
         </div>
     )
 }
-
-export default Options;

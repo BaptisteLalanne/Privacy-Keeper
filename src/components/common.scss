@@ -13,6 +13,8 @@ $background-color: #f8f8f8;
     margin: 0;
     padding: 0;
     text-decoration: none;
+    box-sizing: border-box;
+    font-size: $font-size;
 }
 
 .horizontal-line {

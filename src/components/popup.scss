@@ -1,7 +1,13 @@
 @import "./common.scss";
 @import "./score-wheel.scss";
+/* ==================================================================== */
+/* -------------------------------------------------------------------- */
+/*                                                                      */
+/*                             POPUP CSS                                */
+/*                                                                      */
+/* -------------------------------------------------------------------- */
+/* ==================================================================== */
 
-$font-size: 16px;
 $header-size: 18px;
 $general-score-size: 75px;
 $detailed-score-size: 50px;
@@ -9,7 +15,7 @@ $general-score-outline: 0.8;
 
 
 body {
-    background-color: #f8f8f8;
+    background-color: $background-color;
 }
 body::-webkit-scrollbar { 
     width: 0;

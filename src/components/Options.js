@@ -13,9 +13,27 @@ import Foreground from './Foreground.js';
 function Options() {
     return (
         <Router>
-            <div style={styles.container}>
-                <div style={styles.nav_bar}>
-                    <h1>Chrome Ext - Options</h1>
+            <div className="main-wrapper">
+
+                {/* Navigation bar */}
+                <div className="nav-bar">
+
+                    {/* Title and logo */}
+                    <div className="header">
+
+                        <div className="logo">
+                            <img src="../icons/icon_48.png"></img>
+                        </div>
+
+                        <div className="title">
+                            Privacy Keeper
+                        </div>
+
+                    </div>
+
+                    <div className="horizontal-line"></div>
+
+                    {/* Navigation items */}
                     <nav>
                         <ul>
                             <li>
@@ -44,22 +62,6 @@ function Options() {
             </div>
         </Router>
     )
-}
-
-const styles = {
-    container: {
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    nav_bar: {
-        // position: 'relative',
-        // left: '50%',
-        // transform: 'translate(-50%, 0%)',
-        // width: 'fit-content',
-        marginBottom: '50px'
-    }
 }
 
 export default Options;

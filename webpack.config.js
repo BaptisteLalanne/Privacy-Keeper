@@ -5,7 +5,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
     resolve: {
-        extensions: ['.js', '.jsx', '.css']
+        extensions: ['.js', '.jsx', '.css', '.ttf']
     },
     devServer: {
         contentBase: path.resolve(__dirname, './src'),
@@ -58,7 +58,11 @@ module.exports = {
                   // Compiles Sass to CSS
                   "sass-loader",
                 ],
-              },
+            },
+            {
+                test: /\.(woff|woff2|eot|ttf|otf)$/i,
+                type: 'asset/resource',
+            },
         ]
     },
     plugins: [

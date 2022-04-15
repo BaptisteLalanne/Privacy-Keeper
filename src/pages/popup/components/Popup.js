@@ -4,6 +4,7 @@ import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import './popup.scss';
+/* global chrome */
 
 // Opening dashboard on button clicks
 function clickIndex() {

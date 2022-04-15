@@ -7,11 +7,11 @@ import MenuBookIcon from '@mui/icons-material/MenuBook';
 import BuildIcon from '@mui/icons-material/Build';
 import SettingsIcon from '@mui/icons-material/Settings';
 import InfoIcon from '@mui/icons-material/Info';
-import Dashboard from './Dashboard.js';
-import LearnMore from './LearnMore.js';
-import Controls from './Controls.js';
-import Settings from './Settings.js';
-import AboutUs from './AboutUs.js';
+import Dashboard from './dashboard/Dashboard';
+import LearnMore from './learnMore/LearnMore';
+import Controls from './controls/Controls.js';
+import Settings from './controls/Settings';
+import AboutUs from './aboutUs/AboutUs';
 import "./options.scss";
 
 function urlify(label) {
@@ -66,7 +66,7 @@ export default function Options() {
 
                     {/* Title and logo */}
                     <div className="header">
-                        <div className="logo"><img src="../icons/icon_128.png"></img></div>
+                        <div className="logo"><img src="icon_128.png"></img></div>
                         <div className="title">Privacy Keeper</div>
                     </div>
 

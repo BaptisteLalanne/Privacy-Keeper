@@ -47,14 +47,14 @@ function updateCSS(node, score, cookieScore, trackerScore) {
   let doc = node.ownerDocument;
 
   // Update cookie score color
-  doc.getElementById("cookie-score").style.color = mixColors(posColor, negColor, cookieScore / 100);
+  doc.getElementById("cookie-score").style.color = mixColors(negColor, posColor, cookieScore / 100);
 
   // Update tracker score color
-  doc.getElementById("tracker-score").style.color = mixColors(posColor, negColor, trackerScore / 100);
+  doc.getElementById("tracker-score").style.color = mixColors(negColor, posColor, trackerScore / 100);
 
   // Update global score (configure final keyframe)
-  doc.documentElement.style.setProperty('--initial-wheel-color', (score <= 50) ? negColor : posColor);
-  doc.documentElement.style.setProperty('--final-wheel-color', mixColors(posColor, negColor, score / 100));
+  doc.documentElement.style.setProperty('--initial-wheel-color', (score <= 50) ? posColor : negColor);
+  doc.documentElement.style.setProperty('--final-wheel-color', mixColors(negColor, posColor, score / 100));
   doc.documentElement.style.setProperty('--final-wheel-angle', 'rotate(' + score * 3.6 + 'deg)');
 
   // Add animation classes
@@ -145,7 +145,7 @@ function Popup() {
 
               {/* General score graphic label */}
               <div className="general-score-label">
-                Privacy Score
+                Privacy Risk
               </div>
 
               {/* General score graphic wheel */}
@@ -187,7 +187,7 @@ function Popup() {
 
                 {/* Cookie score label */}
                 <div className="detailed-score-header-label">
-                  Cookie score
+                  Cookie intrusiveness
                 </div>
 
               </MuiAccordionSummary>
@@ -217,7 +217,7 @@ function Popup() {
 
                 {/* Tracker score label */}
                 <div className="detailed-score-header-label">
-                  Tracker score
+                  Tracking suspicion
                 </div>
 
               </MuiAccordionSummary>

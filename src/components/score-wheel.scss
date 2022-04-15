@@ -18,8 +18,8 @@ $default-size: 5.5 * $font-size;
 $default-outline: 10;
 $label-font-size: $default-size * 0.42;
 $label-font-size-redo: $default-size * 1;
-$animation-duration: 0.6s;
-$animation-ease: cubic-bezier(0.32, 0.29, 0.1, 0.92);
+$animation-duration: 0.3s;
+$animation-ease: linear; /*cubic-bezier(0.32, 0.29, 0.1, 0.92);*/
 
 @mixin size($width, $height) {
     height: $height;
@@ -97,7 +97,7 @@ $animation-ease: cubic-bezier(0.32, 0.29, 0.1, 0.92);
     animation: right-side-progression-big $animation-duration $animation-ease both; 
 }
 .pie.animate-big {
-    clip: rect(auto, auto, auto, auto);
+    animation: pie-progression-big $animation-duration $animation-ease both; 
 }
 
 .left-side.animate-small {
@@ -110,10 +110,29 @@ $animation-ease: cubic-bezier(0.32, 0.29, 0.1, 0.92);
     clip: rect(0, $default-size, $default-size, $default-size/2);
 }
 
+@keyframes pie-progression-big {
+    0% {
+        clip: rect(0, $default-size, $default-size, $default-size/2);
+    }
+    49% {
+        clip: rect(0, $default-size, $default-size, $default-size/2);
+    }
+    51% {
+        clip: rect(auto, auto, auto, auto);
+    }
+    100% {
+        clip: rect(auto, auto, auto, auto);
+    }
+}
+
 @keyframes right-side-progression-big {
     0% {
-        transform: rotate(180deg);
+        transform: rotate(0deg);
         border-color: var(--initial-wheel-color);
+    }
+    50% {
+        transform: rotate(180deg);
+        border-color: var(--final-wheel-color);
     }
     100% {
         transform: rotate(180deg);
@@ -123,8 +142,12 @@ $animation-ease: cubic-bezier(0.32, 0.29, 0.1, 0.92);
 
 @keyframes left-side-progression-big {
     0% {
-        transform: rotate(360deg);
+        transform: rotate(0deg);
         border-color: var(--initial-wheel-color);
+    }
+    50% {
+        transform: rotate(180deg);
+        border-color: var(--final-wheel-color);
     }
     100% {
         transform: var(--final-wheel-angle);

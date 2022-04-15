@@ -212,17 +212,9 @@ const fingerprinterScript = () => {
         score = 100;
     else
         score = 1.25 * total - 10;
-    
-    score = 100 - score;
-    
+        
     console.log("Score : " + score);
 
-    //let port = chrome.runtime.connect({ name: "fingerprinter" });
-    //port.postMessage({ nb: score });
     chrome.storage.sync.set({'fingerprintScore': score}, function() {});
-    /*
-    port.onMessage.addListener(function (msg) {
-        console.log("[EXTENSIONS] Response: " + msg.answer);
-    });
-    */
+
 }

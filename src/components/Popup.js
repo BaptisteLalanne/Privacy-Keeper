@@ -68,12 +68,8 @@ function updateCSS(node, score, cookieScore, trackerScore) {
 /* global chrome */
 function Popup() {
 
-  let wrapperRef = React.createRef();
-  chrome.storage.sync.get(['beacons'], function(result) {
-    console.log(result);
-    console.log('[EXTENSION] beacons value is ' + result.beacons);
-  });
-
+  let wrapperRef = React.useRef(null);
+  
   const [url, setUrl] = useState('');
   let [score, setScore] = useState(100);
   let [cookieScore, setCookieScore] = useState(100);
@@ -91,17 +87,24 @@ function Popup() {
 
     // Fetch scores from storage
     cookieScore = 80;
-    trackerScore = 40;
-    score = Math.min(cookieScore, trackerScore);
+    chrome.storage.sync.get(['fingerprintScore'], function(result) {
+      trackerScore = Math.round(result.fingerprintScore);
+      console.log('[EXTENSION] Fingerprinter score : ' + result.fingerprintScore);
+      
+      score = Math.min(cookieScore, trackerScore);
+      
+      // Save score states
+      setScore(score);
+      setCookieScore(cookieScore);
+      setTrackerScore(trackerScore);
+      
+      // Update CSS
+      updateCSS(wrapperRef.current, score, cookieScore, trackerScore);
 
-    // Save score states
-    setScore(score);
-    setCookieScore(cookieScore);
-    setTrackerScore(trackerScore);
+      console.log("im here")
 
-    // Update CSS
-    updateCSS(wrapperRef.current, score, cookieScore, trackerScore);
-
+    });
+      
   }, []);
 
   // Handle click on collapsable items

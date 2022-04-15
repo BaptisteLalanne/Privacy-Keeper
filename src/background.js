@@ -141,7 +141,7 @@ const fingerprinterScript = () => {
      * Returns the number of times strings in an array are present in a text
      */
     const findElementFromArrayInText = (array, text) => {
-        var nbAppearance = 0;
+        let nbAppearance = 0;
         array.forEach((element) => {
             if(text.includes(element)){
                 nbAppearance ++;
@@ -155,7 +155,7 @@ const fingerprinterScript = () => {
     console.log("Nb of scripts: " + scripts.length);
 
     // Access to navigator properties
-    var navigatorProperties = ["appCodeName", "appName", "appVersion",
+    let navigatorProperties = ["appCodeName", "appName", "appVersion",
     "buildID", "cookieEnabled", "doNotTrack",
     "geolocation", "language", "languages",
     "onLine", "oscpu", "platform", "product",
@@ -165,16 +165,16 @@ const fingerprinterScript = () => {
     "maxTouchPoints", "activeVRDisplays"];
 
     // Access to Navigator methods
-    var navigatorPropertiesToInstrument = ["vibrate", "sendBeacon", "getGamepads"];
+    let navigatorPropertiesToInstrument = ["vibrate", "sendBeacon", "getGamepads"];
 
     // Access to plugins
-    var pluginProperties = ["name", "filename", "description", "version", "length"];
+    let pluginProperties = ["name", "filename", "description", "version", "length"];
 
     // Access to MIMETypes
-    var mimeTypeProperties = ["description", "suffixes", "type"];
+    let mimeTypeProperties = ["description", "suffixes", "type"];
 
     // Access to Audio API
-    var audioProperties = ["AudioContext", "OfflineAudioContext", "OscillatorNode", "AnalyserNode", "GainNode", "ScriptProcessorNode"];
+    let audioProperties = ["AudioContext", "OfflineAudioContext", "OscillatorNode", "AnalyserNode", "GainNode", "ScriptProcessorNode"];
 
     let navigatorPropertiesCount = 0;
     let navigatorPropertiesToInstrumentCount = 0; 
@@ -201,11 +201,24 @@ const fingerprinterScript = () => {
     console.log("pluginPropertiesCount: " + pluginPropertiesCount);
     console.log("mimeTypePropertiesCount: " + mimeTypePropertiesCount);
     console.log("audioPropertiesCount: " + audioPropertiesCount);
-    var total = (navigatorPropertiesCount+navigatorPropertiesToInstrumentCount+pluginPropertiesCount+mimeTypePropertiesCount+audioPropertiesCount);
+    let total = (navigatorPropertiesCount+navigatorPropertiesToInstrumentCount+pluginPropertiesCount+mimeTypePropertiesCount+audioPropertiesCount);
     console.log("Total = " + total);
 
+    let score = 0;
+
+    if(total<=10)
+        score = 0;
+    else if (total >= 90)
+        score = 100;
+    else
+        score = 1.25 * total - 10;
+    
+    score = 100 - score;
+    
+    console.log("Score : " + score);
+
     let port = chrome.runtime.connect({ name: "fingerprinter" });
-    port.postMessage({ nb: total });
+    port.postMessage({ nb: score });
     /*
     port.onMessage.addListener(function (msg) {
         console.log("[EXTENSIONS] Response: " + msg.answer);

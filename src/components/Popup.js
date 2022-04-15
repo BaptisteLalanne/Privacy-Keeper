@@ -71,9 +71,9 @@ function updateCSS(node, score, cookieScore, trackerScore) {
 function Popup() {
 
   let wrapperRef = React.createRef();
-  chrome.storage.sync.get(['beacons'], function(result) {
+  chrome.storage.sync.get(['fingerprinter'], function(result) {
     console.log(result);
-    console.log('[EXTENSION] Number of fingerprinter : ' + result.beacons);
+    console.log('[EXTENSION] Fingerprinter score : ' + result.fingerprinter);
   });
 
   const [url, setUrl] = useState('');

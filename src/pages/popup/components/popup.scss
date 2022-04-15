@@ -1,7 +1,13 @@
 @import "../../../styles/common.scss";
 @import "./score-wheel.scss";
+/* ==================================================================== */
+/* -------------------------------------------------------------------- */
+/*                                                                      */
+/*                             POPUP CSS                                */
+/*                                                                      */
+/* -------------------------------------------------------------------- */
+/* ==================================================================== */
 
-$font-size: 16px;
 $header-size: 18px;
 $general-score-size: 75px;
 $detailed-score-size: 50px;
@@ -9,7 +15,7 @@ $general-score-outline: 0.8;
 
 
 body {
-    background-color: #f8f8f8;
+    background-color: $background-color;
 }
 body::-webkit-scrollbar { 
     width: 0;
@@ -23,7 +29,6 @@ body::-webkit-scrollbar {
     flex-direction: column;
     font-family: interFont;
     gap: calc(0.875*$font-size);
-    box-sizing: border-box;
     padding: $font-size;
 }
 
@@ -67,14 +72,7 @@ body::-webkit-scrollbar {
     background: white;
     border-radius: 5px;
     box-shadow: 1px 1px 4px #cccccc;
-    box-sizing: border-box;
     padding: $font-size;
-}
-
-.horizontal-line {
-    width: 85%;
-    align-self: center;
-    border-bottom: 1px solid #cecece ;
 }
 
 #website-title {

@@ -31,7 +31,7 @@ var fileExtensions = [
 var options = {
   mode: process.env.NODE_ENV || 'development',
   entry: {
-    options: path.join(__dirname, 'src', 'pages', 'dashboard', 'index.js'),
+    options: path.join(__dirname, 'src', 'pages', 'options', 'index.js'),
     popup: path.join(__dirname, 'src', 'pages', 'popup', 'index.js'),
     background: path.join(__dirname, 'src', 'pages', 'background', 'background.js'),
     contentScript: path.join(__dirname, 'src', 'pages', 'content', 'contentScript.js'),
@@ -153,7 +153,7 @@ var options = {
       ],
     }),
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, 'src', 'pages', 'dashboard', 'index.html'),
+      template: path.join(__dirname, 'src', 'pages', 'options', 'index.html'),
       filename: 'options.html',
       chunks: ['options'],
       cache: false,

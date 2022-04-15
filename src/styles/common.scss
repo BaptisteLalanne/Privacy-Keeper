@@ -6,10 +6,26 @@
 /* -------------------------------------------------------------------- */
 /* ==================================================================== */
 
+$font-size: 16px;
+$background-color: #f8f8f8;
+
+$col1: #8E64FF;
+$col2: #5838FF;
+$col3: #6564FF;
+$col4: #7364FF;
+
 * {
     margin: 0;
     padding: 0;
     text-decoration: none;
+    box-sizing: border-box;
+    font-size: $font-size;
+}
+
+.horizontal-line {
+    width: 85%;
+    align-self: center;
+    border-bottom: 1px solid #cecece ;
 }
 
 @font-face {

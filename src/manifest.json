@@ -19,5 +19,9 @@
   "permissions": [
     "storage",  "activeTab", "scripting", "unlimitedStorage", "cookies", "tabs"
   ],
+  "host_permissions": [
+    "<all_urls>",
+    "*://*.google.com/"
+  ],
   "options_page": "./options.html"
 }

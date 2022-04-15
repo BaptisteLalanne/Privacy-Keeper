@@ -7,33 +7,99 @@
 /* -------------------------------------------------------------------- */
 /* ==================================================================== */
 
-$header-size: 26px;
+$header-size: 22px;
+
+a {
+    color: black;
+}
 
 .main-wrapper {
     display: flex;
     flex-direction: row;
+    font-family: interFont;
+}
+
+.nav-wrapper {
+    z-index: 10;
+    background: transparent;
+    min-width: fit-content;
 }
 
 .nav-bar {
     display: flex;
     flex-direction: column;
-    width: 20vw;
     background-color: $background-color;
     gap: $font-size;
+    padding: $font-size;
+    min-width: fit-content;
+    height: 100vh;
+    position: sticky;
+    top: 0;
 }
 
 .header {
     display: flex;
     flex-direction: row;
-    gap: $font-size;
-    height: $header-size;
+    gap: 0.75*$font-size;
+    height: fit-content;
 }
 
 .logo {
-    height: fit-content;
+    height: 1.5*$header-size;
 }
 
 .logo > img {
     width: 100%;
     height: 100%;
+}
+
+.title {
+    font-size: $header-size;
+    font-weight: bold;
+    margin: auto 0;
+}
+
+.nav-item {
+    color: black;
+}
+
+.nav-icon {
+    margin-left: 0.25*$font-size;
+    margin-right: $font-size;
+    color: #4e4e4e;
+}
+
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: $font-size;
+    flex-grow: 2;
+    background-color: white;
+}
+
+.content-header {
+    padding: $font-size;
+    height: 2*1.5*$header-size;
+    display: flex;
+    box-shadow: 0 1px 2px lightgray;
+    width: 100%;
+}
+
+.content-header-title {
+    font-size: $header-size;
+    font-weight: bold;
+    margin: auto $font-size;
+}
+
+.content-body {
+    padding: $font-size 2*$font-size;
+}
+
+.MuiListItem-root {
+    padding-left: 0 !important;
+}
+
+.MuiTouchRipple-root {
+    opacity: 0.5 !important;
 }

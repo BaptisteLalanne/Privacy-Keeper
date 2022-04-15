@@ -1,0 +1,48 @@
+@import "./common.scss";
+/* ==================================================================== */
+/* -------------------------------------------------------------------- */
+/*                                                                      */
+/*                            LEARN MORE CSS                            */
+/*                                                                      */
+/* -------------------------------------------------------------------- */
+/* ==================================================================== */
+
+.tocLink {
+    color: #063e72;
+}
+
+.learn-more-text-wrapper {
+    width: 50%;
+    text-justify: inter-word;
+}
+
+.learn-more-header {
+    margin: $font-size 0;
+}
+
+.learn-more-toc-title {
+    margin: $font-size*0.8 0;
+    font-size: $font-size*1.4;
+    font-weight: bold;
+}
+
+.learn-more-toc {
+    background-color: $background-color;
+    padding: $font-size;
+    width: fit-content;
+}
+
+.learn-more-toc-list, .learn-more-toc-list-2 {
+    list-style-position: inside;
+}
+.learn-more-toc-list-2::marker, .learn-more-toc-list-2::marker {
+    color: #063e72;
+}
+.learn-more-toc-list-2 {
+    padding-left: 1.5*$font-size;
+}
+
+.learn-more-list-item {
+    position: relative;
+    left: -$font-size*0.5;
+}

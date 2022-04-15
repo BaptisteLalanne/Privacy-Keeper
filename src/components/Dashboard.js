@@ -1,9 +1,8 @@
 import React from 'react';
-import "./dashboard.scss";
 import Histogram from './Histogram.js';
+import "./dashboard.scss";
 
-
-function Dashboard() {
+export default function Dashboard() {
     return (
         <div className="main">
             <h1 className="title">Dashboard</h1>
@@ -11,5 +10,3 @@ function Dashboard() {
         </div>
     )
 }
-
-export default Dashboard;

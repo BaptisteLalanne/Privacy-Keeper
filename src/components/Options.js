@@ -1,67 +1,110 @@
-import React from 'react';
-import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
-    Link,
-    Redirect
-} from "react-router-dom";
-import "./options.scss";
-import Popup from './Popup.js';
+import React, { useEffect, useState } from 'react';
+import Divider from '@mui/material/Divider';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import SpeedIcon from '@mui/icons-material/Speed';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
+import BuildIcon from '@mui/icons-material/Build';
+import SettingsIcon from '@mui/icons-material/Settings';
+import InfoIcon from '@mui/icons-material/Info';
 import Dashboard from './Dashboard.js';
+import LearnMore from './LearnMore.js';
+import Controls from './Controls.js';
+import Settings from './Settings.js';
+import AboutUs from './AboutUs.js';
+import "./options.scss";
 
-function Options() {
+function urlify(label) {
+    return label.replace(/\s+/g, '-').toLowerCase();
+}
+
+export default function Options() {
+
+    const itemList = [
+        {"name": "Dashboard",       "icon": <SpeedIcon/>,       "component": <Dashboard/>},
+        {"name": "Learn more",      "icon": <MenuBookIcon/>,    "component": <LearnMore/>}, 
+        {"name": "Controls",        "icon": <BuildIcon/>,       "component": <Controls/>}, 
+        {"name": "Settings",        "icon": <SettingsIcon/>,    "component": <Settings/>}, 
+        {"name": "About us",        "icon": <InfoIcon/>,        "component": <AboutUs/>}
+    ];
+
+    let [currentComponent, setCurrentComponent] = useState(0);
+    
+    useEffect(() => {
+
+        // Redirect to appropriate page based on window param
+        let param = window.location.search.substring(1).split('=');
+        const currentPage = param[1];
+        console.log(param);
+        if (currentPage != null) {
+            for (let i = 0; i < itemList.length; i++) {
+                if (currentPage == urlify(itemList[i].name)) {
+                    if (currentComponent != i) setCurrentComponent(i);
+                    break;
+                }
+            }
+        }
+
+    }, []);
+
+    const clickItem = (index) => {
+
+        // Set current component index
+        setCurrentComponent(index);
+
+        // Update window param
+        window.history.replaceState(null, null, "?page="+urlify(itemList[index].name));
+
+    };
+
     return (
-        <Router>
-            <div className="main-wrapper">
+        <div className="main-wrapper">
 
-                {/* Navigation bar */}
+            {/* Navigation bar */}
+            <div className="nav-wrapper">
                 <div className="nav-bar">
 
                     {/* Title and logo */}
                     <div className="header">
-
-                        <div className="logo">
-                            <img src="../icons/icon_48.png"></img>
-                        </div>
-
-                        <div className="title">
-                            Privacy Keeper
-                        </div>
-
+                        <div className="logo"><img src="../icons/icon_128.png"></img></div>
+                        <div className="title">Privacy Keeper</div>
                     </div>
 
-                    <div className="horizontal-line"></div>
+                    <Divider />
 
                     {/* Navigation items */}
-                    <nav>
-                        <ul>
-                            <li>
-                                <Link to="/">Options</Link>
-                            </li>
-                            <li>
-                                <Link to="/popup">Popup</Link>
-                            </li>
-                            <li>
-                                <Link to="/dashboard">Dashboard</Link>
-                            </li>
-                        </ul>
-                    </nav>
+                    <List>
+                    {
+                        itemList.map((item, index) => (
+                            <ListItem button key={item.name} onClick={() => { clickItem(index); }}>
+                                <div className="nav-icon">{item.icon}</div>
+                                {item.name}
+                            </ListItem>
+                        ))
+                    }
+                    </List>
+
                 </div>
-                <Switch>
-                    <Route exact path="/popup">
-                        <Popup />
-                    </Route>
-                    <Route exact path="/dashboard">
-                        <Dashboard />
-                    </Route>
-                    <Route exact path="/">
-                        <Redirect to="/options.html" />
-                    </Route>
-                </Switch>
             </div>
-        </Router>
+
+            {/* Page */}
+            <div className="content-wrapper">
+
+
+                 {/* Page header */}
+                <div className="content-header">
+                    <div className="content-header-title">
+                        {itemList[currentComponent].name}
+                    </div>
+                </div>
+                
+                 {/* Page body */}
+                <div className="content-body">
+                    <div>{itemList[currentComponent].component}</div>
+                </div>
+
+            </div>
+
+        </div>
     )
 }
-
-export default Options;

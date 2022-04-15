@@ -33,6 +33,7 @@ let server = new WebpackDevServer(
   {
     https: false,
     hot: false,
+    liveReload: false,
     client: false,
     host: 'localhost',
     port: env.PORT,

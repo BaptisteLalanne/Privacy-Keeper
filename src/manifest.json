@@ -17,7 +17,7 @@
     "default_popup": "popup.html"
   },
   "permissions": [
-    "storage",  "activeTab", "scripting", "unlimitedStorage", "cookies", "tabs"
+    "storage",  "activeTab", "scripting", "unlimitedStorage", "cookies", "tabs", "webNavigation", "webRequest"
   ],
   "host_permissions": [
     "<all_urls>",

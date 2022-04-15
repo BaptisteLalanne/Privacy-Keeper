@@ -1,3 +1,23 @@
+// import cookie classification
+
+importScripts('./modules/third_party/lz-string.js');
+importScripts('./modules/third_party/levenshtein.js');
+importScripts('./modules/third_party/difflib-browser.js');
+importScripts('./modules/globals.js');
+importScripts('./modules/extractor.js');
+importScripts('./modules/predictor.js');
+importScripts('./classifier-background.js');
+
+/*
+import './modules/third_party/lz-string.js';
+import './modules/third_party/levenshtein.js';
+import './modules/third_party/difflib-browser.js';
+import './modules/globals.js';
+import './modules/extractor.js';
+import './modules/predictor.js';
+import './classifier-background.js';
+*/
+
 //Listen when the browser is opened
 chrome.windows.onCreated.addListener(function () {
     //Getting data

@@ -81,6 +81,14 @@ function Popup() {
   let [cookieScore, setCookieScore] = useState('');
   let [trackerScore, setTrackerScore] = useState('');
 
+  console.log("popup show");
+
+  // check labels
+  chrome.storage.sync.get(['cookiesLabels'], function(result) {
+    console.log("popup labels: ");
+    console.log(result);
+  });
+
   // Main Hook
   useEffect(() => {
 

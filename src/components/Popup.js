@@ -7,12 +7,10 @@ import './popup.scss';
 
 // Opening dashboard on button clicks
 function clickIndex() {
-  console.log("button #popup-db-button clicked");
-  chrome.tabs.create({ url: chrome.runtime.getURL("options.html") });
+  chrome.tabs.create({ url: chrome.runtime.getURL("options.html?page=dashboard") });
 }
 function clickAbout() {
-  console.log("button #popup-about clicked");
-  chrome.tabs.create({ url: chrome.runtime.getURL("options.html") });
+  chrome.tabs.create({ url: chrome.runtime.getURL("options.html?page=learn-more") });
 }
 
 // Extract domain from URL
@@ -49,14 +47,14 @@ function updateCSS(node, score, cookieScore, trackerScore) {
   let doc = node.ownerDocument;
 
   // Update cookie score color
-  doc.getElementById("cookie-score").style.color = mixColors(posColor, negColor, cookieScore / 100);
+  doc.getElementById("cookie-score").style.color = mixColors(negColor, posColor, cookieScore / 100);
 
   // Update tracker score color
-  doc.getElementById("tracker-score").style.color = mixColors(posColor, negColor, trackerScore / 100);
+  doc.getElementById("tracker-score").style.color = mixColors(negColor, posColor, trackerScore / 100);
 
   // Update global score (configure final keyframe)
-  doc.documentElement.style.setProperty('--initial-wheel-color', (score <= 50) ? negColor : posColor);
-  doc.documentElement.style.setProperty('--final-wheel-color', mixColors(posColor, negColor, score / 100));
+  doc.documentElement.style.setProperty('--initial-wheel-color', (score <= 50) ? posColor : negColor);
+  doc.documentElement.style.setProperty('--final-wheel-color', mixColors(negColor, posColor, score / 100));
   doc.documentElement.style.setProperty('--final-wheel-angle', 'rotate(' + score * 3.6 + 'deg)');
 
   // Add animation classes
@@ -70,16 +68,12 @@ function updateCSS(node, score, cookieScore, trackerScore) {
 /* global chrome */
 function Popup() {
 
-  let wrapperRef = React.createRef();
-  chrome.storage.sync.get(['beacons'], function(result) {
-    console.log(result);
-    console.log('[EXTENSION] beacons value is ' + result.beacons);
-  });
-
+  let wrapperRef = React.useRef(null);
+  
   const [url, setUrl] = useState('');
-  let [score, setScore] = useState('');
-  let [cookieScore, setCookieScore] = useState('');
-  let [trackerScore, setTrackerScore] = useState('');
+  let [score, setScore] = useState(100);
+  let [cookieScore, setCookieScore] = useState(100);
+  let [trackerScore, setTrackerScore] = useState(100);
 
   // Main Hook
   useEffect(() => {
@@ -93,17 +87,24 @@ function Popup() {
 
     // Fetch scores from storage
     cookieScore = 80;
-    trackerScore = 40;
-    score = Math.min(cookieScore, trackerScore);
+    chrome.storage.sync.get(['fingerprintScore'], function(result) {
+      trackerScore = Math.round(result.fingerprintScore);
+      console.log('[EXTENSION] Fingerprinter score : ' + result.fingerprintScore);
+      
+      score = Math.min(cookieScore, trackerScore);
+      
+      // Save score states
+      setScore(score);
+      setCookieScore(cookieScore);
+      setTrackerScore(trackerScore);
+      
+      // Update CSS
+      updateCSS(wrapperRef.current, score, cookieScore, trackerScore);
 
-    // Save score states
-    setScore(score);
-    setCookieScore(cookieScore);
-    setTrackerScore(trackerScore);
+      console.log("im here")
 
-    // Update CSS
-    updateCSS(wrapperRef.current, score, cookieScore, trackerScore);
-
+    });
+      
   }, []);
 
   // Handle click on collapsable items
@@ -144,7 +145,7 @@ function Popup() {
 
               {/* General score graphic label */}
               <div className="general-score-label">
-                Privacy Score
+                Privacy Risk
               </div>
 
               {/* General score graphic wheel */}
@@ -186,7 +187,7 @@ function Popup() {
 
                 {/* Cookie score label */}
                 <div className="detailed-score-header-label">
-                  Cookie score
+                  Cookie intrusiveness
                 </div>
 
               </MuiAccordionSummary>
@@ -216,7 +217,7 @@ function Popup() {
 
                 {/* Tracker score label */}
                 <div className="detailed-score-header-label">
-                  Tracker score
+                  Tracking suspicion
                 </div>
 
               </MuiAccordionSummary>

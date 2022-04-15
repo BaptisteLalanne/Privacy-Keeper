@@ -36,3 +36,10 @@ $col4: #7364FF;
     font-family: oswaldFont;
     src: url('/src/assets/fonts/oswald-font.ttf');
 }
+
+:export {
+    col1: $col1; 
+    col2: $col2; 
+    col3: $col3; 
+    col4: $col4;
+}

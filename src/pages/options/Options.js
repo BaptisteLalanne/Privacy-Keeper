@@ -12,7 +12,7 @@ import LearnMore from './learnMore/LearnMore';
 import Controls from './controls/Controls.js';
 import Settings from './controls/Settings';
 import AboutUs from './aboutUs/AboutUs';
-import "./options.scss";
+import style from "./options.scss";
 
 function urlify(label) {
     return label.replace(/\s+/g, '-').toLowerCase();
@@ -28,6 +28,8 @@ export default function Options() {
         {"name": "About us",        "icon": <InfoIcon/>,        "component": <AboutUs/>}
     ];
 
+    const itemRefs = [React.useRef(null), React.useRef(null), React.useRef(null), React.useRef(null), React.useRef(null)];
+
     let [currentComponent, setCurrentComponent] = useState(0);
     
     useEffect(() => {
@@ -35,7 +37,6 @@ export default function Options() {
         // Redirect to appropriate page based on window param
         let param = window.location.search.substring(1).split('=');
         const currentPage = param[1];
-        console.log(param);
         if (currentPage != null) {
             for (let i = 0; i < itemList.length; i++) {
                 if (currentPage == urlify(itemList[i].name)) {
@@ -54,6 +55,14 @@ export default function Options() {
 
         // Update window param
         window.history.replaceState(null, null, "?page="+urlify(itemList[index].name));
+
+        // Update item CSS
+        /*
+        for (let i = 0; i < itemList.length; i++) {
+            itemRefs[i].current.style.color = "black";
+        }
+        itemRefs[index].current.style.color = style.col2;
+        */
 
     };
 
@@ -76,7 +85,7 @@ export default function Options() {
                     <List>
                     {
                         itemList.map((item, index) => (
-                            <ListItem button key={item.name} onClick={() => { clickItem(index); }}>
+                            <ListItem button key={item.name} onClick={() => { clickItem(index); }} ref={itemRefs[index]}>
                                 <div className="nav-icon">{item.icon}</div>
                                 {item.name}
                             </ListItem>

@@ -59,9 +59,9 @@ export default function Options() {
             itemRefs[i].current.setAttribute('style', 'font-weight: normal');
             itemRefs[i].current.style.color = "black";
         }
-        itemRefs[index].current.getElementsByClassName("nav-icon")[0].style.color = style.col2;
+        itemRefs[index].current.getElementsByClassName("nav-icon")[0].style.color = style.col0;
         itemRefs[index].current.setAttribute('style', 'font-weight: bold');
-        itemRefs[index].current.style.color = style.col2;
+        itemRefs[index].current.style.color = style.col0;
 
     };
 
@@ -74,8 +74,8 @@ export default function Options() {
 
                     {/* Title and logo */}
                     <div className="header">
-                        <div className="logo"><img src="icon_128.png"></img></div>
-                        <div className="title">Privacy Keeper</div>
+                        <div className="logo"><img src="icon_banner.png"></img></div>
+                        {/* <div className="title">Privacy Keeper</div> */}
                     </div>
 
                     <Divider />

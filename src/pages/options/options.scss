@@ -61,12 +61,13 @@ a {
 
 .nav-item {
     color: black;
+    font-weight: normal;
 }
 
 .nav-icon {
     margin-left: 0.25*$font-size;
     margin-right: $font-size;
-    color: #4e4e4e;
+    color: $dark-grey;
 }
 
 .content-wrapper {
@@ -84,6 +85,7 @@ a {
     display: flex;
     box-shadow: 0 1px 2px lightgray;
     width: 100%;
+    color: $col2;
 }
 
 .content-header-title {

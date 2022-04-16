@@ -57,9 +57,12 @@ var options = {
           },
           {
             loader: 'css-loader',
-            /*options: {
-                modules: true
-            }*/
+            options: {
+              importLoaders: 1,
+              modules: {
+                mode: "icss",
+              },
+            },
           },
           {
             loader: 'sass-loader',

@@ -1,11 +1,22 @@
+// When the app is first installed
+chrome.runtime.onInstalled.addListener(function (details) {
+    if (details.reason === "install") {
+        let max_diff = 1000 * 60 * 60 * 24 * 7 * 2; //2 weeks is the default cookie expiration time
+        chrome.storage.local.set({"expiration_time": max_diff}, function () {
+            if (chrome.runtime.error) {
+                console.log("Runtime error.");
+            }});
+    }
+})
+
 //Listen when the browser is opened
 chrome.windows.onCreated.addListener(function () {
+    
     //Getting data
     chrome.storage.local.get("updateDateCookies", async function (result) {
 
         //Time after which unused cookies are deleted
-        //To be set in settings
-        let max_diff = 1000 * 60 * 60 * 24 * 7 * 2; //2 weeks
+        let max_diff = chrome.storage.local.get("expiration_time"); // Retrieving cookie expiration time -> default is 1000 * 60 * 60 * 24 * 7 * 2; //2 weeks
 
         //data fetched
         if (result && result["updateDateCookies"])

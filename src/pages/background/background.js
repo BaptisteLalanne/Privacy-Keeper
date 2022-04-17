@@ -6,7 +6,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
 
         // Set default toggle options
         let default_options = {
-            autoDeleteOldCookies: true,
+            autoDeleteOldCookies: false,
             blockTrackers: false,
             blockCookies: false,
         }
@@ -15,7 +15,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
                 console.log("Runtime error.");
             }
         });
-        
+
         // Set default expiration time
         let default_expiration_time = 14 * (1000 * 60 * 60 * 24); 
         chrome.storage.local.set({"expiration_time": default_expiration_time}, function () {

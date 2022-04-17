@@ -13,15 +13,19 @@
     gap: 2*$font-size;
 }
 
-.MuiDivider-root::before {
+.controls-section-header .MuiDivider-root::before {
     width: 0% !important;
 }
 
-.MuiDivider-root::after {
+.controls-section-header .MuiDivider-root::after {
     border-top: solid 2px $dark-grey !important;
 }
 
-.MuiDivider-wrapper {
+.controls-section-header .MuiDivider-root {
+    width: 40vw;
+}
+
+.controls-section-header .MuiDivider-wrapper {
     font-size: 1.25*$font-size;
     font-weight: bold;
     padding-left: 0 !important;

@@ -4,8 +4,7 @@ import "./dashboard.scss";
 
 export default function Dashboard() {
     return (
-        <div className="main">
-            <h1 className="title">Dashboard</h1>
+        <div className="dashboard-wrapper">
             <Histogram />
         </div>
     )

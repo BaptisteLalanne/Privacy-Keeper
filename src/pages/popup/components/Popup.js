@@ -4,6 +4,7 @@ import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import './popup.scss';
+/* global chrome */
 
 // Opening dashboard on button clicks
 function clickIndex() {
@@ -86,12 +87,12 @@ function Popup() {
     });
 
     // Fetch scores from storage
-    cookieScore = 80;
+    cookieScore = 40;
     chrome.storage.sync.get(['fingerprintScore'], function(result) {
       trackerScore = Math.round(result.fingerprintScore);
       console.log('[EXTENSION] Fingerprinter score : ' + result.fingerprintScore);
       
-      score = Math.min(cookieScore, trackerScore);
+      score = Math.max(cookieScore, trackerScore);
       
       // Save score states
       setScore(score);
@@ -100,8 +101,6 @@ function Popup() {
       
       // Update CSS
       updateCSS(wrapperRef.current, score, cookieScore, trackerScore);
-
-      console.log("im here")
 
     });
       

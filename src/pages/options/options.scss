@@ -1,4 +1,4 @@
-@import "./common.scss";
+@import "../../styles/common.scss";
 /* ==================================================================== */
 /* -------------------------------------------------------------------- */
 /*                                                                      */
@@ -49,7 +49,6 @@ a {
 }
 
 .logo > img {
-    width: 100%;
     height: 100%;
 }
 
@@ -61,12 +60,13 @@ a {
 
 .nav-item {
     color: black;
+    font-weight: normal;
 }
 
 .nav-icon {
     margin-left: 0.25*$font-size;
     margin-right: $font-size;
-    color: #4e4e4e;
+    color: $dark-grey;
 }
 
 .content-wrapper {
@@ -84,6 +84,7 @@ a {
     display: flex;
     box-shadow: 0 1px 2px lightgray;
     width: 100%;
+    color: $col0;
 }
 
 .content-header-title {
@@ -94,6 +95,7 @@ a {
 
 .content-body {
     padding: $font-size 2*$font-size;
+    width: 100%;
 }
 
 .MuiListItem-root {

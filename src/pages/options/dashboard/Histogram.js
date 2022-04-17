@@ -6,9 +6,8 @@ import "./dashboard.scss";
 
 function Histogram() {
     return (
-        <div className="title">
-            <h1>Coucou je suis un histogram</h1>
-
+        <div>
+            Coucou je suis un histogramme
         </div>
     )
 }

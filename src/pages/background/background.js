@@ -1,13 +1,29 @@
 import fingerprinterScript from "./injectTrackerAnnalyser.js"
 
-// When the app is first installed
+// When the app is first installed, write default settings
 chrome.runtime.onInstalled.addListener(function (details) {
     if (details.reason === "install") {
-        let max_diff = 1000 * 60 * 60 * 24 * 7 * 2; //2 weeks is the default cookie expiration time
-        chrome.storage.local.set({"expiration_time": max_diff}, function () {
+
+        // Set default toggle options
+        let default_options = {
+            autoDeleteOldCookies: true,
+            blockTrackers: false,
+            blockCookies: false,
+        }
+        chrome.storage.local.set({"toggle_options": default_options}, function () {
             if (chrome.runtime.error) {
                 console.log("Runtime error.");
-            }});
+            }
+        });
+        
+        // Set default expiration time
+        let default_expiration_time = 14 * (1000 * 60 * 60 * 24); 
+        chrome.storage.local.set({"expiration_time": default_expiration_time}, function () {
+            if (chrome.runtime.error) {
+                console.log("Runtime error.");
+            }
+        });
+
     }
 })
 

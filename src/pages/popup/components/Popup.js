@@ -102,8 +102,6 @@ function Popup() {
       // Update CSS
       updateCSS(wrapperRef.current, score, cookieScore, trackerScore);
 
-      console.log("im here")
-
     });
       
   }, []);

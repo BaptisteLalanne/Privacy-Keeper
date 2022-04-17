@@ -1,0 +1,59 @@
+@import "../../../styles/common.scss";
+/* ==================================================================== */
+/* -------------------------------------------------------------------- */
+/*                                                                      */
+/*                            CONTROLS CSS                              */
+/*                                                                      */
+/* -------------------------------------------------------------------- */
+/* ==================================================================== */
+
+.controls-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 2*$font-size;
+}
+
+.MuiDivider-root::before {
+    width: 0% !important;
+}
+
+.MuiDivider-root::after {
+    border-top: solid 2px $dark-grey !important;
+}
+
+.MuiDivider-wrapper {
+    font-size: 1.25*$font-size;
+    font-weight: bold;
+    padding-left: 0 !important;
+}
+
+.controls-section-header {
+    margin-bottom: $font-size;
+}
+
+.toggle-options-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5*$font-size;
+}
+
+.toggle-options-item {
+    display: flex;
+    flex-direction: row;
+    gap: $font-size;
+}
+
+.MuiSwitch-root {
+    margin: auto 0 !important;
+}
+
+.toggle-options-item-label {
+    margin: auto 0;
+}
+
+#expirationTimeInput {
+    width: 3*$font-size !important;
+    text-align: center;
+    color: $col2;
+    font-weight: bold;
+}

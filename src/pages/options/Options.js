@@ -75,7 +75,6 @@ export default function Options() {
                     {/* Title and logo */}
                     <div className="header">
                         <div className="logo"><img src="icon_banner.png"></img></div>
-                        {/* <div className="title">Privacy Keeper</div> */}
                     </div>
 
                     <Divider />

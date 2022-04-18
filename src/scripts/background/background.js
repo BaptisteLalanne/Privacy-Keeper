@@ -1,4 +1,4 @@
-import fingerprinterScript from "./injectTrackerAnnalyser.js"
+import fingerprinterScript from "./injectTrackerAnalyser.js"
 
 // When the app is first installed, write default settings
 chrome.runtime.onInstalled.addListener(function (details) {

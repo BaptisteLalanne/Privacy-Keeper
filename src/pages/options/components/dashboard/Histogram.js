@@ -7,7 +7,7 @@ import "./dashboard.scss";
 function Histogram() {
     return (
         <div>
-            Coucou je suis un histogramme
+            {renderLineChart}
         </div>
     )
 }

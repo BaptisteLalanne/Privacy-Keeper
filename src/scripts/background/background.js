@@ -1,31 +1,59 @@
-// import cookie classification
+// Import cookie classification
+importScripts('../../modules/third_party/lz-string.js');
+importScripts('../../modules/third_party/levenshtein.js');
+importScripts('../../modules/third_party/difflib-browser.js');
+importScripts('../../modules/globals.js');
+importScripts('../../modules/extractor.js');
+importScripts('../../modules/predictor.js');
+importScripts('./classifierBackground.js');
 
-importScripts('./modules/third_party/lz-string.js');
-importScripts('./modules/third_party/levenshtein.js');
-importScripts('./modules/third_party/difflib-browser.js');
-importScripts('./modules/globals.js');
-importScripts('./modules/extractor.js');
-importScripts('./modules/predictor.js');
-importScripts('./classifier-background.js');
+/*import '../../modules/third_party/lz-string.js';
+import '../../modules/third_party/levenshtein.js';
+import '../../modules/third_party/difflib-browser.js';
+import '../../modules/third_party/difflib-browser.js';
+import '../../modules/globals.js';
+import '../../modules/extractor.js';
+import '../../modules/predictor.js';
+import './classifierBackground.js';*/
 
-/*
-import './modules/third_party/lz-string.js';
-import './modules/third_party/levenshtein.js';
-import './modules/third_party/difflib-browser.js';
-import './modules/globals.js';
-import './modules/extractor.js';
-import './modules/predictor.js';
-import './classifier-background.js';
-*/
+// Other imports
+import fingerprinterScript from "./injectTrackerAnalyser.js"
+
+// When the app is first installed, write default settings
+chrome.runtime.onInstalled.addListener(function (details) {
+    if (details.reason === "install") {
+
+        // Set default toggle options
+        let default_options = {
+            autoDeleteOldCookies: false,
+            blockTrackers: false,
+            blockCookies: false,
+        }
+        chrome.storage.local.set({"toggle_options": default_options}, function () {
+            if (chrome.runtime.error) {
+                console.log("Runtime error.");
+            }
+        });
+
+        // Set default expiration time
+        let default_expiration_time = 14 * (1000 * 60 * 60 * 24); 
+        chrome.storage.local.set({"expiration_time": default_expiration_time}, function () {
+            if (chrome.runtime.error) {
+                console.log("Runtime error.");
+            }
+        });
+
+    }
+})
 
 //Listen when the browser is opened
 chrome.windows.onCreated.addListener(function () {
+    
     //Getting data
     chrome.storage.local.get("updateDateCookies", async function (result) {
 
         //Time after which unused cookies are deleted
-        //To be set in settings
-        let max_diff = 1000 * 60 * 60 * 24 * 7 * 2; //2 weeks
+        let max_diff = chrome.storage.local.get("expiration_time"); // Retrieving cookie expiration time -> default is 1000 * 60 * 60 * 24 * 7 * 2; //2 weeks
 
         //data fetched
         if (result && result["updateDateCookies"])
@@ -131,13 +159,13 @@ const injectScripts = (idTab, script) => {
 
 chrome.tabs.onActivated.addListener(function (tab, changeInfo) {
     console.log("[BACKGROUND] Tab activated");
-    injectScripts(tab.tabId, beaconsScript);
+    injectScripts(tab.tabId, fingerprinterScript);
 });
 
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     if (changeInfo.status === 'complete' && tab.url) {
         console.log("[BACKGROUND] Tab updated");
-        injectScripts(tabId, beaconsScript);
+        injectScripts(tabId, fingerprinterScript);
     }
 });
 
@@ -155,33 +183,3 @@ chrome.runtime.onConnect.addListener(function (port) {
         }
     });
 });
-
-
-const beaconsScript = () => {
-    //This class implements all methods to analyse trackers whithin a web page
-    const scripts = document.scripts;
-    console.log("Nb of scripts: " + scripts.length);
-
-    let nbBeacon = 0;
-    for (let i = 0; i < scripts.length; i++) {
-        if (scripts[i].src) {
-            externalSourceLink = scripts[i].src;
-            console.log(externalSourceLink);
-
-        }
-        const scriptContent = scripts[i].text;
-        if (scriptContent.includes("sendBeacon")) {
-            console.log("FOUND Beacon!")
-            nbBeacon++;
-        }
-    }
-    console.log("Nb of beacons found: " + nbBeacon);
-
-    let port = chrome.runtime.connect({ name: "beacons" });
-    port.postMessage({ nb: nbBeacon });
-    /*
-    port.onMessage.addListener(function (msg) {
-        console.log("[EXTENSIONS] Response: " + msg.answer);
-    });
-    */
-}

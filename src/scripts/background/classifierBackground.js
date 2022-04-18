@@ -10,7 +10,10 @@ const classifyCookiesTab = () => {
     chrome.tabs.query(queryOptions, async function (tabs) {
         if (tabs.length > 0 && tabs[0].url !== "") {
 
-            chrome.storage.sync.set({cookiesClassification: [0,0,0,0]}, function() {
+            chrome.storage.sync.set({"cookieClassification": [0,0,0,0]}, function() {
+
+                console.log("[BACKGROUND] Here")
+
                 //Getting all the cookie whose url matches the active tab
                 chrome.cookies.getAll({"url": tabs[0].url}, function (cookies) {
 
@@ -197,7 +200,9 @@ const classifyCookie = async function(cookieDat, feature_input) {
        
     }
 
-    chrome.storage.sync.set({cookiesLabels: labels});
+    console.log("[BACKGROUND] cookieClassification saved");
+    console.log(labels);
+    chrome.storage.sync.set({"cookieClassification": labels});
     
 }
 

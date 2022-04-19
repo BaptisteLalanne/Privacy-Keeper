@@ -6,3 +6,68 @@
 /*                                                                      */
 /* -------------------------------------------------------------------- */
 /* ==================================================================== */
+
+.dashboard-wrapper {  
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    grid-auto-columns: 1fr;
+    gap: 2*$font-size 2*$font-size;
+    grid-auto-flow: column;
+    grid-template-areas:
+      ". ."
+      ". .";
+    width: 90%;
+}
+
+.dashboard-box {
+    border-radius: $font-size;
+    border: solid 1px lightgray;
+    box-shadow: 1px 1px 4px lightgray;
+    padding: $font-size;
+}
+
+.graph-title {
+    text-align: center;
+    margin: auto;
+    margin-top: 1.5*$font-size;
+    color: $dark-grey;
+}
+.graph-title .MuiDivider-root::before, .graph-title .MuiDivider-root::after {
+    border-top: solid 1px $dark-grey !important;
+    opacity: 0.6;
+}
+
+.graph {
+    user-select: none;
+}
+
+.dual-graph-wrapper {
+    display: flex;
+}
+
+#cookie-histogram-wrapper {
+    width: 70%;
+}
+#cookie-pie-wrapper {
+    width: 30%;
+}
+
+.recharts-default-legend {
+    margin-top: -2*$font-size !important;
+}
+
+#cookie-pie-wrapper .recharts-default-legend {
+    margin: auto !important;
+}
+#cookie-pie-wrapper .recharts-legend-wrapper {
+    left: 50px !important;
+}
+#cookie-pie-wrapper .recharts-pie {
+    margin: auto !important;
+}
+
+#cookie-histogram-wrapper .recharts-default-legend {
+    margin: auto !important;
+    margin-top: -1*$font-size !important;
+}

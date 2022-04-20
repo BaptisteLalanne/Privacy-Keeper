@@ -1,12 +1,12 @@
 import React from 'react';
-import Slide from '@mui/material/Slide';
+import Grow from '@mui/material/Grow';
 
 export default function AboutUs() {
     return (
-        <Slide in={true} direction="right" timeout={250}>
+        <Grow in={true} timeout={250} style={{ transformOrigin: '0 0 0' }}>
             <div>
                 This is going to be the 'About us' page!
             </div>
-        </Slide>
+        </Grow>
     )
 }

@@ -25,6 +25,7 @@
     border: solid 1px lightgray;
     box-shadow: 1px 1px 4px lightgray;
     padding: $font-size;
+    align-self: stretch;
 }
 
 .graph-title {
@@ -45,7 +46,6 @@
 .dual-graph-wrapper {
     display: flex;
 }
-
 #cookie-histogram-wrapper {
     width: 70%;
 }
@@ -53,21 +53,13 @@
     width: 30%;
 }
 
-.recharts-default-legend {
+#score-line-chart-wrapper .recharts-default-legend, 
+#cookie-line-chart-wrapper .recharts-default-legend {
     margin-top: -2*$font-size !important;
 }
-
 #cookie-pie-wrapper .recharts-default-legend {
-    margin: auto !important;
+    margin-left: 3*$font-size !important;
 }
-#cookie-pie-wrapper .recharts-legend-wrapper {
-    left: 50px !important;
-}
-#cookie-pie-wrapper .recharts-pie {
-    margin: auto !important;
-}
-
 #cookie-histogram-wrapper .recharts-default-legend {
-    margin: auto !important;
     margin-top: -1*$font-size !important;
 }

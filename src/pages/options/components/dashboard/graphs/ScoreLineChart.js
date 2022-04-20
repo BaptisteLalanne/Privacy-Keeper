@@ -43,7 +43,7 @@ export default function ScoreLineChart() {
   }
 
   return (
-    <div className="dashboard-box">
+    <div className="dashboard-box" id="score-line-chart-wrapper">
         <ResponsiveContainer width="99%" height={300}>
           <LineChart width={600} height={300} data={data} margin={{ top: 32, right: 20, bottom: 20, left: -10 }} className="graph">
             <CartesianGrid stroke="#ccc" strokeDasharray="3 3" />

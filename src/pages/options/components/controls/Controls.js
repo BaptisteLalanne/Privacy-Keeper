@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Divider from '@mui/material/Divider';
 import Switch from '@mui/material/Switch';
 import Input from '@mui/material/Input';
-import Slide from '@mui/material/Slide';
+import Grow from '@mui/material/Grow';
 import "./controls.scss";
 
 // Update switch CSS
@@ -95,7 +95,7 @@ export default function Controls() {
     };
 
     return (
-        <Slide in={true} direction="right" timeout={250}>
+        <Grow in={true} timeout={250} style={{ transformOrigin: '0 0 0' }}>
             <div className="controls-wrapper">
 
                 {/* Toggle options*/}
@@ -146,6 +146,6 @@ export default function Controls() {
                 </div>
 
             </div>
-        </Slide>
+        </Grow>
     )
 }

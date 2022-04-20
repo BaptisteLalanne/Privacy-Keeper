@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Slide from '@mui/material/Slide';
+import Grow from '@mui/material/Grow';
 import "./learn-more.scss";
 
 export default function LearnMore() {
@@ -87,7 +87,7 @@ export default function LearnMore() {
 
   return (
     <>
-      <Slide in={true} direction="right" timeout={250}>
+      <Grow in={true} timeout={250} style={{ transformOrigin: '0 0 0' }}>
         <div>
           <p>
             This is an introductory text to explain what the document is about.
@@ -140,7 +140,7 @@ export default function LearnMore() {
 
           </div>
         </div>
-      </Slide>
+      </Grow>
     </>
   )
 }

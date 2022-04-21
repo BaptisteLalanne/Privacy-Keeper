@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Divider from '@mui/material/Divider';
 import Switch from '@mui/material/Switch';
 import Input from '@mui/material/Input';
-import Grow from '@mui/material/Grow';
+import Fade from '@mui/material/Fade';
 import "./controls.scss";
 
 // Update switch CSS
@@ -94,11 +94,14 @@ export default function Controls() {
         saveToggleOptions(newState);
     };
 
+    const fadeDuration = 400;
+    const fadeOffset = 150;
+
     return (
-        <Grow in={true} timeout={250} style={{ transformOrigin: '0 0 0' }}>
             <div className="controls-wrapper">
 
                 {/* Toggle options*/}
+                <Fade in={true} timeout={fadeDuration} style={{ transitionDelay: 50+0*fadeOffset+'ms' }}>
                 <div className="controls-section">
                     <div className="controls-section-header">
                         <Divider textAlign="left">Toggle options</Divider>
@@ -134,8 +137,10 @@ export default function Controls() {
                         </div>
                     </div>
                 </div>
+                </Fade>
 
                 {/* Manage cookies */}
+                <Fade in={true} timeout={fadeDuration} style={{ transitionDelay: 1*fadeOffset+'ms' }}>
                 <div className="controls-section">
                     <div className="controls-section-header">
                         <Divider textAlign="left">Manage cookies</Divider>
@@ -144,8 +149,8 @@ export default function Controls() {
 
                     </div>
                 </div>
+                </Fade>
 
             </div>
-        </Grow>
     )
 }

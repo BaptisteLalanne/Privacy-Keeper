@@ -4,28 +4,26 @@ import CookieLineChart from './graphs/CookieLineChart.js';
 import CookieHistoAndPieChart from './graphs/CookieHistoAndPieChart.js';
 import WebsiteTable from './graphs/WebsiteTable.js';
 import Zoom from '@mui/material/Zoom';
-import Grow from '@mui/material/Grow';
 import "./dashboard.scss";
 
 export default function Dashboard() {
-    let [animationEnd, setAnimationEnd] = useState(false);
-    const endZoom = (e) => {
-        setAnimationEnd(true);
-        console.log(animationEnd)
-    }
+    
+    const zoomDuration = 300;
+    const zoomOffset = 75;
+
     return (
         
         <div className="dashboard-wrapper">
-            <Zoom in={true} style={{ transitionDelay: '0ms'}} timeout={300} >
+            <Zoom in={true} style={{ transitionDelay: 0*zoomOffset+'ms'}} timeout={zoomDuration} >
                 <div><ScoreLineChart/></div>
             </Zoom>
-            <Zoom in={true} style={{ transitionDelay: '150ms'}} timeout={300} >
+            <Zoom in={true} style={{ transitionDelay: 2*zoomOffset+'ms'}} timeout={zoomDuration} >
                 <div><CookieLineChart/></div>
             </Zoom>
-            <Zoom in={true} style={{ transitionDelay: '75ms'}} timeout={300} >
+            <Zoom in={true} style={{ transitionDelay: 1*zoomOffset+'ms'}} timeout={zoomDuration} >
                 <div><WebsiteTable/></div>
             </Zoom>
-            <Zoom in={true} style={{ transitionDelay: '225ms'}} timeout={300} addEndListener={endZoom}>
+            <Zoom in={true} style={{ transitionDelay: 3*zoomOffset+'ms'}} timeout={zoomDuration}>
                 <div><CookieHistoAndPieChart/></div>
             </Zoom>
             

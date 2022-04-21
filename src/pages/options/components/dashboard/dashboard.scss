@@ -17,7 +17,7 @@
     grid-template-areas:
       ". ."
       ". .";
-    width: 90%;
+    width: 85%;
 }
 
 .dashboard-box {
@@ -26,6 +26,8 @@
     box-shadow: 1px 1px 4px lightgray;
     padding: $font-size;
     align-self: stretch;
+    height: 100%;
+    width: 100%;
 }
 
 .graph-title {
@@ -62,4 +64,34 @@
 }
 #cookie-histogram-wrapper .recharts-default-legend {
     margin-top: -1*$font-size !important;
+}
+
+.MuiTable-root {
+    width: 80% !important;
+    height: 300px !important;
+    margin: auto !important;
+}
+.MuiTableCell-head {
+    font-size: $font-size !important;
+}
+.MuiTableCell-root {
+    border: none !important;
+    padding: 0.5*$font-size !important;
+}
+.table-content-cell {
+    margin: auto;
+    display: flex;
+    gap: $font-size;
+    justify-content: center;
+    justify-items: center;
+}
+.table-right-border-cell {
+    border-right: 1px solid lightgray !important;
+}
+.table-header-cell {
+    border-bottom: 1px solid lightgray !important;
+    font-size: 1.1*$font-size !important;
+}
+.table-top-padding-cell {
+    padding-top: $font-size !important;
 }

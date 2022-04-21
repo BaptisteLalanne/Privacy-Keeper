@@ -45,7 +45,7 @@ export default function CookieHistoAndPieChart() {
 
   }, []);
 
-  const COLORS = [style.col1, style.col2, style.col3, style.col4];
+  const COLORS = [style.graphcol2, style.graphcol4, style.graphcol3, style.graphcol1];
   let TOTAL = 0; for (let i in data) { TOTAL += data[i]["Total"]; }
 
   return (
@@ -79,7 +79,7 @@ export default function CookieHistoAndPieChart() {
                   <Cell key={`cell-${index}`} fill={"#202020"} />
                 ))}
               </Bar>
-              <Bar dataKey="Detected" stackId="a" fill={style.col1} animationBegin={225}>
+              <Bar dataKey="Detected" stackId="a" fill={"#606060"} animationBegin={225}>
                 {data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % 20]} />
                 ))}

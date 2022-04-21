@@ -59,9 +59,9 @@ export default function Options() {
             itemRefs[i].current.setAttribute('style', 'font-weight: normal');
             itemRefs[i].current.style.color = "black";
         }
-        itemRefs[index].current.getElementsByClassName("nav-icon")[0].style.color = style.col0;
+        itemRefs[index].current.getElementsByClassName("nav-icon")[0].style.color = style.logocol0;
         itemRefs[index].current.setAttribute('style', 'font-weight: bold');
-        itemRefs[index].current.style.color = style.col0;
+        itemRefs[index].current.style.color = style.logocol0;
 
     };
 

@@ -1,7 +1,8 @@
-import React, { PureComponent } from 'react';
+import React, { useState, useEffect, PureComponent } from 'react'
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import Divider from '@mui/material/Divider';
 import style from "./../dashboard.scss";
+import { mapRange, nonPeriodicSine } from "./../../../../../scripts/miscellaneous/common.js";
 
 // Custom Time Label
 class CustomizedTimeTick extends PureComponent {
@@ -19,28 +20,27 @@ class CustomizedTimeTick extends PureComponent {
 
 export default function ScoreLineChart() {
 
-  const mapRange = (x, min1, max1, min2, max2) => {
-    return (x-min1)/(max1-min1) * (max2-min2) + min2;
-  }
-
-  const nonPeriodicSine = (x) => {
-    return ((Math.sin(2 * 0.15 * x) + Math.sin(Math.PI * 0.15 * x)) / 2 + 1) * 20 + 40;
-  }
+  let [data, setData] = useState([]);
   
-  // Generate random data
-  let data = [];
-  const today = new Date();
-  for (let i = 31; i >= 0; i--) {
-    let slope =  mapRange(i, 31, 0, 1, 0.5);
-    let key = new Date(today); key.setDate(today.getDate() - i);
-    let formattedKey = key.getDate().toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false }) + "/" + 
-                       key.getMonth().toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false });
-    data.push({
-      "Time": formattedKey,
-      "Cookie intrusiveness": Math.round(nonPeriodicSine(i)*slope),
-      "Tracking suspicion": Math.round(nonPeriodicSine(i - 100)*slope)
-    });
-  }
+  useEffect(() => {
+
+    // Generate random data
+    let _data = [];
+    const today = new Date();
+    for (let i = 31; i >= 0; i--) {
+      let slope =  mapRange(i, 31, 0, 1, 0.5);
+      let key = new Date(today); key.setDate(today.getDate() - i);
+      let formattedKey = key.getDate().toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false }) + "/" + 
+                        key.getMonth().toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false });
+      _data.push({
+        "Time": formattedKey,
+        "Cookie intrusiveness": Math.round(nonPeriodicSine(i, 20)*slope),
+        "Tracking suspicion": Math.round(nonPeriodicSine(i - 100, 20)*slope)
+      });
+    }
+    setData(_data);
+
+  }, []);
 
   return (
     <div className="dashboard-box" id="score-line-chart-wrapper">
@@ -51,8 +51,8 @@ export default function ScoreLineChart() {
             <YAxis type="number" domain={[0, 100]} />
             <Legend align="right" verticalAlign="top" />
             <Tooltip formatter={(value, name, props) => value+"%"}/>
-            <Line type="natural" dataKey="Cookie intrusiveness" stroke={style.col1} strokeWidth={1.5} animationDuration={800} dot={false}/>
-            <Line type="natural" dataKey="Tracking suspicion" stroke={style.col5} strokeWidth={1.5} animationDuration={800} dot={false}/>
+            <Line type="natural" dataKey="Cookie intrusiveness" stroke={style.graphcol3} strokeWidth={1.5} animationDuration={800} dot={false}/>
+            <Line type="natural" dataKey="Tracking suspicion" stroke={style.graphcol1} strokeWidth={1.5} animationDuration={800} dot={false}/>
           </LineChart>
         </ResponsiveContainer>
         <div className="graph-title">

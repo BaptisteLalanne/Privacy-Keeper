@@ -19,7 +19,7 @@
   "action": {
     "default_title": "Open the popup",
     "default_popup": "popup.html",
-    "default_icon": "icon_32.png"
+    "default_icon": "icon_128.png"
   },
   "permissions": [
     "storage",  "activeTab", "scripting", "unlimitedStorage", "cookies", "tabs", "webNavigation", "webRequest"

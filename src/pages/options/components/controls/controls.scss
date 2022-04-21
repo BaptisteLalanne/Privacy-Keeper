@@ -22,7 +22,7 @@
 }
 
 .controls-section-header .MuiDivider-root {
-    width: 40vw;
+    width: 50%;
 }
 
 .controls-section-header .MuiDivider-wrapper {
@@ -58,6 +58,6 @@
 #expirationTimeInput {
     width: 3*$font-size !important;
     text-align: center;
-    color: $col2;
+    color: $logo-col2;
     font-weight: bold;
 }

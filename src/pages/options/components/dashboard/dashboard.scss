@@ -1,0 +1,97 @@
+@import "../../../../styles/common.scss";
+/* ==================================================================== */
+/* -------------------------------------------------------------------- */
+/*                                                                      */
+/*                          DASHBOARD CSS                               */
+/*                                                                      */
+/* -------------------------------------------------------------------- */
+/* ==================================================================== */
+
+.dashboard-wrapper {  
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    grid-auto-columns: 1fr;
+    gap: 2*$font-size 2*$font-size;
+    grid-auto-flow: column;
+    grid-template-areas:
+      ". ."
+      ". .";
+    width: 85%;
+}
+
+.dashboard-box {
+    border-radius: $font-size;
+    border: solid 1px lightgray;
+    box-shadow: 1px 1px 4px lightgray;
+    padding: $font-size;
+    align-self: stretch;
+    height: 100%;
+    width: 100%;
+}
+
+.graph-title {
+    text-align: center;
+    margin: auto;
+    margin-top: 1.5*$font-size;
+    color: $dark-grey;
+}
+.graph-title .MuiDivider-root::before, .graph-title .MuiDivider-root::after {
+    border-top: solid 1px $dark-grey !important;
+    opacity: 0.6;
+}
+
+.graph {
+    user-select: none;
+}
+
+.dual-graph-wrapper {
+    display: flex;
+}
+#cookie-histogram-wrapper {
+    width: 70%;
+}
+#cookie-pie-wrapper {
+    width: 30%;
+}
+
+#score-line-chart-wrapper .recharts-default-legend, 
+#cookie-line-chart-wrapper .recharts-default-legend {
+    margin-top: -2*$font-size !important;
+}
+#cookie-pie-wrapper .recharts-default-legend {
+    margin-left: 3*$font-size !important;
+}
+#cookie-histogram-wrapper .recharts-default-legend {
+    margin-top: -1*$font-size !important;
+}
+
+.MuiTable-root {
+    width: 80% !important;
+    height: 300px !important;
+    margin: auto !important;
+}
+.MuiTableCell-head {
+    font-size: $font-size !important;
+}
+.MuiTableCell-root {
+    border: none !important;
+    padding: 0.5*$font-size !important;
+}
+.table-content-cell {
+    margin: auto;
+    display: flex;
+    gap: $font-size;
+    justify-content: center;
+    justify-items: center;
+}
+.table-right-border-cell {
+    border-right: 1px solid lightgray !important;
+}
+.table-header-cell {
+    border-bottom: 1px solid lightgray !important;
+    font-size: 1.1*$font-size !important;
+}
+.table-top-padding-cell {
+    padding-top: $font-size !important;
+}

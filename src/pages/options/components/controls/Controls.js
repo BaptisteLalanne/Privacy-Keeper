@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Divider from '@mui/material/Divider';
 import Switch from '@mui/material/Switch';
 import Input from '@mui/material/Input';
+import Fade from '@mui/material/Fade';
 import "./controls.scss";
 
 // Update switch CSS
@@ -36,7 +37,7 @@ export default function Controls() {
 
     // Retrieve settings from local storage
     useEffect(() => {
-        
+
         // Retrieve option toggles
         let switchNodesList = document.getElementsByClassName("MuiSwitch-input");
         chrome.storage.local.get(["toggle_options"], function (res) {
@@ -57,7 +58,7 @@ export default function Controls() {
         });
 
     }, []);
-    
+
     // Local settings updaters
     const saveExpirationTime = (newTime) => {
         chrome.storage.local.set({ "expiration_time": newTime * (1000 * 60 * 60 * 24) }, function () {
@@ -93,23 +94,27 @@ export default function Controls() {
         saveToggleOptions(newState);
     };
 
-    return (
-        <div className="controls-wrapper">
+    const fadeDuration = 400;
+    const fadeOffset = 150;
 
-            {/* Toggle options*/}
-            <div className="controls-section">
-                <div className="controls-section-header">
-                    <Divider textAlign="left">Toggle options</Divider>
-                </div>
-                <div className="controls-section-body">
+    return (
+            <div className="controls-wrapper">
+
+                {/* Toggle options*/}
+                <Fade in={true} timeout={fadeDuration} style={{ transitionDelay: 50+0*fadeOffset+'ms' }}>
+                <div className="controls-section">
+                    <div className="controls-section-header">
+                        <Divider textAlign="left">Toggle options</Divider>
+                    </div>
+                    <div className="controls-section-body">
                         <div className="toggle-options-body">
 
                             <div className="toggle-options-item">
                                 <Switch checked={state.autoDeleteOldCookies} onChange={handleToggleChange} name="autoDeleteOldCookies" size="small" />
                                 <div className="toggle-options-item-label">
                                     Delete cookies older than &nbsp;
-                                    <Input id="expirationTimeInput" type="number" 
-                                        onBlur={handleExpirationTimeChange} 
+                                    <Input id="expirationTimeInput" type="number"
+                                        onBlur={handleExpirationTimeChange}
                                         ref={expirationTimeInputRef}
                                     />
                                     &nbsp; days each time the browser is launched
@@ -130,19 +135,22 @@ export default function Controls() {
                                 </div>
                             </div>
                         </div>
+                    </div>
                 </div>
+                </Fade>
+
+                {/* Manage cookies */}
+                <Fade in={true} timeout={fadeDuration} style={{ transitionDelay: 1*fadeOffset+'ms' }}>
+                <div className="controls-section">
+                    <div className="controls-section-header">
+                        <Divider textAlign="left">Manage cookies</Divider>
+                    </div>
+                    <div className="controls-section-body">
+
+                    </div>
+                </div>
+                </Fade>
+
             </div>
-
-            {/* Manage cookies */}
-            <div className="controls-section">
-                <div className="controls-section-header">
-                    <Divider textAlign="left">Manage cookies</Divider>
-                </div>
-                <div className="controls-section-body">
-
-                </div>
-            </div>
-
-        </div>
     )
 }

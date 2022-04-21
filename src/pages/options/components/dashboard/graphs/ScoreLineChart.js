@@ -61,7 +61,3 @@ export default function ScoreLineChart() {
     </div>
   )
 }
-
-
-
-

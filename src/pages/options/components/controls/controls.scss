@@ -61,3 +61,13 @@
     color: $logo-col2;
     font-weight: bold;
 }
+
+.cookie-table {
+    width: 50%;
+}
+
+.cookie-table .MuiTableCell-root {
+    white-space: 'nowrap';
+    overflow: 'hidden';
+    text-overflow: 'ellipsis';
+}

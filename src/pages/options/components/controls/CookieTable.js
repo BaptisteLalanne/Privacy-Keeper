@@ -189,6 +189,12 @@ export default function CookieTable() {
 
     const constructData = (lastCookieUpdateDates) => {
 
+        const cleanDomainName = (domain) => {
+            if (domain[0] == '.') domain = domain.substr(1);
+            if (domain.substr(0, 4) == "www.") domain = domain.substr(4);
+            return domain;
+        }
+
         // Fetch all cookies
         chrome.cookies.getAll({}, function (cookies) {
             let _data = [];
@@ -201,6 +207,7 @@ export default function CookieTable() {
                 // Query last used date
                 let lastUsedKey = "domain" + domain + "name" + name;
                 let lastUsed = lastCookieUpdateDates[lastUsedKey];
+                if (!lastUsed) lastUsed = Date.now().toString();
 
                 // Compute type (WIP: might be stored in local storage and passed as param)
                 let type = "UNKNOWN";
@@ -209,6 +216,7 @@ export default function CookieTable() {
                 let size = 0.1;
 
                 // Update data
+                domain = cleanDomainName(domain);
                 let dataKey = "domain" + domain + "type" + type;
                 let row = _data[dataKey];
                 // If there's no associated row (with that domain and type), create the data row
@@ -349,12 +357,12 @@ export default function CookieTable() {
                                                     padding="none"
                                                     style={{ width: colWidths[1] }}
                                                 >
-                                                    {row.website}
+                                                    {row.website/*row.website[0] == '.' ? row.website.substr(1) : row.website*/}
                                                 </TableCell>
                                                 <TableCell align="right" style={{ width: colWidths[2] }}>{row.type}</TableCell>
                                                 <TableCell align="right" style={{ width: colWidths[3] }}>{row.cookies}</TableCell>
                                                 <TableCell align="right" style={{ width: colWidths[4] }}>{Math.round(row.storage*100) / 100 + " MB"}</TableCell>
-                                                <TableCell align="right" style={{ width: colWidths[5] }}>{new Date(row.lastUsed*1000).toLocaleDateString("en-US")}</TableCell>
+                                                <TableCell align="right" style={{ width: colWidths[5] }}>{new Date(parseInt(row.lastUsed)).toLocaleDateString("fr-FR")}</TableCell>
                                             </TableRow>
                                         );
                                     })}
@@ -377,32 +385,6 @@ export default function CookieTable() {
                     />
                 </Paper>
             </Box>
-            {/*
-            <TableContainer>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                        <TableCell align="left">Website</TableCell>
-                        <TableCell align="right">Type</TableCell>
-                        <TableCell align="right">Cookies</TableCell>
-                        <TableCell align="right">Storage</TableCell>
-                        <TableCell align="right">Last used</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {Object.keys(data).map((index) => (
-                        <TableRow key={index}>
-                            <TableCell align="left">{data[index]["website"]}</TableCell>
-                            <TableCell align="right">{data[index]["type"]}</TableCell>
-                            <TableCell align="right">{data[index]["cookies"]}</TableCell>
-                            <TableCell align="right">{Math.round(data[index]["storage"]*100) / 100 + " MB"}</TableCell>
-                            <TableCell align="right">{data[index]["last-used"]}</TableCell>
-                        </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-                */}
         </div>
     );
 

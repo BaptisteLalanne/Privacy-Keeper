@@ -18,6 +18,15 @@ import Button from '@mui/material/Button';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { visuallyHidden } from '@mui/utils';
 import "./controls.scss";
+import { IconButton, TextField } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import CloseIcon from '@mui/icons-material/Close';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputAdornment from '@mui/material/InputAdornment';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -38,6 +47,7 @@ function getComparator(order, orderBy) {
 export default function CookieTable() {
 
     let [rows, setRows] = useState([]);
+    let [originalRows, setOriginalRows] = useState([]);
 
     const constructData = (lastCookieUpdateDates) => {
 
@@ -47,13 +57,12 @@ export default function CookieTable() {
             return domain;
         }
 
-        const getCookieSize = (cookie) => {  
+        const getCookieSize = (cookie) => {
             let cookieString = "";
             for (const [key, value] of Object.entries(cookie)) {
                 cookieString += key + "=" + value + "; ";
             }
-            console.log(new Blob([cookieString]).size / 1024)
-            return new Blob([cookieString]).size / 1024;
+            return cookieString.length / 1024;
         }
 
         // Fetch all cookies
@@ -107,6 +116,7 @@ export default function CookieTable() {
             // Put object in an array
             let _rows = Object.keys(_data).map(function (key) { return _data[key]; });
             setRows(_rows);
+            setOriginalRows(_rows);
 
         })
     }
@@ -134,7 +144,9 @@ export default function CookieTable() {
         }
 
         // Filter and unselect table rows
-        setRows(rows.filter(function(e) { return selected.indexOf(e) == -1; }));
+        let filteredRows = rows.filter(function (e) { return selected.indexOf(e) == -1; });
+        setRows(filteredRows);
+        setOriginalRows(filteredRows);
         setSelected([]);
 
         // Store deleted cookies
@@ -167,6 +179,9 @@ export default function CookieTable() {
     const [order, setOrder] = useState('desc');
     const [orderBy, setOrderBy] = useState('cookies');
     const [selected, setSelected] = useState([]);
+    const [domainSearch, setDomainSearch] = useState("");
+    const [typeFilter, setTypeFilter] = useState("");
+    const [daysFilter, setDaysFilter] = useState("");
     const [page, setPage] = useState(0);
     const rowsPerPage = 10;
 
@@ -210,10 +225,50 @@ export default function CookieTable() {
 
     const isSelected = (row) => selected.indexOf(row) !== -1;
 
+    const formatDate = (date) => {
+        let diff = Math.round(((new Date().getTime()) - (new Date(parseInt(date)).getTime())) / (1000 * 3600 * 24));
+        return (diff == 0) ? "Today" : diff + " day" + (diff == 1 ? "" : "s") + " ago";
+    }
+
+    const requestDomainSearch = (searchTerm) => {
+        setDomainSearch(searchTerm);
+        filterRows(searchTerm, typeFilter, daysFilter);
+    };
+
+    const cancelDomainSearch = () => {
+        setDomainSearch("");
+        filterRows("", typeFilter, daysFilter);
+    };
+
+    const requestTypeFilter = (searchTerm) => {
+        setTypeFilter(searchTerm);
+        filterRows(domainSearch, searchTerm, daysFilter);
+    }
+
+    const requestDaysFilter = (searchTerm) => {
+        if (searchTerm >= 0) {
+            setDaysFilter(searchTerm);
+            filterRows(domainSearch, typeFilter, searchTerm);
+        }
+    }
+
+    const filterRows = (domainSearch, typeFilter, daysFilter) => {
+        console.log(domainSearch + "; " + typeFilter + "; " + daysFilter)
+        let searchDomain = domainSearch.length > 0;
+        let filterType = typeFilter.length > 0 && typeFilter != "Any";
+        let filterDays = daysFilter > 0;
+        const filteredRows = originalRows.filter((row) => {
+            let lastUsed = Math.round(((new Date().getTime()) - (new Date(parseInt(row.lastUsed)).getTime())) / (1000 * 3600 * 24));
+            return ((row.website.toLowerCase().includes(domainSearch.toLowerCase()) && searchDomain) || !searchDomain)
+                && ((row.type.toLowerCase() == typeFilter.toLowerCase() && filterType) || !filterType)
+                && ((lastUsed >= daysFilter && filterDays) || !filterDays);
+        });
+        setRows(filteredRows);
+    }
+
     // Avoid a layout jump when reaching the last page with empty rows.
     const emptyRows =
         page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-
 
     const colWidths = ["5%", "24%", "14%", "9%", "9%", "14%"];
     const headCells = [
@@ -329,7 +384,7 @@ export default function CookieTable() {
                     <Typography
                         sx={{ flex: '1 1 100%', fontWeight: 'bold' }}
                         color="inherit"
-                        variant="subtitle1"
+                        variant="h6"
                         component="div"
                     >
                         Locally stored cookies
@@ -348,6 +403,62 @@ export default function CookieTable() {
         selected: PropTypes.array.isRequired,
     };
 
+    const Filters = () => {
+        return (
+            <div className="filter-toolbar">
+                <div className="search-bar">
+                    <FormControl variant="outlined" size="small">
+                        <InputLabel htmlFor="domain-search-input">Domain</InputLabel>
+                        <OutlinedInput
+                            id="domain-search-input"
+                            label="doma"
+                            type="text"
+                            value={domainSearch}
+                            onChange={(event) => requestDomainSearch(event.target.value)}
+                            endAdornment={
+                                <InputAdornment position="end">
+                                    <IconButton onClick={() => cancelDomainSearch()} edge="end">
+                                        {domainSearch.length == 0 ? <SearchIcon /> : <CloseIcon />}
+                                    </IconButton>
+                                </InputAdornment>
+                            }
+                        />
+                    </FormControl>
+                </div>
+                <div className="type-filter-bar">
+                    <FormControl sx={{ minWidth: 240 }} size="small">
+                        <InputLabel id="type-filter-input">Type</InputLabel>
+                        <Select
+                            labelId="type-filter-input"
+                            id="type-filter-input"
+                            value={typeFilter}
+                            label="Typ"
+                            onChange={(event) => requestTypeFilter(event.target.value)}
+                        >
+                            <MenuItem value={""}><em>Any</em></MenuItem>
+                            <MenuItem value={"necessary"}>Necessary</MenuItem>
+                            <MenuItem value={"functional"}>Functional</MenuItem>
+                            <MenuItem value={"analytics"}>Analytics</MenuItem>
+                            <MenuItem value={"advertising"}>Advertising</MenuItem>
+                        </Select>
+                    </FormControl>
+                </div>
+                <div className="days-filter-bar">
+                    <FormControl variant="outlined" size="small">
+                        <InputLabel htmlFor="days-filter-input">Older than ...</InputLabel>
+                        <OutlinedInput
+                            id="days-filter-input"
+                            label="Older than"
+                            type="number"
+                            value={daysFilter}
+                            onChange={(event) => requestDaysFilter(event.target.value)}
+                            endAdornment={<InputAdornment position="end">days</InputAdornment>}
+                        />
+                    </FormControl>
+                </div>
+            </div>
+        )
+    };
 
     return (
         <div className="cookie-table">
@@ -355,6 +466,7 @@ export default function CookieTable() {
             <Box sx={{ width: '100%' }}>
                 <Paper sx={{ width: '100%', mb: 2 }}>
                     <EnhancedTableToolbar selected={selected} />
+                    <Filters />
                     <TableContainer>
                         <Table sx={{ minWidth: 750 }} size="small" aria-labelledby="tableTitle">
                             <EnhancedTableHead
@@ -396,12 +508,12 @@ export default function CookieTable() {
                                                     padding="none"
                                                     style={{ width: colWidths[1] }}
                                                 >
-                                                    {row.website/*row.website[0] == '.' ? row.website.substr(1) : row.website*/}
+                                                    {row.website}
                                                 </TableCell>
                                                 <TableCell align="right" style={{ width: colWidths[2] }}>{row.type}</TableCell>
                                                 <TableCell align="right" style={{ width: colWidths[3] }}>{row.cookies}</TableCell>
                                                 <TableCell align="right" style={{ width: colWidths[4] }}>{Math.round(row.storage * 100) / 100 + " kB"}</TableCell>
-                                                <TableCell align="right" style={{ width: colWidths[5] }}>{Math.round(((new Date().getTime()) - (new Date(parseInt(row.lastUsed)).getTime())) / (1000 * 3600 * 24)) == 0 ? "Today" : Math.round(((new Date().getTime()) - (new Date(parseInt(row.lastUsed)).getTime())) / (1000 * 3600 * 24)) + " days ago"}</TableCell>
+                                                <TableCell align="right" style={{ width: colWidths[5] }}>{formatDate(row.lastUsed)}</TableCell>
                                             </TableRow>
                                         );
                                     })}

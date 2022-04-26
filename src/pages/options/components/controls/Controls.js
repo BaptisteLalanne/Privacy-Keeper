@@ -96,7 +96,7 @@ export default function Controls() {
     };
 
     const fadeDuration = 400;
-    const fadeOffset = 150;
+    const fadeOffset = 200;
 
     return (
             <div className="controls-wrapper">

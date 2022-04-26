@@ -71,3 +71,8 @@
     overflow: 'hidden';
     text-overflow: 'ellipsis';
 }
+
+.MuiButton-root {
+    white-space: nowrap !important;
+    padding: 0.5*$font-size 1.5*$font-size !important;
+}

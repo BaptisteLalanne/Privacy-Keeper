@@ -47,6 +47,15 @@ export default function CookieTable() {
             return domain;
         }
 
+        const getCookieSize = (cookie) => {  
+            let cookieString = "";
+            for (const [key, value] of Object.entries(cookie)) {
+                cookieString += key + "=" + value + "; ";
+            }
+            console.log(new Blob([cookieString]).size / 1024)
+            return new Blob([cookieString]).size / 1024;
+        }
+
         // Fetch all cookies
         chrome.cookies.getAll({}, function (cookies) {
             let _data = [];
@@ -65,7 +74,7 @@ export default function CookieTable() {
                 let type = "UNKNOWN";
 
                 // Compute cookie storage size (WIP: idk how to do it yet)
-                let size = 0.1;
+                let size = getCookieSize(cookie);
 
                 // Update data
                 domain = cleanDomainName(domain);
@@ -391,8 +400,8 @@ export default function CookieTable() {
                                                 </TableCell>
                                                 <TableCell align="right" style={{ width: colWidths[2] }}>{row.type}</TableCell>
                                                 <TableCell align="right" style={{ width: colWidths[3] }}>{row.cookies}</TableCell>
-                                                <TableCell align="right" style={{ width: colWidths[4] }}>{Math.round(row.storage * 100) / 100 + " MB"}</TableCell>
-                                                <TableCell align="right" style={{ width: colWidths[5] }}>{new Date(parseInt(row.lastUsed)).toLocaleDateString("fr-FR")}</TableCell>
+                                                <TableCell align="right" style={{ width: colWidths[4] }}>{Math.round(row.storage * 100) / 100 + " kB"}</TableCell>
+                                                <TableCell align="right" style={{ width: colWidths[5] }}>{Math.round(((new Date().getTime()) - (new Date(parseInt(row.lastUsed)).getTime())) / (1000 * 3600 * 24)) == 0 ? "Today" : Math.round(((new Date().getTime()) - (new Date(parseInt(row.lastUsed)).getTime())) / (1000 * 3600 * 24)) + " days ago"}</TableCell>
                                             </TableRow>
                                         );
                                     })}

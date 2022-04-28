@@ -66,32 +66,32 @@
     margin-top: -1*$font-size !important;
 }
 
-.MuiTable-root {
+.dashboard-box .MuiTable-root {
     width: 80% !important;
     height: 300px !important;
     margin: auto !important;
 }
-.MuiTableCell-head {
+.dashboard-box .MuiTableCell-head {
     font-size: $font-size !important;
 }
-.MuiTableCell-root {
+.dashboard-box .MuiTableCell-root {
     border: none !important;
     padding: 0.5*$font-size !important;
 }
-.table-content-cell {
+.dashboard-box .table-content-cell {
     margin: auto;
     display: flex;
     gap: $font-size;
     justify-content: center;
     justify-items: center;
 }
-.table-right-border-cell {
+.dashboard-box .table-right-border-cell {
     border-right: 1px solid lightgray !important;
 }
-.table-header-cell {
+.dashboard-box .table-header-cell {
     border-bottom: 1px solid lightgray !important;
     font-size: 1.1*$font-size !important;
 }
-.table-top-padding-cell {
+.dashboard-box .table-top-padding-cell {
     padding-top: $font-size !important;
 }

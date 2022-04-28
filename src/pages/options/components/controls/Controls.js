@@ -3,6 +3,7 @@ import Divider from '@mui/material/Divider';
 import Switch from '@mui/material/Switch';
 import Input from '@mui/material/Input';
 import Fade from '@mui/material/Fade';
+import CookieTable from "./CookieTable.js";
 import "./controls.scss";
 
 // Update switch CSS
@@ -95,7 +96,7 @@ export default function Controls() {
     };
 
     const fadeDuration = 400;
-    const fadeOffset = 150;
+    const fadeOffset = 200;
 
     return (
             <div className="controls-wrapper">
@@ -146,7 +147,7 @@ export default function Controls() {
                         <Divider textAlign="left">Manage cookies</Divider>
                     </div>
                     <div className="controls-section-body">
-
+                        <CookieTable/>
                     </div>
                 </div>
                 </Fade>

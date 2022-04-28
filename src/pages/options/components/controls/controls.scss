@@ -61,3 +61,39 @@
     color: $logo-col2;
     font-weight: bold;
 }
+
+.cookie-table {
+    width: 50%;
+}
+
+.cookie-table .MuiTableCell-root {
+    white-space: 'nowrap';
+    overflow: 'hidden';
+    text-overflow: 'ellipsis';
+}
+
+.MuiButton-root {
+    white-space: nowrap !important;
+    padding: 0.5*$font-size 1.5*$font-size !important;
+}
+
+.MuiPaper-root {
+    border: solid 1px #e7e7e7 !important;
+    box-shadow: 2px 2px 8px lightgrey !important;
+}
+
+.filter-toolbar {
+    width: 100%;
+    display: flex;
+    padding: $font-size;
+    gap: $font-size;
+    justify-content: space-evenly;
+}
+
+.search-bar, .type-filter-bar, .days-filter-bar {
+    width: 33%;
+}
+
+.type-filter-bar .MuiFormControl-root, .search-bar .MuiFormControl-root, .days-filter-bar .MuiFormControl-root {
+    width: 100% !important;
+}

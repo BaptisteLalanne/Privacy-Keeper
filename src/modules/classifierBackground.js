@@ -210,8 +210,21 @@ const classifyCookie = async function(cookieDat, feature_input) {
 
     console.log("[CLASSIFIER BACKGROUND] cookieClassification saved");
     console.log(labels);
+
+    // Save current tab's cookie repartition
     chrome.storage.sync.set({"currentCookieTypes": labels});
-    chrome.storage.sync.set({"cookieTypes": cookieTypes});
+
+    // Update gobal cookie types map
+    chrome.storage.local.get(["cookieTypes"], res => {
+        let data = {};
+        if (res && res.cookieTypes) {
+            data = res.cookieTypes;
+        }
+        newData = {...data, ...cookieTypes};
+        console.log("SFHLSDHSDLFBFSD")
+        console.log(newData);
+        chrome.storage.local.set({ "cookieTypes": newData });
+    });
     
 }
 

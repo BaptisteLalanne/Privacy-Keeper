@@ -49,7 +49,7 @@ export default function CookieTable() {
     let [rows, setRows] = useState([]);
     let [originalRows, setOriginalRows] = useState([]);
 
-    const constructData = (lastCookieUpdateDates) => {
+    const constructData = (lastCookieUpdateDates, cookieTypes) => {
 
         const cleanDomainName = (domain) => {
             if (domain[0] == '.') domain = domain.substr(1);
@@ -75,12 +75,15 @@ export default function CookieTable() {
                 let name = cookie.name;
 
                 // Query last used date
-                let lastUsedKey = "domain" + domain + "name" + name;
-                let lastUsed = lastCookieUpdateDates[lastUsedKey];
+                let key = "domain" + domain + "name" + name;
+                let lastUsed = lastCookieUpdateDates[key];
                 if (!lastUsed) lastUsed = Date.now().toString();
 
                 // Compute type (WIP: might be stored in local storage and passed as param)
-                let type = "UNKNOWN";
+                const types = ["Necessary", "Functional", "Analytics", "Advertising"];
+                console.log(cookieTypes);
+                console.log(cookieTypes[key]);
+                let type = cookieTypes[key] != null ? types[cookieTypes[key]] : "Unknown";
 
                 // Compute cookie storage size (WIP: idk how to do it yet)
                 let size = getCookieSize(cookie);
@@ -144,9 +147,9 @@ export default function CookieTable() {
         }
 
         // Filter and unselect table rows
-        let filteredRows = rows.filter(function (e) { return selected.indexOf(e) == -1; });
-        setRows(filteredRows);
-        setOriginalRows(filteredRows);
+        const filterFunction = (e) => { return selected.indexOf(e) == -1; }
+        setRows(rows.filter(filterFunction));
+        setOriginalRows(originalRows.filter(filterFunction));
         setSelected([]);
 
         // Store deleted cookies
@@ -156,7 +159,6 @@ export default function CookieTable() {
                 data = res.manuallyDeletedCookies;
             }
             data[Date.now().toString()] = deleted;
-            console.log(data);
             chrome.storage.local.set({ "manuallyDeletedCookies": data }, () => {
                 if (chrome.runtime.error) {
                     console.log("Runtime error.");
@@ -169,9 +171,12 @@ export default function CookieTable() {
     useEffect(() => {
 
         // Fetch last used date map, construct data using it
-        chrome.storage.local.get(["updateDateCookies"], function (res) {
-            let lastCookieUpdateDates = res.updateDateCookies;
-            constructData(lastCookieUpdateDates);
+        chrome.storage.local.get(["updateDateCookies"], function (res1) {
+            let lastCookieUpdateDates = res1.updateDateCookies;
+            chrome.storage.local.get(["cookieTypes"], function (res2) {
+                let cookieTypes = res2.cookieTypes;               
+                constructData(lastCookieUpdateDates, cookieTypes);
+            });
         });
 
     }, []);
@@ -403,70 +408,64 @@ export default function CookieTable() {
         selected: PropTypes.array.isRequired,
     };
 
-    const Filters = () => {
-        return (
-            <div className="filter-toolbar">
-                <div className="search-bar">
-                    <FormControl variant="outlined" size="small">
-                        <InputLabel htmlFor="domain-search-input">Domain</InputLabel>
-                        <OutlinedInput
-                            id="domain-search-input"
-                            label="doma"
-                            type="text"
-                            value={domainSearch}
-                            onChange={(event) => requestDomainSearch(event.target.value)}
-                            endAdornment={
-                                <InputAdornment position="end">
-                                    <IconButton onClick={() => cancelDomainSearch()} edge="end">
-                                        {domainSearch.length == 0 ? <SearchIcon /> : <CloseIcon />}
-                                    </IconButton>
-                                </InputAdornment>
-                            }
-                        />
-                    </FormControl>
-                </div>
-                <div className="type-filter-bar">
-                    <FormControl sx={{ minWidth: 240 }} size="small">
-                        <InputLabel id="type-filter-input">Type</InputLabel>
-                        <Select
-                            labelId="type-filter-input"
-                            id="type-filter-input"
-                            value={typeFilter}
-                            label="Typ"
-                            onChange={(event) => requestTypeFilter(event.target.value)}
-                        >
-                            <MenuItem value={""}><em>Any</em></MenuItem>
-                            <MenuItem value={"necessary"}>Necessary</MenuItem>
-                            <MenuItem value={"functional"}>Functional</MenuItem>
-                            <MenuItem value={"analytics"}>Analytics</MenuItem>
-                            <MenuItem value={"advertising"}>Advertising</MenuItem>
-                        </Select>
-                    </FormControl>
-                </div>
-                <div className="days-filter-bar">
-                    <FormControl variant="outlined" size="small">
-                        <InputLabel htmlFor="days-filter-input">Older than ...</InputLabel>
-                        <OutlinedInput
-                            id="days-filter-input"
-                            label="Older than"
-                            type="number"
-                            value={daysFilter}
-                            onChange={(event) => requestDaysFilter(event.target.value)}
-                            endAdornment={<InputAdornment position="end">days</InputAdornment>}
-                        />
-                    </FormControl>
-                </div>
-            </div>
-        )
-    };
-
     return (
         <div className="cookie-table">
 
             <Box sx={{ width: '100%' }}>
                 <Paper sx={{ width: '100%', mb: 2 }}>
                     <EnhancedTableToolbar selected={selected} />
-                    <Filters />
+                    <div className="filter-toolbar">
+                        <div className="search-bar">
+                            <FormControl variant="outlined" size="small">
+                                <InputLabel htmlFor="domain-search-input">Domain</InputLabel>
+                                <OutlinedInput
+                                    id="domain-search-input"
+                                    label="doma"
+                                    type="text"
+                                    value={domainSearch}
+                                    onChange={(event) => requestDomainSearch(event.target.value)}
+                                    endAdornment={
+                                        <InputAdornment position="end">
+                                            <IconButton onClick={() => cancelDomainSearch()} edge="end">
+                                                {domainSearch.length == 0 ? <SearchIcon /> : <CloseIcon />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    }
+                                />
+                            </FormControl>
+                        </div>
+                        <div className="type-filter-bar">
+                            <FormControl sx={{ minWidth: 240 }} size="small">
+                                <InputLabel id="type-filter-input">Type</InputLabel>
+                                <Select
+                                    labelId="type-filter-input"
+                                    id="type-filter-input"
+                                    value={typeFilter}
+                                    label="Typ"
+                                    onChange={(event) => requestTypeFilter(event.target.value)}
+                                >
+                                    <MenuItem value={""}><em>Any</em></MenuItem>
+                                    <MenuItem value={"necessary"}>Necessary</MenuItem>
+                                    <MenuItem value={"functional"}>Functional</MenuItem>
+                                    <MenuItem value={"analytics"}>Analytics</MenuItem>
+                                    <MenuItem value={"advertising"}>Advertising</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </div>
+                        <div className="days-filter-bar">
+                            <FormControl variant="outlined" size="small">
+                                <InputLabel htmlFor="days-filter-input">Older than ...</InputLabel>
+                                <OutlinedInput
+                                    id="days-filter-input"
+                                    label="Older than"
+                                    type="number"
+                                    value={daysFilter}
+                                    onChange={(event) => requestDaysFilter(event.target.value)}
+                                    endAdornment={<InputAdornment position="end">days</InputAdornment>}
+                                />
+                            </FormControl>
+                        </div>
+                    </div>
                     <TableContainer>
                         <Table sx={{ minWidth: 750 }} size="small" aria-labelledby="tableTitle">
                             <EnhancedTableHead

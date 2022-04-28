@@ -1,6 +1,8 @@
 // LISTENERS
 
-const classifyCookiesTab = () => {
+const classifyCookiesTab = (activeInfo) => {
+
+    console.log("[CLASSIFIER BACKGROUND] Tab activated")
 
     const queryOptions = {
         active: true,
@@ -10,9 +12,7 @@ const classifyCookiesTab = () => {
     chrome.tabs.query(queryOptions, async function (tabs) {
         if (tabs.length > 0 && tabs[0].url !== "") {
 
-            chrome.storage.sync.set({"cookieClassification": [0,0,0,0]}, function() {
-
-                console.log("[BACKGROUND] Here")
+            chrome.storage.sync.set({"currentCookieTypes": [0,0,0,0]}, function() {
 
                 //Getting all the cookie whose url matches the active tab
                 chrome.cookies.getAll({"url": tabs[0].url}, function (cookies) {
@@ -43,7 +43,7 @@ const classifyCookiesTab = () => {
 
 }
 
-chrome.tabs.onUpdated.addListener(classifyCookiesTab);
+chrome.tabs.onActivated.addListener(classifyCookiesTab);
 
 
 //-------------------------------------------------------------------------------
@@ -166,13 +166,13 @@ const updateFEInput = async function(storedFEInput, rawCookie) {
  */
 const classifyCookie = async function(cookieDat, feature_input) {
 
-    // console.log("[BACKGROUND] entering classifyCookie");
+    // console.log("[CLASSIFIER BACKGROUND] entering classifyCookie");
 
     let features = extractFeatures(feature_input);
     //label = await predictClass(features, cblk_pscale);
     label = await predictClass(features, 1);
     
-    // console.log("[BACKGROUND] leaving classifyCookie");
+    // console.log("[CLASSIFIER BACKGROUND] leaving classifyCookie");
 
     return label;
 };
@@ -186,6 +186,7 @@ const classifyCookie = async function(cookieDat, feature_input) {
  const handleCookies = async function (newCookies){
 
     let labels = [0,0,0,0];
+    let cookieTypes = {};
 
     for (let cookie of newCookies) {
         serializedCookie = createFEInput(cookie);
@@ -194,15 +195,23 @@ const classifyCookie = async function(cookieDat, feature_input) {
         //console.log(serializedCookie);
     
         console.assert(serializedCookie !== undefined, "Cookie object was still undefined!");
-    
-        clabel = await classifyCookie(cookie, serializedCookie);
+        
+        // Classify cookie
+        let clabel = await classifyCookie(cookie, serializedCookie);
+
+        // Count cookies
         labels[clabel] = labels[clabel] + 1;
-       
+        
+        // Save type in local storage
+        let key = "domain" + cookie.domain + "name" + cookie.name;
+        cookieTypes[key] = clabel;
+
     }
 
-    console.log("[BACKGROUND] cookieClassification saved");
+    console.log("[CLASSIFIER BACKGROUND] cookieClassification saved");
     console.log(labels);
-    chrome.storage.sync.set({"cookieClassification": labels});
+    chrome.storage.sync.set({"currentCookieTypes": labels});
+    chrome.storage.sync.set({"cookieTypes": cookieTypes});
     
 }
 

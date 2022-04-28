@@ -75,6 +75,7 @@ function Popup() {
   let [score, setScore] = useState(100);
   let [cookieScore, setCookieScore] = useState(100);
   let [trackerScore, setTrackerScore] = useState(100);
+  let [cookieDetails, setCookieDetails] = useState([0, 0, 0, 0]);
 
   // Main Hook
   useEffect(() => {
@@ -106,10 +107,9 @@ function Popup() {
     });
 
     // Fetch cookie classificatins from storage
-    chrome.storage.sync.get(['cookieClassification'], function(result) {
-      let labels = result.cookieClassification;
-      console.log("[EXTENSION] Classification: ")
-      console.log(result);
+    chrome.storage.sync.get(['currentCookieTypes'], function(result) {
+      let labels = result.currentCookieTypes;
+      setCookieDetails(labels);
     });
       
   }, []);
@@ -201,12 +201,7 @@ function Popup() {
 
               {/* Content */}
               <MuiAccordionDetails className="detailed-score-contents">
-                <Typography>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                  malesuada lacus ex, sit amet blandit leo lobortis eget. Lorem ipsum dolor
-                  sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
-                  sit amet blandit leo lobortis eget.
-                </Typography>
+                {cookieDetails}
               </MuiAccordionDetails>
 
             </MuiAccordion>

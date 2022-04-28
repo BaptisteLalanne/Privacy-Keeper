@@ -7,15 +7,6 @@ importScripts('./modules/extractor.js');
 importScripts('./modules/predictor.js');
 importScripts('./modules/classifierBackground.js');
 
-/*import '../../modules/third_party/lz-string.js';
-import '../../modules/third_party/levenshtein.js';
-import '../../modules/third_party/difflib-browser.js';
-import '../../modules/third_party/difflib-browser.js';
-import '../../modules/globals.js';
-import '../../modules/extractor.js';
-import '../../modules/predictor.js';
-import './classifierBackground.js';*/
-
 // Other imports
 import fingerprinterScript from "./injectTrackerAnalyser.js"
 

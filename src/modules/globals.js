@@ -101,20 +101,20 @@ const getExtensionFile = function(url, dtype, callback, errorCallback = null) {
 
     fetch(url, initObject)
         .then((response) => {
-            console.log("[BACKGROUND] Fetch response :");
-            console.log(response);
+            //console.log("[BACKGROUND] Fetch response :");
+            //console.log(response);
             if (dtype == "json")
                 return response.json();
             else
                 return response;
         })
         .then(function (data) {
-            console.log("[BACKGROUND] Fetch response data :");
-            console.log(data);
+            //console.log("[BACKGROUND] Fetch response data :");
+            //console.log(data);
             callback(data)
         })
         .catch(function (err) {
-            console.log("Something went wrong!", err);
+            //console.log("Something went wrong!", err);
             if (errorCallback != null)
                 errorCallback(this.status);
         });

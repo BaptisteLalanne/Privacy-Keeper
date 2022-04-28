@@ -1,11 +1,11 @@
 // Import cookie classification
-importScripts('../../modules/third_party/lz-string.js');
-importScripts('../../modules/third_party/levenshtein.js');
-importScripts('../../modules/third_party/difflib-browser.js');
-importScripts('../../modules/globals.js');
-importScripts('../../modules/extractor.js');
-importScripts('../../modules/predictor.js');
-importScripts('./classifierBackground.js');
+importScripts('./modules/third_party/lz-string.js');
+importScripts('./modules/third_party/levenshtein.js');
+importScripts('./modules/third_party/difflib-browser.js');
+importScripts('./modules/globals.js');
+importScripts('./modules/extractor.js');
+importScripts('./modules/predictor.js');
+importScripts('./modules/classifierBackground.js');
 
 /*import '../../modules/third_party/lz-string.js';
 import '../../modules/third_party/levenshtein.js';

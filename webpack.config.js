@@ -158,6 +158,24 @@ var options = {
         },
       ],
     }),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: 'src/modules/',
+          to: path.join(__dirname, 'build/modules'),
+          force: true,
+        },
+      ],
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: 'src/ext_data/',
+          to: path.join(__dirname, 'build/ext_data'),
+          force: true,
+        },
+      ],
+    }),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, 'src', 'pages', 'options', 'index.html'),
       filename: 'options.html',

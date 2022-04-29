@@ -70,12 +70,20 @@ function updateCSS(node, score, cookieScore, trackerScore) {
 
 }
 
+// Generate blank popup
+function generateBlankPopup(node) {
+
+  node.innerHTML = "Nothing to see here...";
+
+}
+
 /* global chrome */
 function Popup() {
 
   let wrapperRef = React.useRef(null);
   
   const [url, setUrl] = useState('');
+  const [isChromeTab, setIsChromeTab] = useState(false);
   let [score, setScore] = useState(100);
   let [cookieScore, setCookieScore] = useState(100);
   let [trackerScore, setTrackerScore] = useState(100);
@@ -94,8 +102,8 @@ function Popup() {
     // Fetch URL
     const queryInfo = { active: true, lastFocusedWindow: true };
     chrome.tabs && chrome.tabs.query(queryInfo, tabs => {
-      const url = tabs[0].url;
-      setUrl(url);
+      setUrl(tabs[0].url);
+      setIsChromeTab(tabs[0].url.split(":")[0] == "chrome")
     });
 
     // Fetch scores from storage
@@ -128,7 +136,7 @@ function Popup() {
   }, []);
 
   // Handle click on collapsable items
-  const [expanded, setExpanded] = React.useState('');
+  const [expanded, setExpanded] = useState('');
   const handleChange = (panel) => (event, newExpanded) => {
     setExpanded(newExpanded ? panel : false);
   };
@@ -152,13 +160,13 @@ function Popup() {
 
           {/* Name of website */}
           <div className="body-item" id="website-title">
-            {extractDomain(url) || "This website"}
+            {isChromeTab ? "Nothing to see here..." : (extractDomain(url) || "This website")}
           </div>
 
           <div className="horizontal-line"></div>
 
           {/* General score */}
-          <div className="body-item card general-score-container">
+          <div className="body-item card general-score-container" style={{display: isChromeTab ? 'none' : 'flex'}}>
 
             {/* General score graphic (left side) */}
             <div className="general-score-left">
@@ -192,7 +200,7 @@ function Popup() {
           </div>
 
           {/* Detailed scores */}
-          <div className="body-item card detailed-scores">
+          <div className="body-item card detailed-scores" style={{display: isChromeTab ? 'none' : 'flex'}}>
 
             {/* Cookie score */}
             <MuiAccordion disableGutters elevation={0} expanded={expanded === 'cookieScoreAccordion'} onChange={handleChange('cookieScoreAccordion')}>

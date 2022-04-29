@@ -58,6 +58,7 @@ chrome.windows.onCreated.addListener(function () {
 
         //Getting all the cookies
         await chrome.cookies.getAll({}).then(cookies => {
+
             let key;
             cookies.forEach(cookie => {
                 key = "domain" + cookie.domain + "name" + cookie.name;
@@ -110,6 +111,9 @@ function setInfos() {
     chrome.tabs.query(queryOptions, function (tabs) {
         if (tabs.length > 0 && tabs[0].url !== "") {
 
+            // Exit if this is a chrome tab
+            if (tabs[0].url.split(":")[0] == "chrome") { return; }
+
             //Getting all the cookie whose url matches the active tab
             chrome.cookies.getAll({"url": tabs[0].url}, function (cookies) {
 
@@ -150,12 +154,18 @@ const injectScripts = (idTab, script) => {
 
 chrome.tabs.onActivated.addListener(function (tab, changeInfo) {
     console.log("[BACKGROUND] Tab activated");
+    // Exit if this is a chrome tab
+    if (tab.url.split(":")[0] == "chrome") { return; }
+    // Inject analysis scripts
     injectScripts(tab.tabId, fingerprinterScript);
 });
 
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     if (changeInfo.status === 'complete' && tab.url) {
         console.log("[BACKGROUND] Tab updated");
+        // Exit if this is a chrome tab
+        if (tab.url.split(":")[0] == "chrome") { return; }
+        // Inject analysis scripts
         injectScripts(tabId, fingerprinterScript);
     }
 });

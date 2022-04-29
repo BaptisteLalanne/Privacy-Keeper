@@ -112,19 +112,19 @@ function setInfos() {
         if (tabs.length > 0 && tabs[0].url !== "") {
 
             // Exit if this is a chrome tab
-            if (tabs[0].url.split(":")[0] == "chrome") { return; }
+            if (tabs[0].url.split(":")[0].includes("chrome")) { return; }
 
             //Getting all the cookie whose url matches the active tab
             chrome.cookies.getAll({"url": tabs[0].url}, function (cookies) {
 
                 //Getting stored cookies' dates
                 chrome.storage.local.get("updateDateCookies", function (result) {
-                    let value;
+
                     // Getting them only if they exist
-                    if (result && result["updateDateCookies"])
+                    let value = {};
+                    if (result && result["updateDateCookies"]) {
                         value = result["updateDateCookies"];
-                    else
-                        value = {};
+                    }
 
                     //Updating cookies' dates
                     let date_now = Date.now().toString()
@@ -133,6 +133,7 @@ function setInfos() {
                         key = "domain" + cookie.domain + "name" + cookie.name;
                         value[key] = date_now;
                     });
+
                     //Putting the new date into the local storage
                     chrome.storage.local.set({"updateDateCookies": value}, function () {
                         if (chrome.runtime.error) {
@@ -153,20 +154,32 @@ const injectScripts = (idTab, script) => {
 }
 
 chrome.tabs.onActivated.addListener(function (tab, changeInfo) {
+
     console.log("[BACKGROUND] Tab activated");
-    // Exit if this is a chrome tab
-    if (tab.url.split(":")[0] == "chrome") { return; }
-    // Inject analysis scripts
-    injectScripts(tab.tabId, fingerprinterScript);
+    //Query the active tab
+    let queryOptions = {active: true, currentWindow: true};
+    chrome.tabs.query(queryOptions, function (tabs) {
+        if (tabs.length > 0 && tabs[0].url !== "") {
+
+            // Exit if this is a chrome tab
+            if (tabs[0].url.split(":")[0].includes("chrome")) { return; }
+
+            // Otherwise inject analysis scripts
+            injectScripts(tab.tabId, fingerprinterScript);
+        }
+    });
 });
 
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+    console.log("[BACKGROUND] Tab updated");
     if (changeInfo.status === 'complete' && tab.url) {
-        console.log("[BACKGROUND] Tab updated");
+
         // Exit if this is a chrome tab
-        if (tab.url.split(":")[0] == "chrome") { return; }
-        // Inject analysis scripts
+        if (tab.url.split(":")[0].includes("chrome")) { return; }
+
+        // Otherwise inject analysis scripts
         injectScripts(tabId, fingerprinterScript);
+        
     }
 });
 

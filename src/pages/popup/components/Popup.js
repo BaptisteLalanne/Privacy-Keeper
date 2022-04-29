@@ -103,7 +103,7 @@ function Popup() {
     const queryInfo = { active: true, lastFocusedWindow: true };
     chrome.tabs && chrome.tabs.query(queryInfo, tabs => {
       setUrl(tabs[0].url);
-      setIsChromeTab(tabs[0].url.split(":")[0] == "chrome")
+      setIsChromeTab(tabs[0].url.split(":")[0].includes("chrome"));
     });
 
     // Fetch scores from storage

@@ -16,24 +16,8 @@ const classifyCookiesTab = (activeInfo) => {
 
                 //Getting all the cookie whose url matches the active tab
                 chrome.cookies.getAll({"url": tabs[0].url}, function (cookies) {
-
+        
                     handleCookies(cookies);
-
-                    /*
-                    let allLabels = [0,0,0,0];
-
-                    for (let cookie of cookies) {
-                        console.log("[BACKGROUND] cookie: ");
-                        console.log(cookie);
-                        let label = 
-                        allLabels[label] = allLabels[label]+1;
-                    }
-
-                    chrome.storage.sync.set({cookiesClassification: allLabels}, function() {
-                        // console.log("saved finally:");
-                        console.log(allLabels);
-                    });
-                    */
                     
                 });
             });
@@ -164,16 +148,9 @@ const updateFEInput = async function(storedFEInput, rawCookie) {
  * @param  {Object} feature_input   Transformed cookie data input, for the feature extraction.
  * @return {Promise<Number>}        Cookie category label as an integer, ranging from [0,3].
  */
-const classifyCookie = async function(cookieDat, feature_input) {
-
-    // console.log("[CLASSIFIER BACKGROUND] entering classifyCookie");
-
+const classifyCookie = async function(feature_input) {
     let features = extractFeatures(feature_input);
-    //label = await predictClass(features, cblk_pscale);
     label = await predictClass(features, 1);
-    
-    // console.log("[CLASSIFIER BACKGROUND] leaving classifyCookie");
-
     return label;
 };
 
@@ -186,44 +163,66 @@ const classifyCookie = async function(cookieDat, feature_input) {
  const handleCookies = async function (newCookies){
 
     let labels = [0,0,0,0];
-    let cookieTypes = {};
-
-    for (let cookie of newCookies) {
-        serializedCookie = createFEInput(cookie);
+    let currCookieTypes = {};
     
-        //console.log("[BACKGROUND] serialized cookie:");
-        //console.log(serializedCookie);
-    
-        console.assert(serializedCookie !== undefined, "Cookie object was still undefined!");
-        
-        // Classify cookie
-        let clabel = await classifyCookie(cookie, serializedCookie);
+    // Get already stored classifications
+    chrome.storage.local.get(["cookieTypes"], async (res) => {
 
-        // Count cookies
-        labels[clabel] = labels[clabel] + 1;
-        
-        // Save type in local storage
-        let key = "domain" + cookie.domain + "name" + cookie.name;
-        cookieTypes[key] = clabel;
-
-    }
-
-    console.log("[CLASSIFIER BACKGROUND] cookieClassification saved");
-    console.log(labels);
-
-    // Save current tab's cookie repartition
-    chrome.storage.sync.set({"currentCookieTypes": labels});
-
-    // Update gobal cookie types map
-    chrome.storage.local.get(["cookieTypes"], res => {
-        let data = {};
+        let prevCookieTypes = {};
         if (res && res.cookieTypes) {
-            data = res.cookieTypes;
+            prevCookieTypes = res.cookieTypes;
         }
-        newData = {...data, ...cookieTypes};
-        console.log("SFHLSDHSDLFBFSD")
-        console.log(newData);
-        chrome.storage.local.set({ "cookieTypes": newData });
+
+        for (let cookie of newCookies) {
+
+            let key = "domain" + cookie.domain + "name" + cookie.name;
+
+            let getClassification = 
+
+                // If cookie has already been classified,
+                prevCookieTypes[key] ? 
+
+                    async () => {
+
+                        // Fetch stored classiification
+                        return prevCookieTypes[key];
+                        
+                    }
+
+                // If cookie has not alreayd been classified,
+                : 
+
+                    async () => {
+
+                        // Classify it
+                        let serializedCookie = createFEInput(cookie);
+                        let res = await classifyCookie(serializedCookie);
+
+                        // Store the result
+                        currCookieTypes[key] = res;
+
+                        return res;
+                    }
+
+                ;
+
+            let clabel = await getClassification();
+
+            // Count cookie types
+            labels[clabel] += 1;
+
+        }
+
+        console.log("[CLASSIFIER BACKGROUND] cookieClassification saved");
+        console.log(labels);
+
+        // Save current tab's cookie repartition
+        chrome.storage.sync.set({"currentCookieTypes": labels});
+
+        // Update gobal cookie types map
+        newCookieTypes = {...prevCookieTypes, ...currCookieTypes};
+        chrome.storage.local.set({ "cookieTypes": newCookieTypes });
+
     });
     
 }

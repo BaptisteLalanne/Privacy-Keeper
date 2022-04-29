@@ -17,8 +17,7 @@ import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { visuallyHidden } from '@mui/utils';
-import "./controls.scss";
-import { IconButton, TextField } from '@mui/material';
+import { IconButton } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import FormControl from '@mui/material/FormControl';
@@ -27,6 +26,8 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import {cookieTypeLabels} from '../../../../scripts/miscellaneous/common.js'
+import "./controls.scss";
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -66,7 +67,7 @@ export default function CookieTable() {
         }
 
         // Fetch all cookies
-        chrome.cookies.getAll({}, function (cookies) {
+        chrome.cookies.getAll({}, async function (cookies) {
             let _data = [];
             for (let cookie of cookies) {
 
@@ -80,11 +81,15 @@ export default function CookieTable() {
                 if (!lastUsed) lastUsed = Date.now().toString();
 
                 // Compute type (WIP: might be stored in local storage and passed as param)
-                const types = ["Necessary", "Functional", "Analytics", "Advertising"];
-                console.log(cookieTypes);
-                console.log(cookieTypes[key]);
-                let type = cookieTypes[key] != null ? types[cookieTypes[key]] : "Unknown";
-
+                let type = "Unknown";
+                if (cookieTypes[key]) {
+                    type = cookieTypeLabels[cookieTypes[key]];
+                }
+                else {
+                    //let clabel = await classifyCookie(createFEInput(cookie));
+                    //type = cookieTypeLabels[clabel];
+                }
+                
                 // Compute cookie storage size (WIP: idk how to do it yet)
                 let size = getCookieSize(cookie);
 

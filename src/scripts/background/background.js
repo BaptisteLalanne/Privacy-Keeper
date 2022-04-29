@@ -5,7 +5,7 @@ importScripts('./modules/third_party/difflib-browser.js');
 importScripts('./modules/globals.js');
 importScripts('./modules/extractor.js');
 importScripts('./modules/predictor.js');
-importScripts('./modules/classifierBackground.js');
+importScripts('./modules/classifier.js');
 
 // Other imports
 import fingerprinterScript from "./injectTrackerAnalyser.js"

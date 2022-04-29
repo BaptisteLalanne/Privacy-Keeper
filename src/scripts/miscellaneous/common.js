@@ -26,3 +26,5 @@ export function mixColors(color1, color2, percent) {
     c1.forEach((c, i) => cm.push(parseInt(lerp(c1[i], c2[i], percent))));
     return rgbToHex(cm);
 }
+
+export var cookieTypeLabels = ["Necessary", "Functional", "Analytics", "Advertising"];

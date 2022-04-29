@@ -3,8 +3,12 @@ import MuiAccordion from '@mui/material/Accordion';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
+import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
+import BuildIcon from '@mui/icons-material/Build';
+import InsightsIcon from '@mui/icons-material/Insights';
+import CampaignIcon from '@mui/icons-material/Campaign';
+import {cookieTypeLabels} from '../../../scripts/miscellaneous/common.js'
 import './popup.scss';
-/* global chrome */
 
 // Opening dashboard on button clicks
 function clickIndex() {
@@ -77,6 +81,13 @@ function Popup() {
   let [trackerScore, setTrackerScore] = useState(100);
   let [cookieDetails, setCookieDetails] = useState([0, 0, 0, 0]);
 
+  const detailedCookiesIcons = [
+    <ElectricBoltIcon/>,
+    <BuildIcon/>,
+    <InsightsIcon/>,
+    <CampaignIcon/>
+  ];
+
   // Main Hook
   useEffect(() => {
 
@@ -88,13 +99,14 @@ function Popup() {
     });
 
     // Fetch scores from storage
-    cookieScore = 40;
+    cookieScore = "??";
     chrome.storage.sync.get(['fingerprintScore'], function(result) {
       
       trackerScore = Math.round(result.fingerprintScore);
       console.log('[EXTENSION] Fingerprinter score : ' + result.fingerprintScore);
       
-      score = Math.max(cookieScore, trackerScore);
+      //score = Math.max(cookieScore, trackerScore);
+      score = trackerScore;
       
       // Save score states
       setScore(score);
@@ -109,6 +121,7 @@ function Popup() {
     // Fetch cookie classificatins from storage
     chrome.storage.sync.get(['currentCookieTypes'], function(result) {
       let labels = result.currentCookieTypes;
+      console.log(labels);
       setCookieDetails(labels);
     });
       
@@ -201,7 +214,15 @@ function Popup() {
 
               {/* Content */}
               <MuiAccordionDetails className="detailed-score-contents">
-                {cookieDetails}
+                {[...Array(4)].map((x, i) =>
+                  <div className="detailed-score-item" style={{opacity: cookieDetails[i] > 0 ? 1 : 0.8}}>
+                    <div className="detailed-cookies-score-item-icon"> {detailedCookiesIcons[i]} </div>
+                    <div className="detailed-cookies-score-item-text"> 
+                      {cookieDetails[i] > 0 ? <div style={{fontWeight:"bold"}}>{cookieDetails[i]}</div> : <></>}
+                      <div>{(cookieDetails[i] == 0 ? "No " : "") + cookieTypeLabels[i].toLowerCase() + " cookie" + (cookieDetails[i] > 1 ? "s" : "")}</div> 
+                    </div>
+                  </div>
+                )}  
               </MuiAccordionDetails>
 
             </MuiAccordion>

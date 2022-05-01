@@ -4,7 +4,7 @@ Chromium extension to help users understanding cookies on their computer and tra
 
 ## Features
 
-Currently, all the features have to be developed. At the end of the project, we would like to have cookie actions (analysis, deletions, whitelist...), tracker actions (analysis, whitelist...), a popup and a management dashboard.
+At the end of the project, we would like to have cookie actions (analysis, deletions, whitelist...), tracker actions (analysis, whitelist...), a popup and a management dashboard.
 
 ### Cookies
 
@@ -39,13 +39,29 @@ As the popup is too small to display all our explanations, a full page dashboard
 
 ## Installation
 
-Download the projet and put it in a folder.
+Open a terminal in root directory, then install dependencies by running
+```sh
+$ npm install
+```
 
-In a chromium based browser (i.e.: Chrome), load the folder as an extension. You may have to turn on developer mode on your browser to be able to do so.
+Once dependencies are installed, build the extension with
+```
+$ npm run start
+```
+
+When a file is modified (and saved), the extension is rebuilt automaticaly. On your chrome browser, load the `build` folder. Don't forget to reload the extensions (on your browser extensions page) after each modification.
 
 ### Chrome
 
 Open the settings menu, then go the "Extensions" section. On the top right of the windows, turn on "Developer mode". Then you can click on the "Load unpacked" button, and select the extension folder (root). The cookie extension must appear in your extensions.
+
+## Sources
+
+- [Cookie Block](https://github.com/dibollinger/CookieBlock)
+
+- [Privacy Badger](https://github.com/EFForg/privacybadger)
+
+- [FP-Inspector](https://github.com/uiowa-irl/FP-Inspector)
 
 ## Contributors
 

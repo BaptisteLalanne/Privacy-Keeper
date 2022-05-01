@@ -1,0 +1,346 @@
+{
+    "name_match": {
+        "CookieConsent" : 0,
+        "OptanonConsent" : 0,
+        "gdpr-last-interaction": 0,
+        "__cflb": 0,
+        "__cf_bm": 0,
+        "cf_ob_info": 0,
+        "cf_use_ob": 0,
+        "__cfwaitingroom": 0,
+        "__cfruid": 0,
+        "cf_clearance": 0,
+        "__cmpAcceptedPurposes": 0,
+        "pubconsent-v2": 0,
+        "consentUUID": 0
+    },
+    "domain_match": {
+
+        "authorstream.com": {
+            "Remember": 0,
+            "newUser": 0,
+            "userId": 0
+        },
+        "amazon.com": {
+            "aws-userInfo": 0
+        },
+        "aws.amazon.com": {
+            "aws-account-data": 0
+        },
+        "azure.com": {
+            "LPVID": 0
+        },
+        "bethesda.net": {
+            "bnet-username": 0
+        },
+        "idp.corel.com": {
+            "SERVER": 0,
+            "_omappvp": 0,
+            "_omappvs": 0
+        },
+        "dafont.com": {
+            "mtx": 0
+        },
+        "dropbox.com": {
+            "jar": 0,
+            "utag_main": 0,
+            "__Host-js_csrf": 0,
+            "last_active_role": 0,
+            "bjar": 0,
+            "flash": 0,
+            "bang": 0
+        },
+        "eventbrite.co.uk": {
+            "mglts": 0,
+            "mgssl": 0
+        },
+        "fandom.com": {
+            "access_token": 0
+        },
+        "ebay.ch": {
+            "__ssds": 0,
+            "__sstester": 0,
+            "dp1": 0
+        },
+        "gog.com": {
+            "gog_lc": 0,
+            "gog-al": 0
+        },
+        "globus.ch": {
+            "globus-session": 0
+        },
+        "etsy.com": {
+            "uaid": 0,
+            "exp_hangover":0,
+            "user_prefs": 0,
+            "ua": 0
+        },
+        "humblebundle.com": {
+            "_simpleauth_sess": 0
+        },
+        "login.microsoftonline.com": {
+            "brcap": 0,
+            "stsservicecookie": 0
+        },
+        "linkedin.com": {
+            "li_at":0,
+            "liap": 0,
+            "JSESSIONID": 0,
+            "chp_token": 0,
+            "li_rm": 0,
+            "bcookie": 0,
+            "lidc": 0,
+            "visit": 0,
+            "bscookie": 0,
+            "li_theme": 1,
+            "li_theme_set": 1
+        },
+        "magix.com": {
+            "mgxLoginCheck": 0,
+            "MGX_SSC": 0
+        },
+        "ap.magix.com": {
+            "mgxcrslive_initial": 0
+        },
+        "myalumni.ethz.ch": {
+            "login_membership": 0,
+            "password": 0,
+            "snik": 0,
+            "username": 0
+        },
+        "mediafire.com": {
+            "skey": 0,
+            "user": 0,
+            "justloggedin": 0
+        },
+        "netgear.com": {
+            "validDomain": 0
+        },
+        "netflix.com": {
+            "memclid": 0,
+            "nfvdid": 0
+        },
+        "outlook.live.com": {
+            "DefaultAnchorMailbox": 0
+        },
+        "redhat.com": {
+            "rh_user": 0
+        },
+        "builtwith.com": {
+            "BWSSON": 0
+        },
+        "todoist.com": {
+            "todoistd": 0
+        },
+        "twitter.com": {
+            "eu_cn": 0,
+            "guest_id": 0,
+            "personalization_id":0,
+            "ct0": 0,
+            "auth_token": 0,
+            "twid": 0,
+            "kdt": 0
+        },
+        "walmart.com": {
+            "CID": 0,
+            "SPID": 0,
+            "cart-item-count": 0,
+            "hasCID": 0,
+            "type": 0
+        },
+        "forums.sherdog.com": {
+            "_awl": 0
+        },
+        "philips.co.uk": {
+            "notice_settings": 0
+        },
+        "swisspass.ch": {
+            "atidvisitor": 0,
+            "atuserid": 0,
+            "AL_SESS-S": 0
+        },
+        "askubuntu.com": {
+            "acct": 0
+        },
+        "mathoverflow.com": {
+            "acct": 0
+        },
+        "blogoverflow.com": {
+            "acct": 0
+        },
+        "serverfault.com": {
+            "acct": 0
+        },
+        "stackoverflow.com": {
+            "acct": 0
+        },
+        "stackexchange.com": {
+            "acct": 0
+        },
+        "stackapps.com": {
+            "acct": 0
+        },
+        "superuser.com": {
+            "acct": 0
+        },
+        "tex-talk.com": {
+            "acct": 0
+        },
+        "stackauth.com": {
+            "acct": 0
+        },
+        "patreon.com": {
+            "_swb": 0
+        },
+        "facebook.com": {
+            "_js_datr": 0,
+            "_js_fr": 0,
+            "fr": 0,
+            "xs": 0,
+            "dbln": 0,
+            "datr": 0,
+            "c_user": 0
+        },
+        "iherb.com": {
+            "__asc": 2,
+            "__auc": 2,
+            "_gali": 2,
+            "_schn": 3,
+            "_uetsid": 2,
+            "cmapi_gtm_bl": 1,
+            "ih-preference": 1,
+            "ih-experiment": 0,
+            "ihr-ocid1": 0,
+            "ihr-session-id1": 0,
+            "notice_gdpr_prefs": 1
+        },
+        "seznam.cz": {
+            "cmppersisttestcookie": 1,
+            "cmprefreshcount": 1,
+            "cmptestcookie": 1,
+            "euconsent-v2": 1,
+            "szncmpone": 1
+        },
+        "szn.cz": {
+            "cmppersisttestcookie": 1,
+            "cmptestcookie": 1
+        },
+        "zdf.de": {
+            "OptanonAlertBoxClosed": 1,
+            "iom_consent": 1,
+            "atidvisitor": 2
+        },
+        "spotify.com": {
+            "sp_dc": 0
+        },
+        "ethz.ch": {
+            "SAPWP_active": 1,
+            "rl_page_init_referrer": 2,
+            "rl_page_init_referring_domain": 2
+        },
+        "sap-wdp.ethz.ch": {
+            "PortalAlias": 0
+        },
+        "reddit.com": {
+            "over18": 0
+        },
+        "twitch.tv": {
+            "auth-token": 0,
+            "login": 0,
+            "name": 0,
+            "twilight-login-state": 0,
+            "twilight-user": 0,
+            "unique_id": 0
+        },
+        "bing.com": {
+            "BCP": 1
+        },
+        "notion.so": {
+            "token_v2": 0
+        },
+        "doodle.com": {
+            "KEYCLOAK_SESSION_LEGACY": 0
+        },
+        "tweakers.net": {
+            "__Secure-TnetID": 0
+        },
+        "web.de": {
+            "consentLevel": 0,
+            "uiconsent": 0
+        },
+        "ethz.ch": {
+            "IAMUserTokenPRD_authnSession": 0
+        },
+        "corriere.it": {
+            "__ABTcorriere_ct": 0,
+            "__CPcorriere_ct": 0,
+            "__GDPRcorriere_ct": 0
+        },
+        "ryanair.com": {
+            "RY_COOKIE_CONSENT": 0
+        },
+        "swisscom.ch": {
+            "CONSENTMGR": 0
+        },
+        "pipedrive.com": {
+            "__tld__": 0
+        },
+        "instagram.com": {
+            "ds_user_id": 0,
+            "sessionid": 0
+        },
+        "gommadiretto.it": {
+            "__cmpcccu25422": 0,
+            "__cmpconsent25422": 0
+        },
+        "consentmanager.net": {
+            "__cmpcccu25422": 0,
+            "__cmpconsent25422": 0
+        },
+        "airbnb.com": {
+            "_user_attributes": 0
+        },
+        "parlament.ch": {
+            "PdInternet_UserLanguage": 0
+        }
+    },
+    "domain_regex": {
+        "^google\\..*": {
+            "CONSENT": 0,
+            "NID" : 0,
+            "SID" : 0,
+            "HSID" : 0,
+            "SSID" : 0,
+            "_GRECAPTCHA": 0
+        },
+        "^youtube\\..*" : {
+            "PREF": 1,
+            "CONSENT": 0,
+            "NID": 0,
+            "SID" : 0,
+            "HSID" : 0,
+            "SSID" : 0,
+            "LOGIN_INFO": 0,
+            "YSC": 1,
+            "VISITOR_INFO1_LIVE":1
+        },
+        "^consent.youtube\\..*": {
+            "TESTCOOKIESENABLED": 0,
+            "OTZ": 0
+        },
+        "^ebay\\..*": {
+            "ebay":0,
+            "nonsession":0
+        },
+        "^amazon\\..*": {
+            "session-id": 0,
+            "csm-hit": 0,
+            "session-id-time": 0,
+            "ubid-acbde": 0
+        },
+        "^facebook\\..*": {
+            "datr": 0,
+            "c_user": 0
+        }
+    }
+}

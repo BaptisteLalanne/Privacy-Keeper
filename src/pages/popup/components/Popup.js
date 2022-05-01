@@ -3,8 +3,12 @@ import MuiAccordion from '@mui/material/Accordion';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
+import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
+import BuildIcon from '@mui/icons-material/Build';
+import InsightsIcon from '@mui/icons-material/Insights';
+import CampaignIcon from '@mui/icons-material/Campaign';
+import {cookieTypeLabels} from '../../../scripts/miscellaneous/common.js'
 import './popup.scss';
-/* global chrome */
 
 // Opening dashboard on button clicks
 function clickIndex() {
@@ -66,15 +70,31 @@ function updateCSS(node, score, cookieScore, trackerScore) {
 
 }
 
+// Generate blank popup
+function generateBlankPopup(node) {
+
+  node.innerHTML = "Nothing to see here...";
+
+}
+
 /* global chrome */
 function Popup() {
 
   let wrapperRef = React.useRef(null);
   
   const [url, setUrl] = useState('');
+  const [isChromeTab, setIsChromeTab] = useState(false);
   let [score, setScore] = useState(100);
   let [cookieScore, setCookieScore] = useState(100);
   let [trackerScore, setTrackerScore] = useState(100);
+  let [cookieDetails, setCookieDetails] = useState([0, 0, 0, 0]);
+
+  const detailedCookiesIcons = [
+    <ElectricBoltIcon/>,
+    <BuildIcon/>,
+    <InsightsIcon/>,
+    <CampaignIcon/>
+  ];
 
   // Main Hook
   useEffect(() => {
@@ -82,17 +102,19 @@ function Popup() {
     // Fetch URL
     const queryInfo = { active: true, lastFocusedWindow: true };
     chrome.tabs && chrome.tabs.query(queryInfo, tabs => {
-      const url = tabs[0].url;
-      setUrl(url);
+      setUrl(tabs[0].url);
+      setIsChromeTab(tabs[0].url.split(":")[0].includes("chrome"));
     });
 
     // Fetch scores from storage
-    cookieScore = 40;
+    cookieScore = "??";
     chrome.storage.sync.get(['fingerprintScore'], function(result) {
+      
       trackerScore = Math.round(result.fingerprintScore);
       console.log('[EXTENSION] Fingerprinter score : ' + result.fingerprintScore);
       
-      score = Math.max(cookieScore, trackerScore);
+      //score = Math.max(cookieScore, trackerScore);
+      score = trackerScore;
       
       // Save score states
       setScore(score);
@@ -102,14 +124,19 @@ function Popup() {
       // Update CSS
       updateCSS(wrapperRef.current, score, cookieScore, trackerScore);
 
-      console.log("im here")
+    });
 
+    // Fetch cookie classificatins from storage
+    chrome.storage.sync.get(['currentCookieTypes'], function(result) {
+      let labels = result.currentCookieTypes;
+      console.log(labels);
+      setCookieDetails(labels);
     });
       
   }, []);
 
   // Handle click on collapsable items
-  const [expanded, setExpanded] = React.useState('');
+  const [expanded, setExpanded] = useState('');
   const handleChange = (panel) => (event, newExpanded) => {
     setExpanded(newExpanded ? panel : false);
   };
@@ -133,13 +160,13 @@ function Popup() {
 
           {/* Name of website */}
           <div className="body-item" id="website-title">
-            {extractDomain(url) || "This website"}
+            {isChromeTab ? "Nothing to see here..." : (extractDomain(url) || "This website")}
           </div>
 
           <div className="horizontal-line"></div>
 
           {/* General score */}
-          <div className="body-item card general-score-container">
+          <div className="body-item card general-score-container" style={{display: isChromeTab ? 'none' : 'flex'}}>
 
             {/* General score graphic (left side) */}
             <div className="general-score-left">
@@ -173,7 +200,7 @@ function Popup() {
           </div>
 
           {/* Detailed scores */}
-          <div className="body-item card detailed-scores">
+          <div className="body-item card detailed-scores" style={{display: isChromeTab ? 'none' : 'flex'}}>
 
             {/* Cookie score */}
             <MuiAccordion disableGutters elevation={0} expanded={expanded === 'cookieScoreAccordion'} onChange={handleChange('cookieScoreAccordion')}>
@@ -195,12 +222,15 @@ function Popup() {
 
               {/* Content */}
               <MuiAccordionDetails className="detailed-score-contents">
-                <Typography>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                  malesuada lacus ex, sit amet blandit leo lobortis eget. Lorem ipsum dolor
-                  sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
-                  sit amet blandit leo lobortis eget.
-                </Typography>
+                {[...Array(4)].map((x, i) =>
+                  <div className="detailed-score-item" style={{opacity: cookieDetails[i] > 0 ? 1 : 0.8}}>
+                    <div className="detailed-cookies-score-item-icon"> {detailedCookiesIcons[i]} </div>
+                    <div className="detailed-cookies-score-item-text"> 
+                      {cookieDetails[i] > 0 ? <div style={{fontWeight:"bold"}}>{cookieDetails[i]}</div> : <></>}
+                      <div>{(cookieDetails[i] == 0 ? "No " : "") + cookieTypeLabels[i].toLowerCase() + " cookie" + (cookieDetails[i] > 1 ? "s" : "")}</div> 
+                    </div>
+                  </div>
+                )}  
               </MuiAccordionDetails>
 
             </MuiAccordion>

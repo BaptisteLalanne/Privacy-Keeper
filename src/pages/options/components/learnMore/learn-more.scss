@@ -1,0 +1,81 @@
+@import "../../../../styles/common.scss";
+/* ==================================================================== */
+/* -------------------------------------------------------------------- */
+/*                                                                      */
+/*                            LEARN MORE CSS                            */
+/*                                                                      */
+/* -------------------------------------------------------------------- */
+/* ==================================================================== */
+
+.lm-wrapper {
+    display: flex;
+    gap: 2*$font-size;
+}
+
+.lm-toc {
+    background-color: $background-color;
+    padding: 2*$font-size;
+    width: fit-content;
+    position: sticky;
+    top: 2*$font-size;
+    align-self: flex-start
+}
+.lm-toc-title {
+    font-size: $font-size*1.1;
+    font-weight: bold;
+    margin-bottom: $font-size;
+}
+.lm-toc-link {
+    color: $graph-col2;
+}
+li {
+    margin-bottom: 0.5*$font-size !important;
+    margin-top: 0.5*$font-size !important;
+}
+.lm-toc-list, .lm-toc-list-2 {
+    list-style-position: inside;
+}
+.lm-toc-list-2::marker, .lm-toc-list-2::marker {
+    color: $graph-col2;
+}
+.lm-toc-list-2 {
+    padding-left: 1.5*$font-size;
+}
+
+.lm-content {
+    width: 50%;
+}
+.lm-text-wrapper {
+    text-justify: inter-word;
+}
+.lm-header {
+    margin: $font-size 0;
+}
+.lm-list-item {
+    position: relative;
+    left: -$font-size*0.5;
+}
+.lm-text-wrapper p {
+    width: 95%;
+}
+
+.lm-text-wrapper .MuiDivider-root::before {
+    width: 0% !important;
+}
+
+.lm-text-wrapper .MuiDivider-root::after {
+    border-top: solid 2px $dark-grey !important;
+}
+
+.lm-text-wrapper .MuiDivider-root {
+    width: 100%;
+}
+
+.lm-text-wrapper .MuiDivider-wrapper {
+    padding-left: 0 !important;
+}
+
+.lm-text-wrapper .MuiDivider-wrapper > h2 {
+    font-size: 1.25*$font-size !important;
+    font-weight: bold !important;
+}

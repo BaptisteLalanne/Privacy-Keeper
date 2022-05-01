@@ -152,10 +152,30 @@ body::-webkit-scrollbar {
     margin: auto 0.5*$font-size;
 }
 
+.detailed-score-contents {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5*$font-size;
+}
+.detailed-score-item {
+    display: flex;
+    gap: $font-size;
+}
+
+.detailed-cookies-score-item-text {
+    margin: auto 0;
+    display: flex;
+    gap: 0.5*$font-size;
+}
+
 .MuiAccordionSummary-content {
     display: flex;
     flex-direction: row;
     gap: 6px;
+}
+
+.MuiAccordionDetails-root {
+    padding: 0px 16px 16px !important;
 }
 
 .Mui-expanded:before {

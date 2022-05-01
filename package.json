@@ -16,14 +16,14 @@
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
     "@hot-loader/react-dom": "^17.0.2",
-    "@material-ui/icons": "^4.11.3",
     "@mui/icons-material": "^5.6.1",
     "@mui/material": "^5.6.1",
     "bootstrap-icons": "^1.8.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-hot-loader": "^4.13.0",
-    "react-router-dom": "^6.3.0"
+    "react-router-dom": "^6.3.0",
+    "recharts": "^2.1.9"
   },
   "devDependencies": {
     "@babel/core": "^7.17.0",

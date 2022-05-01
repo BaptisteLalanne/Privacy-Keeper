@@ -1,4 +1,4 @@
-/*global chrome*/
+/* Based on my understanding, this file is completely useless. -Marcus */
 
 const messagesFromReactAppListener = (message, sender, response) => {
   console.log('[content.js]. Message received', {

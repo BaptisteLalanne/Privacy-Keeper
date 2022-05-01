@@ -9,10 +9,17 @@
 $font-size: 16px;
 $background-color: #f8f8f8;
 
-$col1: #8E64FF;
-$col2: #5838FF;
-$col3: #6564FF;
-$col4: #7364FF;
+$logo-col0: #4b28ca;
+$logo-col1: #531EB0;
+$logo-col2: #605FFF;
+$logo-col3: #9B64FF;
+$logo-col4: #9234CE;
+$graph-col1: #ad343e;
+$graph-col2: #46547d;
+$graph-col3: #eba61b;
+$graph-col4: #70c1b3;
+$graph-col5: #fcb0b3;
+$dark-grey: #4e4e4e;
 
 * {
     margin: 0;
@@ -35,4 +42,18 @@ $col4: #7364FF;
 @font-face {
     font-family: oswaldFont;
     src: url('/src/assets/fonts/oswald-font.ttf');
+}
+
+:export {
+    logocol0: $logo-col0; 
+    logocol1: $logo-col1; 
+    logocol2: $logo-col2; 
+    logocol3: $logo-col3; 
+    logocol4: $logo-col4;
+    graphcol1: $graph-col1;
+    graphcol2: $graph-col2;
+    graphcol3: $graph-col3;
+    graphcol4: $graph-col4;
+    graphcol5: $graph-col5;
+    darkgrey: $dark-grey;
 }

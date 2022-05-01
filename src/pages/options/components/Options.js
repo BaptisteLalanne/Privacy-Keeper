@@ -5,14 +5,12 @@ import ListItem from '@mui/material/ListItem';
 import SpeedIcon from '@mui/icons-material/Speed';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import BuildIcon from '@mui/icons-material/Build';
-import SettingsIcon from '@mui/icons-material/Settings';
 import InfoIcon from '@mui/icons-material/Info';
 import Dashboard from './dashboard/Dashboard';
 import LearnMore from './learnMore/LearnMore';
 import Controls from './controls/Controls.js';
-import Settings from './controls/Settings';
 import AboutUs from './aboutUs/AboutUs';
-import "./options.scss";
+import style from "./options.scss";
 
 function urlify(label) {
     return label.replace(/\s+/g, '-').toLowerCase();
@@ -24,9 +22,10 @@ export default function Options() {
         {"name": "Dashboard",       "icon": <SpeedIcon/>,       "component": <Dashboard/>},
         {"name": "Learn more",      "icon": <MenuBookIcon/>,    "component": <LearnMore/>}, 
         {"name": "Controls",        "icon": <BuildIcon/>,       "component": <Controls/>}, 
-        {"name": "Settings",        "icon": <SettingsIcon/>,    "component": <Settings/>}, 
         {"name": "About us",        "icon": <InfoIcon/>,        "component": <AboutUs/>}
     ];
+
+    const itemRefs = [React.useRef(null), React.useRef(null), React.useRef(null), React.useRef(null), React.useRef(null)];
 
     let [currentComponent, setCurrentComponent] = useState(0);
     
@@ -35,11 +34,10 @@ export default function Options() {
         // Redirect to appropriate page based on window param
         let param = window.location.search.substring(1).split('=');
         const currentPage = param[1];
-        console.log(param);
         if (currentPage != null) {
             for (let i = 0; i < itemList.length; i++) {
                 if (currentPage == urlify(itemList[i].name)) {
-                    if (currentComponent != i) setCurrentComponent(i);
+                    clickItem(i);
                     break;
                 }
             }
@@ -55,6 +53,16 @@ export default function Options() {
         // Update window param
         window.history.replaceState(null, null, "?page="+urlify(itemList[index].name));
 
+        // Update item CSS
+        for (let i = 0; i < itemList.length; i++) {
+            itemRefs[i].current.getElementsByClassName("nav-icon")[0].style.color = style.darkgrey;
+            itemRefs[i].current.setAttribute('style', 'font-weight: normal');
+            itemRefs[i].current.style.color = "black";
+        }
+        itemRefs[index].current.getElementsByClassName("nav-icon")[0].style.color = style.logocol0;
+        itemRefs[index].current.setAttribute('style', 'font-weight: bold');
+        itemRefs[index].current.style.color = style.logocol0;
+
     };
 
     return (
@@ -66,8 +74,7 @@ export default function Options() {
 
                     {/* Title and logo */}
                     <div className="header">
-                        <div className="logo"><img src="icon_128.png"></img></div>
-                        <div className="title">Privacy Keeper</div>
+                        <div className="logo"><img src="icon_banner.png"></img></div>
                     </div>
 
                     <Divider />
@@ -76,7 +83,7 @@ export default function Options() {
                     <List>
                     {
                         itemList.map((item, index) => (
-                            <ListItem button key={item.name} onClick={() => { clickItem(index); }}>
+                            <ListItem button key={item.name} onClick={() => { clickItem(index); }} ref={itemRefs[index]} className="nav-item">
                                 <div className="nav-icon">{item.icon}</div>
                                 {item.name}
                             </ListItem>

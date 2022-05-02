@@ -27,7 +27,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
         });
 
         // Set default expiration time
-        let default_expiration_time = 1;//14 * (1000 * 60 * 60 * 24); 
+        let default_expiration_time = 14 * (1000 * 60 * 60 * 24); 
         chrome.storage.local.set({"expiration_time": default_expiration_time}, function () {
             if (chrome.runtime.error) {
                 console.log("Runtime error : expiration_time");
@@ -35,7 +35,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
         });
 
         // Set unused cookies whitelist
-        let default_unused_cookies_wl = ["hp.com","lemonde.fr"]; 
+        let default_unused_cookies_wl = []; 
         chrome.storage.local.set({"unused_cookies_wl": default_unused_cookies_wl}, function () {
             if (chrome.runtime.error) {
                 console.log("Runtime error : unused_cookies_wl");

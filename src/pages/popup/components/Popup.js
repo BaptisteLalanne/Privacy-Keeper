@@ -7,7 +7,6 @@ import BuildIcon from '@mui/icons-material/Build';
 import InsightsIcon from '@mui/icons-material/Insights';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import SettingsIcon from '@mui/icons-material/Settings';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import {cookieTypeLabels} from '../../../scripts/miscellaneous/common.js'

@@ -42,23 +42,11 @@ chrome.runtime.onInstalled.addListener(function (details) {
             }
         });
 
-        // Load the default classifier configuration
-        getExtensionFile(chrome.runtime.getURL("ext_data/default_config.json"), "json", (dConfig) => {
-            initDefaults(dConfig, false)
-        });
-        getExtensionFile("ext_data/features.json", "json", setupFeatureResourcesCallback);
-
     }
 })
 
 //Listen when the browser is opened
 chrome.windows.onCreated.addListener(function () {
-
-    // Load the default classifier configuration
-    getExtensionFile(chrome.runtime.getURL("ext_data/default_config.json"), "json", (dConfig) => {
-        initDefaults(dConfig, false)
-    });
-    getExtensionFile("ext_data/features.json", "json", setupFeatureResourcesCallback);
     
     //Getting data
     chrome.storage.local.get("updateDateCookies", async function (result) {
@@ -154,6 +142,12 @@ chrome.windows.onCreated.addListener(function () {
     });
 
 });
+
+// Load the default classifier configuration
+getExtensionFile(chrome.runtime.getURL("ext_data/default_config.json"), "json", (dConfig) => {
+    initDefaults(dConfig, false)
+});
+getExtensionFile("ext_data/features.json", "json", setupFeatureResourcesCallback);
 
 //To classify the current tab's cookies
 chrome.tabs.onActivated.addListener(classifyCookiesTab);

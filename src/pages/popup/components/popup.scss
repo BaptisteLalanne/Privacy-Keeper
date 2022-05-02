@@ -53,7 +53,7 @@ body::-webkit-scrollbar {
 }
 
 .top-item > i:hover {
-    color: #919191;
+    color: #6e6e6e;
 }
 
 .body-component {
@@ -117,6 +117,7 @@ body::-webkit-scrollbar {
 
 .general-score-right {
     margin: auto;
+    margin-left: 0.5*$font-size;
 }
 
 .detailed-scores {
@@ -180,12 +181,22 @@ body::-webkit-scrollbar {
 }
 
 .detailed-cookies-score-item-help-icon {
-    margin: auto 0;
     color: $dark-grey;
     padding: 0 !important;
     width: 1.25*$font-size;
 }
 .detailed-cookies-score-item-help-icon > svg {
+    width: 100%;
+}
+
+
+.detailed-tracker-score-item-help-icon {
+    margin-left: 0.5*$font-size !important;
+    color: $dark-grey;
+    padding: 0 !important;
+    width: 1.25*$font-size;
+}
+.detailed-tracker-score-item-help-icon > svg {
     width: 100%;
 }
 

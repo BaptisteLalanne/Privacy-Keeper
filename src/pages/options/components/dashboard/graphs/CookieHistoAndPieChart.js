@@ -92,7 +92,7 @@ export default function CookieHistoAndPieChart() {
         </div>
       </div>
       <div className="graph-explanation">
-        Most of the recorded cookies are necessary.
+        Most of the recorded cookies were necessary.
       </div>
     </div>
   )

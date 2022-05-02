@@ -2,13 +2,12 @@ import React, { useEffect, useState } from 'react';
 import MuiAccordion from '@mui/material/Accordion';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
-import Typography from '@mui/material/Typography';
 import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
 import BuildIcon from '@mui/icons-material/Build';
 import InsightsIcon from '@mui/icons-material/Insights';
 import CampaignIcon from '@mui/icons-material/Campaign';
-import HelpIcon from '@mui/icons-material/Help';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import SettingsIcon from '@mui/icons-material/Settings';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import {cookieTypeLabels} from '../../../scripts/miscellaneous/common.js'
@@ -84,6 +83,8 @@ function Popup() {
   let [cookieScore, setCookieScore] = useState(100);
   let [trackerScore, setTrackerScore] = useState(100);
   let [cookieDetails, setCookieDetails] = useState([0, 0, 0, 0]);
+  let [trackerScoreDescription, setTrackerScoreDescription] = useState("This is how much we suspect this website tracks you.");
+  let [generalScoreDescription, setGeneralScoreDescription] = useState("This website has some hardware trackers.");
 
   const detailedCookiesIcons = [
     <ElectricBoltIcon/>,
@@ -116,15 +117,18 @@ function Popup() {
       chrome.storage.sync.get(['fingerprintScore'], function(fingerprintScoreRes) {
         let trackerScore = fingerprintScoreRes.fingerprintScore;
 
-        cookieScore = Math.round(cookieScore);
-        trackerScore = Math.round(trackerScore);
-              
+        let rounding = 5;
+        cookieScore = Math.ceil(cookieScore/rounding)*rounding; 
+        trackerScore = Math.ceil(trackerScore/rounding)*rounding; 
         score = Math.max(cookieScore, trackerScore);
         
         // Save score states
         setScore(score);
         setCookieScore(cookieScore);
         setTrackerScore(trackerScore);
+
+        // Generate and set the description sentences
+        generateDescriptionSentences(cookieScore, trackerScore, score);
         
         // Update CSS
         updateCSS(wrapperRef.current, score, cookieScore, trackerScore);
@@ -141,6 +145,51 @@ function Popup() {
       
   }, []);
 
+  // Generate and set the description sentences
+  const generateDescriptionSentences = (cookieScore, trackerScore, score) => {
+    
+    // Tracker score description
+    if (trackerScore == 0) {
+      setTrackerScoreDescription("This website doesn't seem to track your fingerprints.");
+    }
+    else if (trackerScore < 10) {
+      setTrackerScoreDescription("This website lightly tracks some of your fingerprints.");
+    }
+    else if (trackerScore < 66) {
+      setTrackerScoreDescription("This website goes out of its way to track several of your fingerprints.")
+    }
+    else {
+      setTrackerScoreDescription("This website actively seeks to track as many of your fingerprints as possible.");
+    }
+
+    // General description
+    // If nothing, "This website seems harmless"
+    // If cookie score ++, "This website uses cookies [somewhat / very] intrusively,"
+    // If tracker score ++, "This website has [some / many] trackers"
+    // If one of the scores is high or if both scores are medium, "Be careful!"
+    let cookieTier = (cookieScore >= 45) + (cookieScore >= 70);
+    let trackerTier = (trackerScore >= 35) + (trackerScore >= 60);
+    console.log(cookieTier + "; " + trackerTier);
+    let generalDesc = "";
+    if (cookieTier > 0 && trackerTier > 0) {
+      generalDesc = "This website uses cookies " + ((cookieTier > 1) ? "very" : "somewhat") + " intrusively, and has " + ((trackerTier > 1) ? "a lot of" : "a few") + " trackers.";
+    }
+    else if (trackerTier > 0) {
+      generalDesc = "This website has " + ((trackerTier > 1) ? "a lot of" : "a few") + " trackers.";
+    }
+    else if (cookieTier > 0) {
+      generalDesc = "This website uses cookies " + ((cookieTier > 1) ? "very" : "somewhat") + " intrusively."
+    }
+    else {
+      generalDesc = "This website seems harmless."
+    }
+    if (cookieTier == 2 || trackerTier == 2 || (cookieTier > 0 && trackerTier > 0)) {
+      generalDesc += " Be careful!";
+    }
+    setGeneralScoreDescription(generalDesc);
+
+  }
+
   // Handle click on collapsable items
   const [expanded, setExpanded] = useState('');
   const handleChange = (panel) => (event, newExpanded) => {
@@ -154,10 +203,14 @@ function Popup() {
         {/* Top banner */}
         <div className="top-component">
           <div className="top-item" onClick={clickAbout}>
-            <i className="bi bi-info-circle"></i>
+            <Tooltip title={"Learn more"}>
+              <i className="bi bi-info-circle"></i>
+            </Tooltip>
           </div>
           <div className="top-item" onClick={clickIndex}>
-            <i className="bi bi-gear"></i>
+            <Tooltip title={"Dashboard & settings"}>
+              <i className="bi bi-gear"></i>
+            </Tooltip>
           </div>
         </div>
 
@@ -200,7 +253,7 @@ function Popup() {
 
             {/* General score explanation (right side) */}
             <div className="general-score-right">
-              This website has some hardware trackers.
+              {generalScoreDescription}
             </div>
 
           </div>
@@ -270,12 +323,12 @@ function Popup() {
 
               {/* Content */}
               <MuiAccordionDetails>
-                <Typography className="detailed-score-contents">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                  malesuada lacus ex, sit amet blandit leo lobortis eget. Lorem ipsum dolor
-                  sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
-                  sit amet blandit leo lobortis eget.
-                </Typography>
+                <span>
+                    {trackerScoreDescription}
+                    <Tooltip title={"Fingerprints are little bits of information you leave online (such as your computer specs or your browser configuration). Thanks to these, websites can easily identify you as a unique individual."}>
+                      <IconButton className="detailed-tracker-score-item-help-icon" size="small" onClick={clickAbout}> <HelpOutlineIcon/> </IconButton>
+                    </Tooltip>
+                </span>
               </MuiAccordionDetails>
 
             </MuiAccordion>

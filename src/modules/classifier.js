@@ -1,5 +1,4 @@
 // LISTENERS
-
 const classifyCookiesTab = (activeInfo) => {
 
     console.log("[CLASSIFIER BACKGROUND] Tab activated")
@@ -8,27 +7,18 @@ const classifyCookiesTab = (activeInfo) => {
         active: true,
         currentWindow: true
     };
-
     chrome.tabs.query(queryOptions, async function (tabs) {
         if (tabs.length > 0 && tabs[0].url !== "") {
-
             chrome.storage.sync.set({"currentCookieTypes": [0,0,0,0]}, function() {
-
-                //Getting all the cookie whose url matches the active tab
+                //Get all the cookie whose url matches the active tab
                 chrome.cookies.getAll({"url": tabs[0].url}, function (cookies) {
-        
                     handleCookies(cookies);
-                    
                 });
             });
-            
         }
     });
 
 }
-
-chrome.tabs.onActivated.addListener(classifyCookiesTab);
-
 
 //-------------------------------------------------------------------------------
 /*
@@ -231,7 +221,7 @@ const classifyCookie = async function(feature_input) {
         for (let i = 3; i >= 0; i--) {
             if (labels[i] > 0) {
                 baseScore = thresholds[i-1];
-                additionalScore = mapRange(maxExpirationTimes[i], 0, 31 * (24*60*60*1000), 0, thresholds[i]-thresholds[i-1]);
+                additionalScore = mapRange(maxExpirationTimes[i], 5 * (24*60*60*1000), 31 * (24*60*60*1000), 0, thresholds[i]-thresholds[i-1]);
                 break;
             }
         }
@@ -251,11 +241,3 @@ const classifyCookie = async function(feature_input) {
     });
     
 }
-
-// Load the default configuration
-getExtensionFile(chrome.runtime.getURL("ext_data/default_config.json"), "json", (dConfig) => {
-    initDefaults(dConfig, false)
-});
-
-// retrieve the configuration
-getExtensionFile("ext_data/features.json", "json", setupFeatureResourcesCallback);

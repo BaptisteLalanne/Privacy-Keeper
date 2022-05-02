@@ -34,11 +34,23 @@ chrome.runtime.onInstalled.addListener(function (details) {
             }
         });
 
+        // Load the default classifier configuration
+        getExtensionFile(chrome.runtime.getURL("ext_data/default_config.json"), "json", (dConfig) => {
+            initDefaults(dConfig, false)
+        });
+        getExtensionFile("ext_data/features.json", "json", setupFeatureResourcesCallback);
+
     }
 })
 
 //Listen when the browser is opened
 chrome.windows.onCreated.addListener(function () {
+
+    // Load the default classifier configuration
+    getExtensionFile(chrome.runtime.getURL("ext_data/default_config.json"), "json", (dConfig) => {
+        initDefaults(dConfig, false)
+    });
+    getExtensionFile("ext_data/features.json", "json", setupFeatureResourcesCallback);
     
     //Getting data
     chrome.storage.local.get("updateDateCookies", async function (result) {
@@ -97,12 +109,12 @@ chrome.windows.onCreated.addListener(function () {
     });
 });
 
-//To update the last time a cookie was used
-//Listen to new tabs
-chrome.tabs.onActivated.addListener(setInfos);
-//Listener to updated tabs (when the url is modifies for instance)
-chrome.tabs.onUpdated.addListener(setInfos);
+//To classify the current tab's cookies
+chrome.tabs.onActivated.addListener(classifyCookiesTab);
 
+//To update the last time a cookie was used
+chrome.tabs.onActivated.addListener(setInfos); //Listen to new tabs / switching tabs / reloading tabs
+chrome.tabs.onUpdated.addListener(setInfos); //Listener to updated tabs (when the url is modifies for instance)
 
 function setInfos() {
 

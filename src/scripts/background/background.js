@@ -178,8 +178,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
         if (tab.url.split(":")[0].includes("chrome")) { return; }
 
         // Otherwise inject analysis scripts
-        injectScripts(tabId, fingerprinterScript);
-        
+        injectScripts(tabId, fingerprinterScript);        
     }
 });
 

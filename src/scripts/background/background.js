@@ -27,7 +27,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
         });
 
         // Set default expiration time
-        let default_expiration_time = 14 * (1000 * 60 * 60 * 24); 
+        let default_expiration_time = 1//14 * (1000 * 60 * 60 * 24); 
         chrome.storage.local.set({"expiration_time": default_expiration_time}, function () {
             if (chrome.runtime.error) {
                 console.log("Runtime error : expiration_time");
@@ -39,6 +39,14 @@ chrome.runtime.onInstalled.addListener(function (details) {
         chrome.storage.local.set({"unused_cookies_wl": default_unused_cookies_wl}, function () {
             if (chrome.runtime.error) {
                 console.log("Runtime error : unused_cookies_wl");
+            }
+        });
+
+        // Set historic deleted unused cookies
+        let default_unusedCookieDeletedHistory = {}; 
+        chrome.storage.local.set({"unusedCookieDeletedHistory": default_unusedCookieDeletedHistory}, function () {
+            if (chrome.runtime.error) {
+                console.log("Runtime error : unusedCookieDeletedHistory");
             }
         });
 
@@ -65,6 +73,8 @@ chrome.windows.onCreated.addListener(function () {
             //Getting data
             await chrome.storage.local.get("updateDateCookies", async function (result) {
 
+                let nb_deleted_cookies = 0
+
                 //Time after which unused cookies are deleted
                 let max_diff = await chrome.storage.local.get("expiration_time") // Retrieving cookie expiration time -> default is 1000 * 60 * 60 * 24 * 7 * 2; //2 weeks
                 max_diff = max_diff.expiration_time
@@ -76,7 +86,6 @@ chrome.windows.onCreated.addListener(function () {
                     result = {};
 
                 let value = {};
-
                 let date_now = Date.now().toString();
 
                 //Getting all the cookies
@@ -103,6 +112,9 @@ chrome.windows.onCreated.addListener(function () {
 
                             //We check if the cookie hasn't been used for too long
                             else if (result[key] && date_now - result[key] > max_diff) {
+                                //Add stats
+                                nb_deleted_cookies += 1;
+
                                 //Delete cookie
                                 chrome.cookies.remove({
                                     "name": cookie.name,
@@ -130,8 +142,29 @@ chrome.windows.onCreated.addListener(function () {
                     }
                 }).catch(err => console.log(err));
 
-            });
+                //Set stats nb deleted cookies
+                await chrome.storage.local.get("unusedCookieDeletedHistory", function (historic) {
+                    if(historic && historic.unusedCookieDeletedHistory){
+                        historic = historic.unusedCookieDeletedHistory
+                    } else {
+                        historic = {}
+                    }
 
+                    //add stats
+                    if(nb_deleted_cookies != null){
+                        historic[date_now] = nb_deleted_cookies
+
+                        //database
+                        chrome.storage.local.set({"unusedCookieDeletedHistory": historic}, function () {
+                            if (chrome.runtime.error) {
+                                console.log("Runtime error : unusedCookieDeletedHistory");
+                            }
+                        });
+                    }
+                    
+                });
+
+            });
 
         }
 

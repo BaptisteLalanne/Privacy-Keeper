@@ -74,7 +74,7 @@ export default function fingerprinterScript() {
     let mimeTypePropertiesCount = 0;
     let audioPropertiesCount = 0;
 
-    let fp_infinity = false;
+    let fp_inf = 0;
     let fp_total = 0;
 
     for (let i = 0; i < scripts.length; i++) {
@@ -92,8 +92,8 @@ export default function fingerprinterScript() {
         audioPropertiesCount += findElementFromArrayInText(audioProperties, scriptContent);
 
         let fp_ratio = findKeywordsOccurences(scriptContent);
-        if (fp_ratio == -1) {
-            fp_infinity = true;
+        if (fp_ratio < 0) {
+            fp_inf += fp_ratio;
         } else {
             fp_total += fp_ratio;
         }
@@ -107,8 +107,6 @@ export default function fingerprinterScript() {
     let total = (navigatorPropertiesCount+navigatorPropertiesToInstrumentCount+pluginPropertiesCount+mimeTypePropertiesCount+audioPropertiesCount);
     console.log("Total = " + total);
 
-    console.log("fp_ratio: " + fp_total);
-
     let score = 0;
 
     if(total<=10)
@@ -117,8 +115,14 @@ export default function fingerprinterScript() {
         score = 100;
     else
         score = 1.25 * total - 10;
-        
+
+    if (fp_inf != 0) {
+        fp_total = fp_inf;
+    }
+    
     console.log("Score : " + score);
+    console.log("FP_TOTAL: " + fp_total);
 
     chrome.storage.sync.set({'fingerprintScore': score}, function() {});
+    chrome.storage.sync.set({'fpRatioTable': fp_total}, function() {});
 }

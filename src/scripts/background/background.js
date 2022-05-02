@@ -14,26 +14,35 @@ import fingerprinterScript from "./injectTrackerAnalyser.js"
 chrome.runtime.onInstalled.addListener(function (details) {
     if (details.reason === "install") {
 
-        // Set default toggle options
+        // set default value for parameters
         let default_options = {
             autoDeleteOldCookies: false,
             blockTrackers: false,
             blockCookies: false,
         }
-        chrome.storage.local.set({"toggle_options": default_options}, function () {
+        let default_expiration_time = 14 * (1000 * 60 * 60 * 24);
+        let default_params = {
+            "updateDateCookies": {},
+            "expiration_time": default_expiration_time,
+            "cookieDeletedHistory": {},
+            "whitelist": {},
+            "manuallyDeletedCookies": {
+                timestamp1: {
+                    type1: 0,
+                    type2: 0
+                },
+                timestamp2: {
+                    type1 : 0
+                }
+            },
+            "toggle_options": default_options,
+            "cookieTypes" : {}
+        }
+        chrome.storage.local.set(default_params, function () {
             if (chrome.runtime.error) {
                 console.log("Runtime error.");
             }
         });
-
-        // Set default expiration time
-        let default_expiration_time = 14 * (1000 * 60 * 60 * 24); 
-        chrome.storage.local.set({"expiration_time": default_expiration_time}, function () {
-            if (chrome.runtime.error) {
-                console.log("Runtime error.");
-            }
-        });
-
     }
 })
 

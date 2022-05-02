@@ -16,7 +16,7 @@ export default function fingerprinterScript() {
     
     //This class implements all methods to analyse trackers whithin a web page
     const scripts = document.scripts;
-    console.log("Nb of scripts: " + scripts.length);
+    //console.log("Nb of scripts: " + scripts.length);
 
     // Access to navigator properties
     let navigatorProperties = ["appCodeName", "appName", "appVersion",
@@ -49,7 +49,7 @@ export default function fingerprinterScript() {
     for (let i = 0; i < scripts.length; i++) {
         if (scripts[i].src) {
             externalSourceLink = scripts[i].src;
-            console.log(externalSourceLink);
+            //console.log(externalSourceLink);
 
         }
         const scriptContent = scripts[i].text;
@@ -60,13 +60,13 @@ export default function fingerprinterScript() {
         mimeTypePropertiesCount += findElementFromArrayInText(mimeTypeProperties, scriptContent);
         audioPropertiesCount += findElementFromArrayInText(audioProperties, scriptContent);
     }
-    console.log("navigatorPropertiesCount: " + navigatorPropertiesCount);
-    console.log("navigatorPropertiesToInstrumentCount: " + navigatorPropertiesToInstrumentCount);
-    console.log("pluginPropertiesCount: " + pluginPropertiesCount);
-    console.log("mimeTypePropertiesCount: " + mimeTypePropertiesCount);
-    console.log("audioPropertiesCount: " + audioPropertiesCount);
+    //console.log("navigatorPropertiesCount: " + navigatorPropertiesCount);
+    //console.log("navigatorPropertiesToInstrumentCount: " + navigatorPropertiesToInstrumentCount);
+    //console.log("pluginPropertiesCount: " + pluginPropertiesCount);
+    //console.log("mimeTypePropertiesCount: " + mimeTypePropertiesCount);
+    //console.log("audioPropertiesCount: " + audioPropertiesCount);
     let total = (navigatorPropertiesCount+navigatorPropertiesToInstrumentCount+pluginPropertiesCount+mimeTypePropertiesCount+audioPropertiesCount);
-    console.log("Total = " + total);
+    //console.log("Total = " + total);
 
     let score = 0;
 
@@ -77,7 +77,7 @@ export default function fingerprinterScript() {
     else
         score = 1.25 * total - 10;
         
-    console.log("Score : " + score);
+    //console.log("Score : " + score);
 
     chrome.storage.sync.set({'fingerprintScore': score}, function() {});
 

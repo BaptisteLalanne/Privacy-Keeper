@@ -16,22 +16,22 @@ const messagesFromReactAppListener = (message, sender, response) => {
 
 //This class implements all methods to analyse trackers whithin a web page
 const scripts = document.scripts;
-console.log("Nb of scripts: " + scripts.length);
+//console.log("Nb of scripts: " + scripts.length);
 
 let nbBeacon = 0;
 for (let i=0; i<scripts.length; i++) {
   if(scripts[i].src) {
     externalSourceLink = scripts[i].src;
-    console.log(externalSourceLink);
+    //console.log(externalSourceLink);
     
   }
   const scriptContent = scripts[i].text;
   if(scriptContent.includes("sendBeacon")){
-    console.log("FOUND Beacon!")
+    //console.log("FOUND Beacon!")
     nbBeacon ++;
   }
 }
-console.log("Nb of beacons found: " + nbBeacon);
+//console.log("Nb of beacons found: " + nbBeacon);
 
 chrome.runtime.sendMessage({function:'handleResultBeacon'}, function(response){
   console.log(response);  

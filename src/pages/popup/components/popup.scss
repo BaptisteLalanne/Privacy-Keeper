@@ -159,13 +159,34 @@ body::-webkit-scrollbar {
 }
 .detailed-score-item {
     display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.detailed-cookies-score-item {
+    display: flex;
     gap: $font-size;
+    align-items: center;
+}
+
+.detailed-cookies-score-item-icon {
+    margin: auto 0;
 }
 
 .detailed-cookies-score-item-text {
     margin: auto 0;
     display: flex;
     gap: 0.5*$font-size;
+}
+
+.detailed-cookies-score-item-help-icon {
+    margin: auto 0;
+    color: $dark-grey;
+    padding: 0 !important;
+    width: 1.25*$font-size;
+}
+.detailed-cookies-score-item-help-icon > svg {
+    width: 100%;
 }
 
 .MuiAccordionSummary-content {

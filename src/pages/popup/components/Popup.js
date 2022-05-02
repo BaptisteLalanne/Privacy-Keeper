@@ -7,6 +7,10 @@ import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
 import BuildIcon from '@mui/icons-material/Build';
 import InsightsIcon from '@mui/icons-material/Insights';
 import CampaignIcon from '@mui/icons-material/Campaign';
+import HelpIcon from '@mui/icons-material/Help';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import {cookieTypeLabels} from '../../../scripts/miscellaneous/common.js'
 import './popup.scss';
 
@@ -70,14 +74,6 @@ function updateCSS(node, score, cookieScore, trackerScore) {
 
 }
 
-// Generate blank popup
-function generateBlankPopup(node) {
-
-  node.innerHTML = "Nothing to see here...";
-
-}
-
-/* global chrome */
 function Popup() {
 
   let wrapperRef = React.useRef(null);
@@ -94,6 +90,13 @@ function Popup() {
     <BuildIcon/>,
     <InsightsIcon/>,
     <CampaignIcon/>
+  ];
+
+  const detailedCookiesExplanations = [
+    "These cookies are necessary for the site to run correctly",
+    "These cookies are used for certain functionalities of the site",
+    "These cookies are used to gather analytics about who visits the website and what they do on it",
+    "These cookies are used to gather information about your personal preferences in order to tailor displayed ads"
   ];
 
   // Main Hook
@@ -223,11 +226,20 @@ function Popup() {
               {/* Content */}
               <MuiAccordionDetails className="detailed-score-contents">
                 {[...Array(4)].map((x, i) =>
-                  <div className="detailed-score-item" style={{opacity: cookieDetails[i] > 0 ? 1 : 0.8}}>
-                    <div className="detailed-cookies-score-item-icon"> {detailedCookiesIcons[i]} </div>
-                    <div className="detailed-cookies-score-item-text"> 
-                      {cookieDetails[i] > 0 ? <div style={{fontWeight:"bold"}}>{cookieDetails[i]}</div> : <></>}
-                      <div>{(cookieDetails[i] == 0 ? "No " : "") + cookieTypeLabels[i].toLowerCase() + " cookie" + (cookieDetails[i] > 1 ? "s" : "")}</div> 
+                  <div className="detailed-score-item" key={i}>
+                    <div className="detailed-cookies-score-item" style={{opacity: cookieDetails[i] > 0 ? 1 : 0.8}}>
+                      <div className="detailed-cookies-score-item-icon"> 
+                        {detailedCookiesIcons[i]} 
+                      </div>
+                      <div className="detailed-cookies-score-item-text"> 
+                        {cookieDetails[i] > 0 ? <div style={{fontWeight:"bold"}}>{cookieDetails[i]}</div> : <></>}
+                        <div>{(cookieDetails[i] == 0 ? "No " : "") + cookieTypeLabels[i].toLowerCase() + " cookie" + (cookieDetails[i] == 1 ? "" : "s")}</div> 
+                      </div>
+                    </div>
+                    <div>
+                    <Tooltip title={detailedCookiesExplanations[i]}>
+                      <IconButton className="detailed-cookies-score-item-help-icon" size="small" onClick={clickAbout}> <HelpOutlineIcon/> </IconButton>
+                    </Tooltip>
                     </div>
                   </div>
                 )}  

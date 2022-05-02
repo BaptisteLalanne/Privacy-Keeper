@@ -176,6 +176,7 @@ const classifyCookie = async function(feature_input) {
         for (let cookie of newCookies) {
 
             let key = "domain" + cookie.domain + "name" + cookie.name;
+            console.log(key);
 
             let getClassification = 
 

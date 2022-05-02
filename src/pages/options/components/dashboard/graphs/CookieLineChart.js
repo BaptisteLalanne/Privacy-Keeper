@@ -48,6 +48,9 @@ export default function CookieLineChart() {
 
   return (
       <div className="dashboard-box" id="cookie-line-chart-wrapper">
+        <div className="graph-title">
+          <Divider textAlign="center">Number of cookies detected in the past month</Divider> 
+        </div>
         <ResponsiveContainer width="99%" height={300}>
           <LineChart width={600} height={300} data={data} margin={{ top: 32, right: 20, bottom: 20, left: -10 }} className="graph">
             <CartesianGrid stroke="#ccc" strokeDasharray="3 3" />
@@ -61,8 +64,8 @@ export default function CookieLineChart() {
             <Line type="natural" dataKey="Advertising" stroke={COLORS[3]} strokeWidth={1.5} animationBegin={150} animationDuration={800} dot={false}/>
           </LineChart>
         </ResponsiveContainer>
-        <div className="graph-title">
-          <Divider textAlign="center">Number of cookies detected in the past month</Divider> 
+        <div className="graph-explanation">
+          Less cookies have been recorded over the past month.
         </div>
       </div>
   )

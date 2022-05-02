@@ -25,20 +25,24 @@
     border: solid 1px lightgray;
     box-shadow: 1px 1px 4px lightgray;
     padding: $font-size;
-    align-self: stretch;
-    height: 100%;
     width: 100%;
 }
 
 .graph-title {
     text-align: center;
     margin: auto;
-    margin-top: 1.5*$font-size;
+    margin-bottom: 1*$font-size;
     color: $dark-grey;
+    font-weight: bold;
 }
 .graph-title .MuiDivider-root::before, .graph-title .MuiDivider-root::after {
-    border-top: solid 1px $dark-grey !important;
+    border-top: solid 2px $dark-grey !important;
     opacity: 0.6;
+}
+
+.graph-explanation {
+    margin-top: 1*$font-size;
+    text-align: center;
 }
 
 .graph {

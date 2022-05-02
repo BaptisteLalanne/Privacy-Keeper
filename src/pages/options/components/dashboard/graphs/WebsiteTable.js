@@ -44,6 +44,9 @@ export default function WebsiteTable() {
 
   return (
     <div className="dashboard-box">
+      <div className="graph-title">
+        <Divider textAlign="center">Safest and riskiest websites you browsed</Divider>
+      </div>
       <TableContainer>
         <Table>
           <TableHead>
@@ -84,8 +87,8 @@ export default function WebsiteTable() {
           </TableBody>
         </Table>
       </TableContainer>
-      <div className="graph-title">
-        <Divider textAlign="center">Safest and riskiest websites you browsed</Divider>
+      <div className="graph-explanation">
+        Be careful about these websites!
       </div>
     </div>
   )

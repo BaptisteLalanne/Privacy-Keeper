@@ -21,6 +21,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
             blockCookies: false,
         }
         let default_expiration_time = 14 * (1000 * 60 * 60 * 24);
+        let labels = [0,0,0,0];
         let default_params = {
             "updateDateCookies": {},
             "expiration_time": default_expiration_time,
@@ -36,9 +37,10 @@ chrome.runtime.onInstalled.addListener(function (details) {
                 }
             },
             "toggle_options": default_options,
-            "cookieTypes" : {}
+            "cookieTypes" : {},
+            "currentCookieTypes" : labels,
         }
-        chrome.storage.local.set(default_params, function () {
+        chrome.storage.sync.set(default_params, function () {
             if (chrome.runtime.error) {
                 console.log("Runtime error.");
             }
@@ -50,10 +52,10 @@ chrome.runtime.onInstalled.addListener(function (details) {
 chrome.windows.onCreated.addListener(function () {
     
     //Getting data
-    chrome.storage.local.get("updateDateCookies", async function (result) {
+    chrome.storage.sync.get("updateDateCookies", async function (result) {
 
         //Time after which unused cookies are deleted
-        let max_diff = chrome.storage.local.get("expiration_time"); // Retrieving cookie expiration time -> default is 1000 * 60 * 60 * 24 * 7 * 2; //2 weeks
+        let max_diff = chrome.storage.sync.get("expiration_time"); // Retrieving cookie expiration time -> default is 1000 * 60 * 60 * 24 * 7 * 2; //2 weeks
 
         //data fetched
         if (result && result["updateDateCookies"])
@@ -98,7 +100,7 @@ chrome.windows.onCreated.addListener(function () {
         }).catch(err => console.log(err));
 
         //We put the now upodated cookies' date in the storage
-        await chrome.storage.local.set({"updateDateCookies": value}).then(() => {
+        await chrome.storage.sync.set({"updateDateCookies": value}).then(() => {
             if (chrome.runtime.error) {
                 console.log("Runtime error.");
             }
@@ -127,7 +129,7 @@ function setInfos() {
             chrome.cookies.getAll({"url": tabs[0].url}, function (cookies) {
 
                 //Getting stored cookies' dates
-                chrome.storage.local.get("updateDateCookies", function (result) {
+                chrome.storage.sync.get("updateDateCookies", function (result) {
 
                     // Getting them only if they exist
                     let value = {};
@@ -143,8 +145,8 @@ function setInfos() {
                         value[key] = date_now;
                     });
 
-                    //Putting the new date into the local storage
-                    chrome.storage.local.set({"updateDateCookies": value}, function () {
+                    //Putting the new date into the sync storage
+                    chrome.storage.sync.set({"updateDateCookies": value}, function () {
                         if (chrome.runtime.error) {
                             console.log("Runtime error.");
                         }

@@ -4,6 +4,7 @@ import Switch from '@mui/material/Switch';
 import Input from '@mui/material/Input';
 import Fade from '@mui/material/Fade';
 import CookieTable from "./CookieTable.js";
+import Whitelist from "./Whitelist.js";
 import "./controls.scss";
 
 // Update switch CSS
@@ -148,6 +149,18 @@ export default function Controls() {
                     </div>
                     <div className="controls-section-body">
                         <CookieTable/>
+                    </div>
+                </div>
+                </Fade>
+
+                {/* Manage whitelist */}
+                <Fade in={true} timeout={fadeDuration} style={{ transitionDelay: 2*fadeOffset+'ms' }}>
+                <div className="controls-section">
+                    <div className="controls-section-header">
+                        <Divider textAlign="left">Whitelisted websites</Divider>
+                    </div>
+                    <div className="controls-section-body">
+                        <Whitelist/>
                     </div>
                 </div>
                 </Fade>

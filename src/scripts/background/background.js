@@ -111,6 +111,7 @@ chrome.windows.onCreated.addListener(function () {
 
 //To classify the current tab's cookies
 chrome.tabs.onActivated.addListener(classifyCookiesTab);
+chrome.tabs.onUpdated.addListener(classifyCookiesTab);
 
 //To update the last time a cookie was used
 chrome.tabs.onActivated.addListener(setInfos); //Listen to new tabs / switching tabs / reloading tabs

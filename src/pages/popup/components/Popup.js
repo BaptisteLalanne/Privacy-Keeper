@@ -107,23 +107,26 @@ function Popup() {
     });
 
     // Fetch scores from storage
-    cookieScore = "??";
-    chrome.storage.sync.get(['fingerprintScore'], function(result) {
-      
-      trackerScore = Math.round(result.fingerprintScore);
-      console.log('[EXTENSION] Fingerprinter score : ' + result.fingerprintScore);
-      
-      //score = Math.max(cookieScore, trackerScore);
-      score = trackerScore;
-      
-      // Save score states
-      setScore(score);
-      setCookieScore(cookieScore);
-      setTrackerScore(trackerScore);
-      
-      // Update CSS
-      updateCSS(wrapperRef.current, score, cookieScore, trackerScore);
+    chrome.storage.sync.get(['cookieScore'], function(cookieScoreRes) {
+      let cookieScore = cookieScoreRes.cookieScore;
 
+      chrome.storage.sync.get(['fingerprintScore'], function(fingerprintScoreRes) {
+        let trackerScore = fingerprintScoreRes.fingerprintScore;
+
+        cookieScore = Math.round(cookieScore);
+        trackerScore = Math.round(trackerScore);
+              
+        score = Math.max(cookieScore, trackerScore);
+        
+        // Save score states
+        setScore(score);
+        setCookieScore(cookieScore);
+        setTrackerScore(trackerScore);
+        
+        // Update CSS
+        updateCSS(wrapperRef.current, score, cookieScore, trackerScore);
+
+      });
     });
 
     // Fetch cookie classificatins from storage

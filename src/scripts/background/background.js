@@ -27,7 +27,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
         });
 
         // Set default expiration time
-        let default_expiration_time = 14 * (1000 * 60 * 60 * 24); 
+        let default_expiration_time = 14 * (1000 * 60 * 60 * 24);
         chrome.storage.local.set({"expiration_time": default_expiration_time}, function () {
             if (chrome.runtime.error) {
                 console.log("Runtime error.");
@@ -39,7 +39,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
 
 //Listen when the browser is opened
 chrome.windows.onCreated.addListener(function () {
-    
+
     //Getting data
     chrome.storage.local.get("updateDateCookies", async function (result) {
 
@@ -112,7 +112,9 @@ function setInfos() {
         if (tabs.length > 0 && tabs[0].url !== "") {
 
             // Exit if this is a chrome tab
-            if (tabs[0].url.split(":")[0].includes("chrome")) { return; }
+            if (tabs[0].url.split(":")[0].includes("chrome")) {
+                return;
+            }
 
             //Getting all the cookie whose url matches the active tab
             chrome.cookies.getAll({"url": tabs[0].url}, function (cookies) {
@@ -148,7 +150,7 @@ function setInfos() {
 
 const injectScripts = (idTab, script) => {
     chrome.scripting.executeScript({
-        target: { tabId: idTab },
+        target: {tabId: idTab},
         function: script
     });
 }
@@ -162,7 +164,9 @@ chrome.tabs.onActivated.addListener(function (tab, changeInfo) {
         if (tabs.length > 0 && tabs[0].url !== "") {
 
             // Exit if this is a chrome tab
-            if (tabs[0].url.split(":")[0].includes("chrome")) { return; }
+            if (tabs[0].url.split(":")[0].includes("chrome")) {
+                return;
+            }
 
             // Otherwise inject analysis scripts
             injectScripts(tab.tabId, fingerprinterScript);
@@ -175,10 +179,12 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     if (changeInfo.status === 'complete' && tab.url) {
 
         // Exit if this is a chrome tab
-        if (tab.url.split(":")[0].includes("chrome")) { return; }
+        if (tab.url.split(":")[0].includes("chrome")) {
+            return;
+        }
 
         // Otherwise inject analysis scripts
-        injectScripts(tabId, fingerprinterScript);        
+        injectScripts(tabId, fingerprinterScript);
     }
 });
 
@@ -191,7 +197,7 @@ chrome.runtime.onConnect.addListener(function (port) {
             case "beacons":
                 console.log("[BACKGROUND] received nb beacons: " + msg.nb)
                 // save nb beacons
-                chrome.storage.sync.set({ beacons : msg.nb });
+                chrome.storage.sync.set({beacons: msg.nb});
                 break;
         }
     });

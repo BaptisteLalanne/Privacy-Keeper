@@ -60,7 +60,7 @@ chrome.windows.onCreated.addListener(function () {
 
     //Getting toggle options
     chrome.storage.local.get("toggle_options", async function (result) {
-        if(result && result.toggle_options && result.toggle_options.autoDeleteOldCookies){
+        if(result && result.toggle_options && result.toggle_options.autoDeleteOldCookies) {
 
             let whitelist
             //Getting whitelist
@@ -73,17 +73,21 @@ chrome.windows.onCreated.addListener(function () {
             //Getting data
             await chrome.storage.local.get("updateDateCookies", async function (result) {
 
-                let nb_deleted_cookies = 0
-
-                //Time after which unused cookies are deleted
-                let max_diff = await chrome.storage.local.get("expiration_time") // Retrieving cookie expiration time -> default is 1000 * 60 * 60 * 24 * 7 * 2; //2 weeks
-                max_diff = max_diff.expiration_time
-
-                //data fetched
+                // Fetch data
                 if (result && result["updateDateCookies"])
                     result = result["updateDateCookies"];
                 else
                     result = {};
+
+                // Fetch cookie types
+                let res = await chrome.storage.local.get("cookieTypes");
+                let cookieTypes = res.cookieTypes;
+
+                let nb_deleted_cookies = [0, 0, 0, 0, 0]
+
+                //Time after which unused cookies are deleted
+                let max_diff = await chrome.storage.local.get("expiration_time") // Retrieving cookie expiration time -> default is 1000 * 60 * 60 * 24 * 7 * 2; //2 weeks
+                max_diff = max_diff.expiration_time
 
                 let value = {};
                 let date_now = Date.now().toString();
@@ -102,7 +106,8 @@ chrome.windows.onCreated.addListener(function () {
                             }
                         }
 
-                        if(!found){
+                        if(!found) {
+
                             key = "domain" + cookie.domain + "name" + cookie.name;
 
                             //If we don't have a date in the storage for the cookie we add it
@@ -112,8 +117,11 @@ chrome.windows.onCreated.addListener(function () {
 
                             //We check if the cookie hasn't been used for too long
                             else if (result[key] && date_now - result[key] > max_diff) {
+                                
                                 //Add stats
-                                nb_deleted_cookies += 1;
+                                let type = cookieTypes[key];
+                                if (!type) type = 4;
+                                nb_deleted_cookies[type] += 1;
 
                                 //Delete cookie
                                 chrome.cookies.remove({
@@ -135,7 +143,7 @@ chrome.windows.onCreated.addListener(function () {
                     })
                 }).catch(err => console.log(err));
 
-                //We put the now upodated cookies' date in the storage
+                //We put the now updated cookies' date in the storage
                 await chrome.storage.local.set({"updateDateCookies": value}).then(() => {
                     if (chrome.runtime.error) {
                         console.log("Runtime error.");
@@ -144,14 +152,15 @@ chrome.windows.onCreated.addListener(function () {
 
                 //Set stats nb deleted cookies
                 await chrome.storage.local.get("unusedCookieDeletedHistory", function (historic) {
-                    if(historic && historic.unusedCookieDeletedHistory){
+                    if (historic && historic.unusedCookieDeletedHistory) {
                         historic = historic.unusedCookieDeletedHistory
-                    } else {
+                    } 
+                    else {
                         historic = {}
                     }
 
                     //add stats
-                    if(nb_deleted_cookies != null){
+                    if (nb_deleted_cookies != null) {
                         historic[date_now] = nb_deleted_cookies
 
                         //database

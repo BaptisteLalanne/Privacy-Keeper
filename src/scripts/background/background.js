@@ -14,21 +14,38 @@ import fingerprinterScript from "./injectTrackerAnalyser.js"
 chrome.runtime.onInstalled.addListener(function (details) {
     if (details.reason === "install") {
 
-        // Set default toggle options
+        // set default value for parameters
         let default_options = {
             autoDeleteOldCookies: false,
             blockTrackers: false,
             blockCookies: false,
-        }
-        chrome.storage.local.set({"toggle_options": default_options}, function () {
-            if (chrome.runtime.error) {
-                console.log("Runtime error : toggle_options");
-            }
-        });
-
-        // Set default expiration time
-        let default_expiration_time = 14 * (1000 * 60 * 60 * 24); 
-        chrome.storage.local.set({"expiration_time": default_expiration_time}, function () {
+        };
+        let default_expiration_time = 14 * (1000 * 60 * 60 * 24);
+        let labels = [0,0,0,0];
+        let fingerPrintAnalyseResult = {
+            "score" : 0,
+            "fingerPrintComment" : ""
+        };
+        let default_params = {
+            "updateDateCookies": {},
+            "expiration_time": default_expiration_time,
+            "cookieDeletedHistory": {},
+            "whitelist": {},
+            "manuallyDeletedCookies": {
+                timestamp1: {
+                    type1: 0,
+                    type2: 0
+                },
+                timestamp2: {
+                    type1 : 0
+                }
+            },
+            "toggle_options": default_options,
+            "cookieTypes" : {},
+            "currentCookieTypes" : labels,
+            "fingerprintAnalyseResult" : fingerPrintAnalyseResult
+        };
+        chrome.storage.sync.set(default_params, function () {
             if (chrome.runtime.error) {
                 console.log("Runtime error : expiration_time");
             }
@@ -41,57 +58,62 @@ chrome.runtime.onInstalled.addListener(function (details) {
                 console.log("Runtime error : unused_cookies_wl");
             }
         });
-
     }
 })
 
 //Listen when the browser is opened
 chrome.windows.onCreated.addListener(function () {
+    
+    //Getting data
+    chrome.storage.sync.get("updateDateCookies", async function (result) {
 
-    console.log("[BROWSER OPENED]")
+        //Time after which unused cookies are deleted
+        let max_diff = chrome.storage.sync.get("expiration_time"); // Retrieving cookie expiration time -> default is 1000 * 60 * 60 * 24 * 7 * 2; //2 weeks
 
-    //Getting toggle options
-    chrome.storage.local.get("toggle_options", async function (result) {
-        if(result && result.toggle_options && result.toggle_options.autoDeleteOldCookies){
+        console.log("[BROWSER OPENED]")
 
-            let whitelist
-            //Getting whitelist
-            await chrome.storage.local.get("unused_cookies_wl", function (result) {
-                if(result && result.unused_cookies_wl){
-                    whitelist = result.unused_cookies_wl
-                }
-            });
-                
-            //Getting data
-            await chrome.storage.local.get("updateDateCookies", async function (result) {
+        //Getting toggle options
+        chrome.storage.local.get("toggle_options", async function (result) {
+            if(result && result.toggle_options && result.toggle_options.autoDeleteOldCookies){
 
-                //Time after which unused cookies are deleted
-                let max_diff = await chrome.storage.local.get("expiration_time") // Retrieving cookie expiration time -> default is 1000 * 60 * 60 * 24 * 7 * 2; //2 weeks
-                max_diff = max_diff.expiration_time
+                let whitelist
+                //Getting whitelist
+                await chrome.storage.local.get("unused_cookies_wl", function (result) {
+                    if(result && result.unused_cookies_wl){
+                        whitelist = result.unused_cookies_wl
+                    }
+                });
 
-                //data fetched
-                if (result && result["updateDateCookies"])
-                    result = result["updateDateCookies"];
-                else
-                    result = {};
+                //Getting data
+                await chrome.storage.local.get("updateDateCookies", async function (result) {
 
-                let value = {};
+                    //Time after which unused cookies are deleted
+                    let max_diff = await chrome.storage.local.get("expiration_time") // Retrieving cookie expiration time -> default is 1000 * 60 * 60 * 24 * 7 * 2; //2 weeks
+                    max_diff = max_diff.expiration_time
 
-                let date_now = Date.now().toString();
+                    //data fetched
+                    if (result && result["updateDateCookies"])
+                        result = result["updateDateCookies"];
+                    else
+                        result = {};
 
-                //Getting all the cookies
-                await chrome.cookies.getAll({}).then(cookies => {
+                    let value = {};
 
-                    let key;
-                    cookies.forEach(cookie => {
+                    let date_now = Date.now().toString();
 
-                        let found = false
-                        for(const domain of whitelist){
-                            if(cookie.domain.includes(domain)){
-                                found = true
-                                break
+                    //Getting all the cookies
+                    await chrome.cookies.getAll({}).then(cookies => {
+
+                        let key;
+                        cookies.forEach(cookie => {
+
+                            let found = false
+                            for(const domain of whitelist){
+                                if(cookie.domain.includes(domain)){
+                                    found = true
+                                    break
+                                }
                             }
-                        }
 
                         if(!found){
                             key = "domain" + cookie.domain + "name" + cookie.name;
@@ -124,7 +146,7 @@ chrome.windows.onCreated.addListener(function () {
                 }).catch(err => console.log(err));
 
                 //We put the now upodated cookies' date in the storage
-                await chrome.storage.local.set({"updateDateCookies": value}).then(() => {
+                await chrome.storage.sync.set({"updateDateCookies": value}).then(() => {
                     if (chrome.runtime.error) {
                         console.log("Runtime error.");
                     }
@@ -134,7 +156,6 @@ chrome.windows.onCreated.addListener(function () {
 
 
         }
-
     });
 
 });
@@ -162,7 +183,7 @@ function setInfos() {
             chrome.cookies.getAll({"url": tabs[0].url}, function (cookies) {
 
                 //Getting stored cookies' dates
-                chrome.storage.local.get("updateDateCookies", function (result) {
+                chrome.storage.sync.get("updateDateCookies", function (result) {
 
                     // Getting them only if they exist
                     let value = {};
@@ -178,8 +199,8 @@ function setInfos() {
                         value[key] = date_now;
                     });
 
-                    //Putting the new date into the local storage
-                    chrome.storage.local.set({"updateDateCookies": value}, function () {
+                    //Putting the new date into the sync storage
+                    chrome.storage.sync.set({"updateDateCookies": value}, function () {
                         if (chrome.runtime.error) {
                             console.log("Runtime error.");
                         }

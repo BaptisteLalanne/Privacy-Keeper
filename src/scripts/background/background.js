@@ -44,7 +44,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
             "currentCookieTypes": labels,
             "fingerprintAnalyseResult": fingerPrintAnalyseResult,
             "unused_cookies_wl": [],
-            "unusedCookieDeletedHistory" : {}
+            "unusedCookieDeletedHistory": {}
         };
         chrome.storage.sync.set(default_params, function () {
             if (chrome.runtime.error) {
@@ -56,100 +56,70 @@ chrome.runtime.onInstalled.addListener(function (details) {
 
 //Listen when the browser is opened
 chrome.windows.onCreated.addListener(function () {
-    
-    //Getting data
-    chrome.storage.sync.get("updateDateCookies", async function (result) {
 
-        console.log("[BROWSER OPENED]")
+    console.log("[BROWSER OPENED]");
 
-        //Getting toggle options
-        chrome.storage.sync.get("toggle_options", async function (result) {
-            if(result && result.toggle_options && result.toggle_options.autoDeleteOldCookies) {
+    //Getting toggle options
+    chrome.storage.sync.get("toggle_options", async function (result) {
 
-                let whitelist
-                //Getting whitelist
-                await chrome.storage.sync.get("unused_cookies_wl", function (result) {
-                    if(result && result.unused_cookies_wl){
-                        whitelist = result.unused_cookies_wl
-                    }
-                });
-                    
-                //Getting data
-                await chrome.storage.sync.get("updateDateCookies", async function (result) {
+        if (result && result.toggle_options && result.toggle_options.autoDeleteOldCookies) {
 
-                    //Time after which unused cookies are deleted
-                    let max_diff = await chrome.storage.sync.get("expiration_time") // Retrieving cookie expiration time -> default is 1000 * 60 * 60 * 24 * 7 * 2; //2 weeks
-                    max_diff = max_diff.expiration_time
+            let whitelist
+            //Getting whitelist
+            await chrome.storage.sync.get("unused_cookies_wl", function (result) {
+                if (result && result.unused_cookies_wl) {
+                    whitelist = result.unused_cookies_wl
+                }
+            });
 
-                    //data fetched
-                    if (result && result["updateDateCookies"])
-                        result = result["updateDateCookies"];
-                    else
-                        result = {};
+            //Getting data
+            await chrome.storage.sync.get("updateDateCookies", async function (result) {
 
-                    let value = {};
+                // Fetch data
+                if (result && result["updateDateCookies"])
+                    result = result["updateDateCookies"];
+                else
+                    result = {};
 
-                    let date_now = Date.now().toString();
+                // Fetch cookie types
+                let res = await chrome.storage.sync.get("cookieTypes");
+                let cookieTypes = res.cookieTypes;
 
-                    //Getting all the cookies
-                    await chrome.cookies.getAll({}).then(cookies => {
+                let nb_deleted_cookies = [0, 0, 0, 0, 0]
 
-                        let key;
-                        cookies.forEach(cookie => {
+                //Time after which unused cookies are deleted
+                let max_diff = await chrome.storage.sync.get("expiration_time") // Retrieving cookie expiration time -> default is 1000 * 60 * 60 * 24 * 7 * 2; //2 weeks
+                max_diff = max_diff.expiration_time
 
-                            let found = false
-                            for(const domain of whitelist){
-                                if(cookie.domain.includes(domain)){
-                                    found = true
-                                    break
-                                }
+                let value = {};
+                let date_now = Date.now().toString();
+
+                //Getting all the cookies
+                await chrome.cookies.getAll({}).then(cookies => {
+
+                    let key;
+                    cookies.forEach(cookie => {
+
+                        let found = false
+                        for (const domain of whitelist) {
+                            if (cookie.domain.includes(domain)) {
+                                found = true
+                                break
                             }
-
-                            if(!found){
-                                key = "domain" + cookie.domain + "name" + cookie.name;
-
-                                //If we don't have a date in the storage for the cookie we add it
-                                if (!result[key]) {
-                                    value[key] = date_now;
-                                }
-
-                                //We check if the cookie hasn't been used for too long
-                                else if (result[key] && date_now - result[key] > max_diff) {
-                                    //Delete cookie
-                                    chrome.cookies.remove({
-                                        "name": cookie.name,
-                                        "storeId": cookie.storeId,
-                                        "url": "https://" + cookie.domain + cookie.path
-                                    }, function () {
-                                        delete result[key]
-                                        if (chrome.runtime.lastError) {
-                                            console.log("Runtime error.");
-                                        }
-                                    });
-                                }
-                                //If lower than max_diff
-                                else {
-                                    value[key] = result[key];
-                                }
-                            }
-                        })
-                    }).catch(err => console.log(err));
-
-                    //We put the now upodated cookies' date in the storage
-                    await chrome.storage.sync.set({"updateDateCookies": value}).then(() => {
-                        if (chrome.runtime.error) {
-                            console.log("Runtime error.");
                         }
-                    }).catch(err => console.log(err));
 
-                });
+                        if (!found) {
 
-            }
+                            key = "domain" + cookie.domain + "name" + cookie.name;
 
-        });
+                            //If we don't have a date in the storage for the cookie we add it
+                            if (!result[key]) {
+                                value[key] = date_now;
+                            }
+
                             //We check if the cookie hasn't been used for too long
                             else if (result[key] && date_now - result[key] > max_diff) {
-                                
+
                                 //Add stats
                                 let type = cookieTypes[key];
                                 if (!type) type = 4;
@@ -184,11 +154,10 @@ chrome.windows.onCreated.addListener(function () {
                 }).catch(err => console.log(err));
 
                 //Set stats nb deleted cookies
-                await chrome.storage.sync.get("unusedCookieDeletedHistory", function (historic) {
+                await chrome.storage.local.get("unusedCookieDeletedHistory", function (historic) {
                     if (historic && historic.unusedCookieDeletedHistory) {
                         historic = historic.unusedCookieDeletedHistory
-                    } 
-                    else {
+                    } else {
                         historic = {}
                     }
 
@@ -197,13 +166,13 @@ chrome.windows.onCreated.addListener(function () {
                         historic[date_now] = nb_deleted_cookies
 
                         //database
-                        chrome.storage.sync.set({"unusedCookieDeletedHistory": historic}, function () {
+                        chrome.storage.local.set({"unusedCookieDeletedHistory": historic}, function () {
                             if (chrome.runtime.error) {
                                 console.log("Runtime error : unusedCookieDeletedHistory");
                             }
                         });
                     }
-                    
+
                 });
 
             });
@@ -212,6 +181,7 @@ chrome.windows.onCreated.addListener(function () {
     });
 
 });
+
 
 // Load the default classifier configuration
 getExtensionFile(chrome.runtime.getURL("ext_data/default_config.json"), "json", (dConfig) => {

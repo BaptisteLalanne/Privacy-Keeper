@@ -42,7 +42,7 @@ export default function Controls() {
 
         // Retrieve option toggles
         let switchNodesList = document.getElementsByClassName("MuiSwitch-input");
-        chrome.storage.local.get(["toggle_options"], function (res) {
+        chrome.storage.sync.get(["toggle_options"], function (res) {
             let savedState = res.toggle_options;
             // Update state
             setState(savedState);
@@ -53,7 +53,7 @@ export default function Controls() {
         });
 
         // Retrieve expiration time
-        chrome.storage.local.get(["expiration_time"], function (res) {
+        chrome.storage.sync.get(["expiration_time"], function (res) {
             let savedTime = res.expiration_time / (1000 * 60 * 60 * 24);
             // Update DOM (necessary because a state variable is not enough: defaultValue only loaded once, before this hook, so we need to set the actual DOM value)
             expirationTimeInputRef.current.firstChild.value = savedTime;
@@ -63,14 +63,14 @@ export default function Controls() {
 
     // Local settings updaters
     const saveExpirationTime = (newTime) => {
-        chrome.storage.local.set({ "expiration_time": newTime * (1000 * 60 * 60 * 24) }, function () {
+        chrome.storage.sync.set({ "expiration_time": newTime * (1000 * 60 * 60 * 24) }, function () {
             if (chrome.runtime.error) {
                 console.log("Runtime error.");
             }
         });
     }
     const saveToggleOptions = (newState) => {
-        chrome.storage.local.set({ "toggle_options": newState }, function () {
+        chrome.storage.sync.set({ "toggle_options": newState }, function () {
             if (chrome.runtime.error) {
                 console.log("Runtime error.");
             }

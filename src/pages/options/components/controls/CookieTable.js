@@ -174,13 +174,17 @@ export default function CookieTable() {
         });
 
         // Store deleted cookies
-        chrome.storage.local.get(["manuallyDeletedCookies"], res => {
+        chrome.storage.sync.get(["manuallyDeletedCookies"], res => {
             let data = {};
             if (res && res.manuallyDeletedCookies) {
                 data = res.manuallyDeletedCookies;
             }
             data[Date.now().toString()] = deleted;
-            chrome.storage.local.set({ "manuallyDeletedCookies": data });
+            chrome.storage.sync.set({ "manuallyDeletedCookies": data }, () => {
+                if (chrome.runtime.error) {
+                    console.log("Runtime error.");
+                }
+            });
         });
 
     }
@@ -188,9 +192,9 @@ export default function CookieTable() {
     useEffect(() => {
 
         // Fetch last used date map, construct data using it
-        chrome.storage.local.get(["updateDateCookies"], function (res1) {
+        chrome.storage.sync.get(["updateDateCookies"], function (res1) {
             let lastCookieUpdateDates = res1.updateDateCookies;
-            chrome.storage.local.get(["cookieTypes"], function (res2) {
+            chrome.storage.sync.get(["cookieTypes"], function (res2) {
                 let cookieTypes = res2.cookieTypes;               
                 constructData(lastCookieUpdateDates, cookieTypes);
             });

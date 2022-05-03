@@ -157,7 +157,7 @@ const classifyCookie = async function(feature_input) {
     let currCookieTypes = {};
     
     // Get already stored classifications
-    chrome.storage.local.get(["cookieTypes"], async (res) => {
+    chrome.storage.sync.get(["cookieTypes"], async (res) => {
 
         let prevCookieTypes = {};
         if (res && res.cookieTypes) {
@@ -236,7 +236,7 @@ const classifyCookie = async function(feature_input) {
 
         // Update gobal cookie types map
         newCookieTypes = {...prevCookieTypes, ...currCookieTypes};
-        chrome.storage.local.set({ "cookieTypes": newCookieTypes });
+        chrome.storage.sync.set({ "cookieTypes": newCookieTypes });
 
     });
     

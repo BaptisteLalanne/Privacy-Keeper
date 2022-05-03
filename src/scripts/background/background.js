@@ -20,11 +20,11 @@ chrome.runtime.onInstalled.addListener(function (details) {
             blockTrackers: false,
             blockCookies: false,
         };
-        let default_expiration_time = 14 * (1000 * 60 * 60 * 24);
-        let labels = [0,0,0,0];
+        let default_expiration_time = 1//4 * (1000 * 60 * 60 * 24);
+        let labels = [0, 0, 0, 0];
         let fingerPrintAnalyseResult = {
-            "score" : 0,
-            "fingerPrintComment" : ""
+            "score": 0,
+            "fingerPrintComment": ""
         };
         let default_params = {
             "updateDateCookies": {},
@@ -37,13 +37,13 @@ chrome.runtime.onInstalled.addListener(function (details) {
                     type2: 0
                 },
                 timestamp2: {
-                    type1 : 0
+                    type1: 0
                 }
             },
             "toggle_options": default_options,
-            "cookieTypes" : {},
-            "currentCookieTypes" : labels,
-            "fingerprintAnalyseResult" : fingerPrintAnalyseResult
+            "cookieTypes": {},
+            "currentCookieTypes": labels,
+            "fingerprintAnalyseResult": fingerPrintAnalyseResult
         };
         chrome.storage.sync.set(default_params, function () {
             if (chrome.runtime.error) {
@@ -52,8 +52,8 @@ chrome.runtime.onInstalled.addListener(function (details) {
         });
 
         // Set unused cookies whitelist
-        let default_unused_cookies_wl = []; 
-        chrome.storage.local.set({"unused_cookies_wl": default_unused_cookies_wl}, function () {
+        let default_unused_cookies_wl = [];
+        chrome.storage.sync.set({"unused_cookies_wl": default_unused_cookies_wl}, function () {
             if (chrome.runtime.error) {
                 console.log("Runtime error : unused_cookies_wl");
             }
@@ -63,59 +63,54 @@ chrome.runtime.onInstalled.addListener(function (details) {
 
 //Listen when the browser is opened
 chrome.windows.onCreated.addListener(function () {
-    
-    //Getting data
-    chrome.storage.sync.get("updateDateCookies", async function (result) {
 
-        //Time after which unused cookies are deleted
-        let max_diff = chrome.storage.sync.get("expiration_time"); // Retrieving cookie expiration time -> default is 1000 * 60 * 60 * 24 * 7 * 2; //2 weeks
+    console.log("[BROWSER OPENED]");
 
-        console.log("[BROWSER OPENED]")
+    //Getting toggle options
+    chrome.storage.sync.get("toggle_options", async function (result) {
 
-        //Getting toggle options
-        chrome.storage.local.get("toggle_options", async function (result) {
-            if(result && result.toggle_options && result.toggle_options.autoDeleteOldCookies){
+        if (result && result.toggle_options && result.toggle_options.autoDeleteOldCookies) {
 
-                let whitelist
-                //Getting whitelist
-                await chrome.storage.local.get("unused_cookies_wl", function (result) {
-                    if(result && result.unused_cookies_wl){
-                        whitelist = result.unused_cookies_wl
-                    }
-                });
+            let whitelist
+            //Getting whitelist
+            await chrome.storage.sync.get("unused_cookies_wl", function (result) {
+                if (result && result.unused_cookies_wl) {
+                    whitelist = result.unused_cookies_wl
+                }
+            });
 
-                //Getting data
-                await chrome.storage.local.get("updateDateCookies", async function (result) {
+            //Getting data
+            await chrome.storage.sync.get("updateDateCookies", async function (result) {
 
-                    //Time after which unused cookies are deleted
-                    let max_diff = await chrome.storage.local.get("expiration_time") // Retrieving cookie expiration time -> default is 1000 * 60 * 60 * 24 * 7 * 2; //2 weeks
-                    max_diff = max_diff.expiration_time
+                //Time after which unused cookies are deleted
+                let max_diff = await chrome.storage.sync.get("expiration_time") // Retrieving cookie expiration time -> default is 1000 * 60 * 60 * 24 * 7 * 2; //2 weeks
+                max_diff = max_diff.expiration_time
 
-                    //data fetched
-                    if (result && result["updateDateCookies"])
-                        result = result["updateDateCookies"];
-                    else
-                        result = {};
+                //data fetched
+                if (result && result["updateDateCookies"])
+                    result = result["updateDateCookies"];
+                else
+                    result = {};
 
-                    let value = {};
+                let value = {};
 
-                    let date_now = Date.now().toString();
+                let date_now = Date.now().toString();
 
-                    //Getting all the cookies
-                    await chrome.cookies.getAll({}).then(cookies => {
+                //Getting all the cookies
+                await chrome.cookies.getAll({}).then(cookies => {
 
-                        let key;
-                        cookies.forEach(cookie => {
+                    let key;
+                    cookies.forEach(cookie => {
 
-                            let found = false
-                            for(const domain of whitelist){
-                                if(cookie.domain.includes(domain)){
-                                    found = true
-                                    break
-                                }
+                        let found = false
+                        for (const domain of whitelist) {
+                            if (cookie.domain.includes(domain)) {
+                                found = true
+                                break
                             }
+                        }
 
-                        if(!found){
+                        if (!found) {
                             key = "domain" + cookie.domain + "name" + cookie.name;
 
                             //If we don't have a date in the storage for the cookie we add it
@@ -142,6 +137,7 @@ chrome.windows.onCreated.addListener(function () {
                                 value[key] = result[key];
                             }
                         }
+
                     })
                 }).catch(err => console.log(err));
 
@@ -160,6 +156,7 @@ chrome.windows.onCreated.addListener(function () {
 
 });
 
+
 //To update the last time a cookie was used
 //Listen to new tabs
 chrome.tabs.onActivated.addListener(setInfos);
@@ -173,11 +170,12 @@ function setInfos() {
     let queryOptions = {active: true, currentWindow: true};
     chrome.tabs.query(queryOptions, function (tabs) {
 
-        let re = /(chrome|brave|edge|falkon|opera|yandex|ecosia|chromium):\/\//
-        if(tabs.length > 0 && !re.test(tabs[0].url) && tabs[0].url !== ""){
+        if (tabs.length > 0 && tabs[0].url !== "") {
 
             // Exit if this is a chrome tab
-            if (tabs[0].url.split(":")[0].includes("chrome")) { return; }
+            if (tabs[0].url.includes("chrome://")) {
+                return;
+            }
 
             //Getting all the cookie whose url matches the active tab
             chrome.cookies.getAll({"url": tabs[0].url}, function (cookies) {
@@ -213,7 +211,7 @@ function setInfos() {
 
 const injectScripts = (idTab, script) => {
     chrome.scripting.executeScript({
-        target: { tabId: idTab },
+        target: {tabId: idTab},
         function: script
     });
 }
@@ -227,7 +225,9 @@ chrome.tabs.onActivated.addListener(function (tab, changeInfo) {
         if (tabs.length > 0 && tabs[0].url !== "") {
 
             // Exit if this is a chrome tab
-            if (tabs[0].url.split(":")[0].includes("chrome")) { return; }
+            if (tabs[0].url.split(":")[0].includes("chrome")) {
+                return;
+            }
 
             // Otherwise inject analysis scripts
             injectScripts(tab.tabId, fingerprinterScript);
@@ -240,11 +240,13 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     if (changeInfo.status === 'complete' && tab.url) {
 
         // Exit if this is a chrome tab
-        if (tab.url.split(":")[0].includes("chrome")) { return; }
+        if (tab.url.split(":")[0].includes("chrome")) {
+            return;
+        }
 
         // Otherwise inject analysis scripts
         injectScripts(tabId, fingerprinterScript);
-        
+
     }
 });
 
@@ -257,7 +259,7 @@ chrome.runtime.onConnect.addListener(function (port) {
             case "beacons":
                 console.log("[BACKGROUND] received nb beacons: " + msg.nb)
                 // save nb beacons
-                chrome.storage.sync.set({ beacons : msg.nb });
+                chrome.storage.sync.set({beacons: msg.nb});
                 break;
         }
     });

@@ -9,15 +9,32 @@ const classifyCookiesTab = (activeInfo) => {
     };
     chrome.tabs.query(queryOptions, async function (tabs) {
         if (tabs.length > 0 && tabs[0].url !== "") {
-            chrome.storage.sync.set({"currentCookieTypes": [0,0,0,0]}, function() {
+            chrome.storage.sync.set({ "currentCookieTypes": [0, 0, 0, 0] }, function () {
                 //Get all the cookie whose url matches the active tab
-                chrome.cookies.getAll({"url": tabs[0].url}, function (cookies) {
-                    handleCookies(cookies);
+                chrome.cookies.getAll({ "url": tabs[0].url }, function (cookies) {
+                    handleCookies(cookies, tabs[0].url);
                 });
             });
         }
     });
 
+}
+
+// HELPER FUNCTIONS
+const mapRange = (x, min1, max1, min2, max2) => {
+    return clamp((x - min1) / (max1 - min1) * (max2 - min2) + min2, min2, max2);
+}
+const clamp = (x, min, max) => {
+    if (x > max) return max;
+    if (x < min) return min;
+    return x;
+}
+// Extract domain from URL
+function extractDomain(fullUrl) {
+    let domain = fullUrl.replace('http://', '').replace('https://', '').split(/[/?#]/)[0];
+    if (domain[0] == '.') domain = domain.substr(1);
+    if (domain.substr(0, 4) == "www.") domain = domain.substr(4);
+    return domain;
 }
 
 //-------------------------------------------------------------------------------
@@ -72,28 +89,28 @@ const regexKey = "~regex;";
 * @param  {Object} cookie    Raw cookie data as received from the browser.
 * @return {Promise<object>}  Feature Extraction input object.
 */
-const createFEInput = function(cookie) {
+const createFEInput = function (cookie) {
     return {
-      "name": encodeURI(cookie.name),
-      "domain": encodeURI(cookie.domain),
-      "path": encodeURI(cookie.path),
-      "current_label": -1,
-      "label_ts": 0,
-      "storeId": encodeURI(cookie.storeId),
-      "variable_data":
-      [
-        {
-          "host_only": cookie.hostOnly,
-          "http_only": cookie.httpOnly,
-          "secure": cookie.secure,
-          "session": cookie.session,
-          "expirationDate": cookie.expirationDate,
-          "expiry": datetimeToExpiry(cookie),
-          "value": encodeURI(cookie.value),
-          "same_site": encodeURI(cookie.sameSite),
-          "timestamp": Date.now()
-        }
-      ]
+        "name": encodeURI(cookie.name),
+        "domain": encodeURI(cookie.domain),
+        "path": encodeURI(cookie.path),
+        "current_label": -1,
+        "label_ts": 0,
+        "storeId": encodeURI(cookie.storeId),
+        "variable_data":
+            [
+                {
+                    "host_only": cookie.hostOnly,
+                    "http_only": cookie.httpOnly,
+                    "secure": cookie.secure,
+                    "session": cookie.session,
+                    "expirationDate": cookie.expirationDate,
+                    "expiry": datetimeToExpiry(cookie),
+                    "value": encodeURI(cookie.value),
+                    "same_site": encodeURI(cookie.sameSite),
+                    "timestamp": Date.now()
+                }
+            ]
     };
 }
 
@@ -105,7 +122,7 @@ const createFEInput = function(cookie) {
  * @param  {Object} rawCookie       New cookie data, untransformed.
  * @return {Promise<object>}        The existing cookie object, updated with new data.
  */
-const updateFEInput = async function(storedFEInput, rawCookie) {
+const updateFEInput = async function (storedFEInput, rawCookie) {
 
     let updateArray = storedFEInput["variable_data"];
     let updateLimit = cblk_ulimit;
@@ -138,7 +155,7 @@ const updateFEInput = async function(storedFEInput, rawCookie) {
  * @param  {Object} feature_input   Transformed cookie data input, for the feature extraction.
  * @return {Promise<Number>}        Cookie category label as an integer, ranging from [0,3].
  */
-const classifyCookie = async function(feature_input) {
+const classifyCookie = async function (feature_input) {
     let features = extractFeatures(feature_input);
     label = await predictClass(features, 1);
     return label;
@@ -150,12 +167,17 @@ const classifyCookie = async function(feature_input) {
  * @param {Object} newCookie Raw cookie object directly from the browser.
  * @param {Object} storeUpdate Whether
  */
- const handleCookies = async function (newCookies){
+const handleCookies = async function (newCookies, url) {
 
-    let labels = [0,0,0,0];
-    let maxExpirationTimes = [0,0,0,0];
+    let domain = extractDomain(url);
+
+    let labels = [0, 0, 0, 0];
+    let maxExpirationTimes = [0, 0, 0, 0];
     let currCookieTypes = {};
-    
+    let currDate = Date.now().toString();
+    const MAX_DURATION = 365 * (24*60*60);
+    const MAX_DATE = Date.now()/1000 + MAX_DURATION;
+
     // Get already stored classifications
     chrome.storage.sync.get(["cookieTypes"], async (res) => {
 
@@ -163,82 +185,149 @@ const classifyCookie = async function(feature_input) {
         if (res && res.cookieTypes) {
             prevCookieTypes = res.cookieTypes;
         }
+        let newCookieTypes = {};
 
-        for (let cookie of newCookies) {
+        // Get settings
+        chrome.storage.sync.get("toggle_options", async function (res) {
 
-            let key = "domain" + cookie.domain + "name" + cookie.name;
-            console.log(key);
-
-            let getClassification = 
-
-                // If cookie has already been classified,
-                prevCookieTypes[key] ? 
-
-                    async () => {
-
-                        // Fetch stored classiification
-                        return prevCookieTypes[key];
-                        
-                    }
-
-                // If cookie has not alreayd been classified,
-                : 
-
-                    async () => {
-
-                        // Classify it
-                        let serializedCookie = createFEInput(cookie);
-                        let res = await classifyCookie(serializedCookie);
-
-                        // Store the result
-                        currCookieTypes[key] = res;
-
-                        return res;
-                    }
-
-                ;
-
-            let clabel = await getClassification();
-
-            // Count cookie types
-            labels[clabel] += 1;
-            maxExpirationTimes[clabel] = Math.max(maxExpirationTimes[clabel], cookie.expirationDate);
-
-        }
-
-        const mapRange = (x, min1, max1, min2, max2) => {
-            return clamp((x - min1) / (max1 - min1) * (max2 - min2) + min2, min2, max2);
-        }
-        const clamp = (x, min, max) => {
-            if (x > max) return max;
-            if (x < min) return min;
-            return x;
-        }
-
-        let thresholds = [0, 35, 65, 100];
-        let baseScore = 0;
-        let additionalScore = 0;
-        for (let i = 3; i >= 0; i--) {
-            if (labels[i] > 0) {
-                baseScore = thresholds[i-1];
-                //additionalScore = mapRange(maxExpirationTimes[i], 5 * (24*60*60*1000), 31 * (24*60*60*1000), 0, thresholds[i]-thresholds[i-1]);
-                additionalScore = mapRange(labels[i], 1, 5, 0, thresholds[i]-thresholds[i-1]);
-                break;
+            let blockCookies = false;
+            if (res && res.toggle_options) {
+                blockCookies = res.toggle_options.blockCookies;
             }
-        }
-        let score = baseScore + additionalScore;
 
-        console.log("[CLASSIFIER BACKGROUND] cookieClassification saved");
-        console.log(labels);
+            // Get whitelist
+            chrome.storage.sync.get("unused_cookies_wl", async function (res) {
 
-        // Save current tab's cookie score and repartition 
-        chrome.storage.sync.set({"currentCookieTypes": labels});
-        chrome.storage.sync.set({"cookieScore": score});
+                let whitelist = [];
+                if (res && res.unused_cookies_wl) {
+                    whitelist = res.unused_cookies_wl;
+                }
 
-        // Update gobal cookie types map
-        newCookieTypes = {...prevCookieTypes, ...currCookieTypes};
-        chrome.storage.sync.set({ "cookieTypes": newCookieTypes });
+                // Get blocked cookies
+                chrome.storage.sync.get("blockedCookies", async function (result) {
 
+                    let blockedCookies = {};
+                    if (result && result.blockedCookies) {
+                        blockedCookies = result.blockedCookies;
+                        if (!blockedCookies[domain]) {
+                            blockedCookies[domain] = {};
+                        }
+                    }
+
+                    // Iterate through cookies
+                    for (let cookie of newCookies) {
+
+                        let key = "domain" + cookie.domain + "name" + cookie.name;
+
+                        let getClassification =
+
+                            // If cookie has already been classified,
+                            prevCookieTypes[key] ?
+
+                                async () => {
+
+                                    // Fetch stored classiification
+                                    return prevCookieTypes[key];
+
+                                }
+
+                                // If cookie has not alreayd been classified,
+                                :
+
+                                async () => {
+
+                                    // Classify it
+                                    let serializedCookie = createFEInput(cookie);
+                                    let res = await classifyCookie(serializedCookie);
+
+                                    // Store the result
+                                    currCookieTypes[key] = res;
+
+                                    return res;
+                                }
+
+                            ;
+
+                        let ctype = await getClassification();
+                        
+                        // Block cookies
+                        let hasBeenBlocked = false;
+                        if (blockCookies) {
+                
+                            // Check if it's not in whitelist
+                            let found = false;
+                            for (let whitelistedDomain of whitelist) {
+                                if (cookie.domain.includes(whitelistedDomain)) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (!found) {
+                                if (ctype > 1 && cookie.value != "") {
+
+                                    let cookieUrl = "http" + (cookie.secure ? "s" : "") + "://" + cookie.domain + cookie.path;
+                                    // Remove cookie right away
+                                    chrome.cookies.remove({ url: cookieUrl, name: cookie.name });
+                                    hasBeenBlocked = true;
+
+                                    // Store numbers of removed cookies
+                                    blockedCookies[domain][cookie.name] = cookie;
+
+                                }
+                            }
+                        }
+                        newCookieTypes = { ...prevCookieTypes, ...currCookieTypes };
+
+                        // Count cookie types, keep track of longest expiration date
+                        if (!hasBeenBlocked) {
+                            labels[ctype] += 1;
+                            if (!cookie.expirationDate) { maxExpirationTimes[ctype] = MAX_DATE; }
+                            else { maxExpirationTimes[ctype] = Math.max(maxExpirationTimes[ctype], cookie.expirationDate); }
+                        }
+
+                    }
+
+                    // Count in previously blocked cookies
+                    console.log(blockedCookies);
+                    if (blockedCookies[domain]) {
+                        for (const [name, cookie] of Object.entries(blockedCookies[domain])) {
+                            let key = "domain" + cookie.domain + "name" + cookie.name;
+                            let type = newCookieTypes[key];
+                            labels[type] += 1;
+                            if (!cookie.expirationDate) { maxExpirationTimes[type] = MAX_DATE; }
+                            else { maxExpirationTimes[type] = Math.max(maxExpirationTimes[type], cookie.expirationDate); }
+                        }
+                    }
+
+                    // Compute score
+                    let thresholds = [0, 2, 35, 65, 100];
+                    let baseScore = 0;
+                    let additionalScore = 0;
+                    for (let i = 3; i >= 0; i--) {
+                        if (labels[i] > 0) {
+                            baseScore = thresholds[i];
+                            additionalScore = mapRange(maxExpirationTimes[i]-Date.now()/1000, 5 * (24*60*60), MAX_DURATION, 0, thresholds[i+1]-thresholds[i]);
+                            break;
+                        }
+                    }
+                    let score = baseScore + additionalScore;
+                
+                    console.log("[CLASSIFIER BACKGROUND] cookieClassification saved");
+                    console.log(labels);
+                
+                    // Save current tab's cookie score and repartition 
+                    chrome.storage.sync.set({ "currentCookieTypes": labels });
+                    chrome.storage.sync.set({ "cookieScore": score });
+                
+                    // Update gobal cookie types map
+                    chrome.storage.sync.set({ "cookieTypes": newCookieTypes });
+
+                    // Save the deleted cookies
+                    chrome.storage.sync.set({ "blockedCookies": blockedCookies });
+
+                });
+            });
+        });
     });
-    
+
 }

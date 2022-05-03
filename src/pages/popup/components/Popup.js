@@ -8,6 +8,7 @@ import InsightsIcon from '@mui/icons-material/Insights';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import IconButton from '@mui/material/IconButton';
+import ClearIcon from '@mui/icons-material/Clear';
 import Tooltip from '@mui/material/Tooltip';
 import {cookieTypeLabels} from '../../../scripts/miscellaneous/common.js'
 import './popup.scss';
@@ -76,16 +77,17 @@ function Popup() {
 
   let wrapperRef = React.useRef(null);
   
-  const [url, setUrl] = useState('');
-  const [isChromeTab, setIsChromeTab] = useState(false);
-  const [isInWhitelist, setIsInWhitelist] = useState(false);
+  let [url, setUrl] = useState('');
+  let [isChromeTab, setIsChromeTab] = useState(false);
+  let [isInWhitelist, setIsInWhitelist] = useState(false);
   let [score, setScore] = useState(100);
-  let [cookieScore, setCookieScore] = useState(100);
-  let [trackerScore, setTrackerScore] = useState(100);
+  let [cookieScore, setCookieScore] = useState(0);
+  let [trackerScore, setTrackerScore] = useState(0);
   let [cookieDetails, setCookieDetails] = useState([0, 0, 0, 0]);
   let [trackerScoreDescription, setTrackerScoreDescription] = useState("This is how much we suspect this website tracks you.");
   let [generalScoreDescription, setGeneralScoreDescription] = useState("This website has some hardware trackers.");
-
+  let [blocksCookies, setBlocksCookies] = useState(false);
+ 
   const detailedCookiesIcons = [
     <ElectricBoltIcon/>,
     <BuildIcon/>,
@@ -153,7 +155,14 @@ function Popup() {
       console.log(labels);
       setCookieDetails(labels);
     });
-      
+
+    // Fetch options from storage
+    chrome.storage.sync.get("toggle_options", async function (result) {
+      if (result && result.toggle_options) {
+        setBlocksCookies(result.toggle_options.blockCookies);
+      }
+    });
+
   }, []);
 
   const toggleWhitelist = (url) => {
@@ -324,13 +333,14 @@ function Popup() {
               <MuiAccordionDetails className="detailed-score-contents">
                 {[...Array(4)].map((x, i) =>
                   <div className="detailed-score-item" key={i}>
-                    <div className="detailed-cookies-score-item" style={{opacity: cookieDetails[i] > 0 ? 1 : 0.8}}>
+                    <div className="detailed-cookies-score-item" style={{opacity: ((blocksCookies && i > 1) || cookieDetails[i] == 0) ? 0.7 : 1}}>
                       <div className="detailed-cookies-score-item-icon"> 
                         {detailedCookiesIcons[i]} 
+                        {/*<div className="detailed-cookies-cross-icon">{blocksCookies ? <ClearIcon/> : <></>}</div>*/}
                       </div>
                       <div className="detailed-cookies-score-item-text"> 
                         {cookieDetails[i] > 0 ? <div style={{fontWeight:"bold"}}>{cookieDetails[i]}</div> : <></>}
-                        <div>{(cookieDetails[i] == 0 ? "No " : "") + cookieTypeLabels[i].toLowerCase() + " cookie" + (cookieDetails[i] == 1 ? "" : "s")}</div> 
+                        <div>{((blocksCookies && i > 1 && cookieDetails[i] > 0) ? "blocked " : (cookieDetails[i] == 0 ? "No " : "")) + cookieTypeLabels[i].toLowerCase() + " cookie" + (cookieDetails[i] == 1 ? "" : "s")}</div> 
                       </div>
                     </div>
                     <div>

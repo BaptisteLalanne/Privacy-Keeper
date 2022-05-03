@@ -44,7 +44,8 @@ chrome.runtime.onInstalled.addListener(function (details) {
             "currentCookieTypes": labels,
             "fingerprintAnalyseResult": fingerPrintAnalyseResult,
             "unused_cookies_wl": [],
-            "unusedCookieDeletedHistory": {}
+            "unusedCookieDeletedHistory": {},
+            "blockedCookies": {}
         };
         chrome.storage.sync.set(default_params, function () {
             if (chrome.runtime.error) {
@@ -101,7 +102,7 @@ chrome.windows.onCreated.addListener(function () {
                     cookies.forEach(cookie => {
 
                         let found = false
-                        for (const domain of whitelist) {
+                        for (let domain of whitelist) {
                             if (cookie.domain.includes(domain)) {
                                 found = true
                                 break
@@ -205,7 +206,7 @@ function setInfos() {
         if (tabs.length > 0 && tabs[0].url !== "") {
 
             // Exit if this is a chrome tab
-            if (tabs[0].url.includes("chrome://")) {
+            if (tabs[0].url.split(":")[0].includes("chrome")) {
                 return;
             }
 

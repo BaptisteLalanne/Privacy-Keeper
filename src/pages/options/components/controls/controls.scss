@@ -99,10 +99,19 @@
 }
 
 .whitelist-table {
-    width: 25%;
+    width: 50%;
 }
 .whitelist-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+.whitelist-explanation {
+    font-size: $font-size;
+}
+.whitelist-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: $font-size;
+    width: 50%;
 }

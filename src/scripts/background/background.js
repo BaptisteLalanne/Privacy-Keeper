@@ -57,7 +57,6 @@ chrome.windows.onCreated.addListener(function () {
         chrome.storage.local.get("toggle_options", async function (result) {
             if(result && result.toggle_options && result.toggle_options.autoDeleteOldCookies) {
 
-                let whitelist
                 //Getting whitelist
                 await chrome.storage.local.get("unused_cookies_wl", function (result) {
                     if(result && result.unused_cookies_wl){
@@ -150,8 +149,7 @@ getExtensionFile(chrome.runtime.getURL("ext_data/default_config.json"), "json", 
 getExtensionFile("ext_data/features.json", "json", setupFeatureResourcesCallback);
 
 //To classify the current tab's cookies
-chrome.tabs.onActivated.addListener(classifyCookiesTab);
-chrome.tabs.onUpdated.addListener(classifyCookiesTab);
+chrome.cookies.onChanged.addListener(classifyCookiesTab);
 
 //To update the last time a cookie was used
 chrome.tabs.onActivated.addListener(setInfos); //Listen to new tabs / switching tabs / reloading tabs

@@ -80,6 +80,10 @@ export default function Controls() {
     // Change handlers
     const handleExpirationTimeChange = (event) => {
         let newTime = event.target.value;
+        event.target.value = Math.max(newTime, 0);
+    }
+    const handleExpirationTimeUnfocus = (event) => {
+        let newTime = event.target.value;
         // Update stored settings
         saveExpirationTime(newTime);
     }
@@ -115,8 +119,9 @@ export default function Controls() {
                                 <Switch checked={state.autoDeleteOldCookies} onChange={handleToggleChange} name="autoDeleteOldCookies" size="small" />
                                 <div className="toggle-options-item-label">
                                     Delete cookies older than &nbsp;
-                                    <Input id="expirationTimeInput" type="number"
-                                        onBlur={handleExpirationTimeChange}
+                                    <Input id="expirationTimeInput" type="number" inputProps={{ min: 0 }}
+                                        onChange={handleExpirationTimeChange} 
+                                        onBlur={handleExpirationTimeUnfocus}
                                         ref={expirationTimeInputRef}
                                     />
                                     &nbsp; days each time the browser is launched

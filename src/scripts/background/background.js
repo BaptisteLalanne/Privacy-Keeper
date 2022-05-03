@@ -29,7 +29,6 @@ chrome.runtime.onInstalled.addListener(function (details) {
         let default_params = {
             "updateDateCookies": {},
             "expiration_time": default_expiration_time,
-            "cookieDeletedHistory": {},
             "whitelist": {},
             "manuallyDeletedCookies": {
                 timestamp1: {
@@ -43,19 +42,13 @@ chrome.runtime.onInstalled.addListener(function (details) {
             "toggle_options": default_options,
             "cookieTypes": {},
             "currentCookieTypes": labels,
-            "fingerprintAnalyseResult": fingerPrintAnalyseResult
+            "fingerprintAnalyseResult": fingerPrintAnalyseResult,
+            "unused_cookies_wl": [],
+            "unusedCookieDeletedHistory" : {}
         };
         chrome.storage.sync.set(default_params, function () {
             if (chrome.runtime.error) {
-                console.log("Runtime error : expiration_time");
-            }
-        });
-
-        // Set unused cookies whitelist
-        let default_unused_cookies_wl = [];
-        chrome.storage.sync.set({"unused_cookies_wl": default_unused_cookies_wl}, function () {
-            if (chrome.runtime.error) {
-                console.log("Runtime error : unused_cookies_wl");
+                console.log("Runtime error : default parameters");
             }
         });
     }
@@ -82,18 +75,23 @@ chrome.windows.onCreated.addListener(function () {
             //Getting data
             await chrome.storage.sync.get("updateDateCookies", async function (result) {
 
-                //Time after which unused cookies are deleted
-                let max_diff = await chrome.storage.sync.get("expiration_time") // Retrieving cookie expiration time -> default is 1000 * 60 * 60 * 24 * 7 * 2; //2 weeks
-                max_diff = max_diff.expiration_time
-
-                //data fetched
+                // Fetch data
                 if (result && result["updateDateCookies"])
                     result = result["updateDateCookies"];
                 else
                     result = {};
 
-                let value = {};
+                // Fetch cookie types
+                let res = await chrome.storage.sync.get("cookieTypes");
+                let cookieTypes = res.cookieTypes;
 
+                let nb_deleted_cookies = [0, 0, 0, 0, 0]
+
+                //Time after which unused cookies are deleted
+                let max_diff = await chrome.storage.sync.get("expiration_time") // Retrieving cookie expiration time -> default is 1000 * 60 * 60 * 24 * 7 * 2; //2 weeks
+                max_diff = max_diff.expiration_time
+
+                let value = {};
                 let date_now = Date.now().toString();
 
                 //Getting all the cookies
@@ -111,6 +109,7 @@ chrome.windows.onCreated.addListener(function () {
                         }
 
                         if (!found) {
+                          
                             key = "domain" + cookie.domain + "name" + cookie.name;
 
                             //If we don't have a date in the storage for the cookie we add it
@@ -120,6 +119,12 @@ chrome.windows.onCreated.addListener(function () {
 
                             //We check if the cookie hasn't been used for too long
                             else if (result[key] && date_now - result[key] > max_diff) {
+                                
+                                //Add stats
+                                let type = cookieTypes[key];
+                                if (!type) type = 4;
+                                nb_deleted_cookies[type] += 1;
+
                                 //Delete cookie
                                 chrome.cookies.remove({
                                     "name": cookie.name,
@@ -148,8 +153,30 @@ chrome.windows.onCreated.addListener(function () {
                     }
                 }).catch(err => console.log(err));
 
-            });
+                //Set stats nb deleted cookies
+                await chrome.storage.local.get("unusedCookieDeletedHistory", function (historic) {
+                    if (historic && historic.unusedCookieDeletedHistory) {
+                        historic = historic.unusedCookieDeletedHistory
+                    } 
+                    else {
+                        historic = {}
+                    }
 
+                    //add stats
+                    if (nb_deleted_cookies != null) {
+                        historic[date_now] = nb_deleted_cookies
+
+                        //database
+                        chrome.storage.local.set({"unusedCookieDeletedHistory": historic}, function () {
+                            if (chrome.runtime.error) {
+                                console.log("Runtime error : unusedCookieDeletedHistory");
+                            }
+                        });
+                    }
+                    
+                });
+
+            });
 
         }
     });

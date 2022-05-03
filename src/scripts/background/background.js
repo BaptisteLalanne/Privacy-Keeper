@@ -19,9 +19,13 @@ chrome.runtime.onInstalled.addListener(function (details) {
             autoDeleteOldCookies: false,
             blockTrackers: false,
             blockCookies: false,
-        }
+        };
         let default_expiration_time = 14 * (1000 * 60 * 60 * 24);
         let labels = [0,0,0,0];
+        let fingerPrintAnalyseResult = {
+            "score" : 0,
+            "fingerPrintComment" : ""
+        };
         let default_params = {
             "updateDateCookies": {},
             "expiration_time": default_expiration_time,
@@ -39,7 +43,8 @@ chrome.runtime.onInstalled.addListener(function (details) {
             "toggle_options": default_options,
             "cookieTypes" : {},
             "currentCookieTypes" : labels,
-        }
+            "fingerprintAnalyseResult" : fingerPrintAnalyseResult
+        };
         chrome.storage.sync.set(default_params, function () {
             if (chrome.runtime.error) {
                 console.log("Runtime error.");

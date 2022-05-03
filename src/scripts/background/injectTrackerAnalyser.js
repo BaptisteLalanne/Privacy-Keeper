@@ -1,5 +1,7 @@
 //This class implements all methods to analyse trackers whithin a web page
 
+import { resolveConfig } from "prettier";
+
 export default function fingerprinterScript() {
 
     const computeScoreRatio = (obj, text) => {
@@ -11,6 +13,8 @@ export default function fingerprinterScript() {
         }
         return score;
     }
+
+    const clamp = (min, num, max) => Math.min(Math.max(num, min), max);
 
     function findKeywordsOccurences(text_script) {
         const infinity_keywords = {
@@ -319,56 +323,103 @@ export default function fingerprinterScript() {
         let res = computeScoreRatio(infinity_keywords, text_script);
         if (res == 0) {
             res = computeScoreRatio(other_keywords, text_script);
-        } else {
-            console.log("infinity found!!!");
         }
 
         return res;
     }
 
-    //This class implements all methods to analyse trackers whithin a web page
-    const scripts = document.scripts;
-    console.log("Nb of scripts: " + scripts.length);
-
-    let fp_inf = 0;
-    let fp_total = 0;
-
-    for (let i = 0; i < scripts.length; i++) {
-        if (scripts[i].src) {
-            let externalSourceLink = scripts[i].src;
-            // Fetch file with blob
-            fetch(externalSourceLink).then(function (response) {
-                if (!response.ok) {
-                    return false;
+    function computeScoreScript() {
+        // This class implements all methods to analyse trackers whithin a web page
+        const scripts = document.scripts;
+        let fp_inf = 0;
+        let fp_total = 0;
+        //  Score for external link
+        let max_extern = 0;
+        const nbScript = scripts.length;
+        const loopScripts = () => {
+            let promiseList = [];
+            return new Promise((resolve, reject) => {
+                let analysedScripts = 0;
+                for (let i = 0; i < nbScript; i++) {
+                    promiseList.push(new Promise((resolve, reject) => {
+                        if (scripts[i].src) {
+                            let externalSourceLink = scripts[i].src;
+                            // Fetch file with blob
+                            fetch(externalSourceLink).then((response) => {
+                                if (response.ok) {
+                                    response.blob().then((myBlob) => {
+                                        // Get blob content
+                                        myBlob.text().then((scriptContent) => {
+                                            resolve();
+                                            let fp_ratio = findKeywordsOccurences(scriptContent);
+                                            if (fp_ratio < 0 && fp_ratio < max_extern) {
+                                                max_extern = fp_ratio;
+                                            } else if (fp_ratio >= 0 && max_extern >= 0 && fp_ratio > max_extern) {
+                                                max_extern = fp_ratio;
+                                            }
+                                        }).catch((err) => {
+                                            resolve();
+                                        })
+                                    }).catch((err) => {
+                                        resolve();
+                                    });
+                                } else {
+                                    resolve();
+                                }
+                            }).catch((err) => {
+                                resolve();
+                            });
+                        } else {
+                            const script_text = scripts[i].text;
+                            let fp_ratio = findKeywordsOccurences(script_text);
+                            if (fp_ratio < 0) {
+                                fp_inf += fp_ratio;
+                            } else {
+                                fp_total += fp_ratio;
+                            }
+                            resolve();
+                        }
+                    }));
                 }
-                return response.blob();
-            }).then(function (myBlob) {
-                // Get blob content
-                myBlob.text().then((script) => {
-                    let fp_ratio = findKeywordsOccurences(script);
-                    console.log(`LIEN EXTERNE N°${i}: ${fp_ratio}`);
-                });
+                Promise.all(promiseList).then((res)=> {
+                    resolve();
+                })
             })
-
-            //console.log(externalSourceLink);
         }
-        const scriptContent = scripts[i].text;
+        loopScripts().then(() => {
+            let final_score = 0;
 
-        let fp_ratio = findKeywordsOccurences(scriptContent);
-        if (fp_ratio < 0) {
-            fp_inf += fp_ratio;
-        } else {
-            fp_total += fp_ratio;
-        }
+            // When there is an infinite score
+            if (fp_inf != 0) {
+                fp_total = fp_inf;
+                final_score = min(0.9 + 3 * (1 - fp_total), 1);
+            } else {
+                // fp_total: Internal script absolute score - max_extern: External script absolute score
+                if(fp_total < 0 || max_extern < 0){
+                    final_score = 1;
+                } else {
+                    final_score = clamp(50, 0.7 * fp_total + 0.3 * max_extern, 2000) / 2000;
+                }
+            }
+
+            //console.log("EXTERN: " + max_extern);
+            //console.log("FP_TOTAL: " + fp_total);
+            //console.log("final_score: " + final_score);
+            final_score *= 100;
+            return [fp_total,max_extern,final_score];
+        })
+
+
 
     }
 
-    if (fp_inf != 0) {
-        fp_total = fp_inf;
+
+    const [fp_page,fp_extern,final_score] = computeScoreScript();
+    const result = {
+        "fp_page": fp_page,
+        "fp_extern": fp_extern,
+        "final_score": final_score
     }
-
-    console.log("FP_TOTAL: " + fp_total);
-
-    chrome.storage.sync.set({'fingerprintScore': fp_total}, function () {
+    chrome.storage.sync.set(result, function () {
     });
 }

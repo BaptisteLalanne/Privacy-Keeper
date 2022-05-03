@@ -9,7 +9,9 @@ export default function fingerprinterScript() {
         for (let key in obj) {
             let val = obj[key];
             let count = text.split(key).length - 1;
-            score += parseInt(val) * count;
+            if (count > 0) {
+                score += parseInt(val) ;
+            }
         }
         return score;
     }
@@ -398,13 +400,13 @@ export default function fingerprinterScript() {
                 if(fp_total < 0 || max_extern < 0){
                     final_score = 1;
                 } else {
-                    final_score = clamp(50, 0.7 * fp_total + 0.3 * max_extern, 2000) / 2000;
+                    final_score = clamp(50, 0.7 * fp_total + 0.3 * max_extern, 200) / 200;
                 }
             }
 
-            //console.log("EXTERN: " + max_extern);
-            //console.log("FP_TOTAL: " + fp_total);
-            //console.log("final_score: " + final_score);
+            console.log("EXTERN: " + max_extern);
+            console.log("FP_TOTAL: " + fp_total);
+            console.log("final_score: " + final_score);
             final_score *= 100;
             return [fp_total,max_extern,final_score];
         })

@@ -81,7 +81,7 @@ export default function CookieTable() {
                 if (!lastUsed) lastUsed = Date.now().toString();
 
                 // Compute type (WIP: might be stored in local storage and passed as param)
-                let type = "Unknown";
+                let type = "Third-party";
                 if (cookieTypes[key]) {
                     type = cookieTypeLabels[cookieTypes[key]];
                 }
@@ -132,6 +132,7 @@ export default function CookieTable() {
     const deleteCookies = (selected) => {
 
         let deleted = {};
+        let toBeDeletedKeys = [];
         for (let i in selected) {
             let selection = selected[i];
             for (let j in selection.cookieList) {
@@ -148,6 +149,11 @@ export default function CookieTable() {
                 else {
                     deleted[selection.type] += selection.cookies;
                 }
+
+                // Mark it as needing to be deleted from local storage
+                let key = "domain" + cookie.domain + "name" + cookie.name;
+                toBeDeletedKeys.push(key);
+
             }
         }
 
@@ -156,6 +162,16 @@ export default function CookieTable() {
         setRows(rows.filter(filterFunction));
         setOriginalRows(originalRows.filter(filterFunction));
         setSelected([]);
+
+        // Delete types from local storage
+        chrome.storage.local.get(["cookieTypes"], res => {
+            let data = {};
+            if (res && res.cookieTypes) {
+                data = res.cookieTypes;
+            }
+            toBeDeletedKeys.map((key) => delete data[key]);
+            chrome.storage.local.set({ "cookieTypes": data });
+        });
 
         // Store deleted cookies
         chrome.storage.sync.get(["manuallyDeletedCookies"], res => {

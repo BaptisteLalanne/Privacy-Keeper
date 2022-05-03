@@ -23,7 +23,7 @@ export default function CookieHistoAndPieChart() {
     const labels = ["Necessary", "Functional", "Analytics", "Advertising"];
     let _data = [];
     for (let i in labels) {
-      let randomNum = i*2000 + 4000 + Math.random() * 2000;
+      let randomNum = (3-i)*2000 + 4000 + Math.random() * 2000;
       let blockPercent = (i > 1) * (0.5 + Math.random() * 0.4);
       if (blockPercent > 0) {
         _data.push({
@@ -50,6 +50,9 @@ export default function CookieHistoAndPieChart() {
 
   return (
     <div className="dashboard-box">
+      <div className="graph-title">
+        <Divider textAlign="center">Overall number of detected and blocked cookies</Divider>
+      </div>
       <div className="dual-graph-wrapper">
         <div className="graph-wrapper" id="cookie-pie-wrapper">
           <ResponsiveContainer width="99%" height={300}>
@@ -88,8 +91,8 @@ export default function CookieHistoAndPieChart() {
           </ResponsiveContainer>
         </div>
       </div>
-      <div className="graph-title">
-        <Divider textAlign="center">Overall number of detected and blocked cookies</Divider>
+      <div className="graph-explanation">
+        Most of the recorded cookies were necessary.
       </div>
     </div>
   )

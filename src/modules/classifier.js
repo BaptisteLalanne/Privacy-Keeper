@@ -1,5 +1,4 @@
 // LISTENERS
-
 const classifyCookiesTab = (activeInfo) => {
 
     console.log("[CLASSIFIER BACKGROUND] Tab activated")
@@ -8,27 +7,18 @@ const classifyCookiesTab = (activeInfo) => {
         active: true,
         currentWindow: true
     };
-
     chrome.tabs.query(queryOptions, async function (tabs) {
         if (tabs.length > 0 && tabs[0].url !== "") {
-
             chrome.storage.sync.set({"currentCookieTypes": [0,0,0,0]}, function() {
-
-                //Getting all the cookie whose url matches the active tab
+                //Get all the cookie whose url matches the active tab
                 chrome.cookies.getAll({"url": tabs[0].url}, function (cookies) {
-        
                     handleCookies(cookies);
-                    
                 });
             });
-            
         }
     });
 
 }
-
-chrome.tabs.onActivated.addListener(classifyCookiesTab);
-
 
 //-------------------------------------------------------------------------------
 /*
@@ -163,6 +153,7 @@ const classifyCookie = async function(feature_input) {
  const handleCookies = async function (newCookies){
 
     let labels = [0,0,0,0];
+    let maxExpirationTimes = [0,0,0,0];
     let currCookieTypes = {};
     
     // Get already stored classifications
@@ -176,6 +167,7 @@ const classifyCookie = async function(feature_input) {
         for (let cookie of newCookies) {
 
             let key = "domain" + cookie.domain + "name" + cookie.name;
+            console.log(key);
 
             let getClassification = 
 
@@ -210,14 +202,37 @@ const classifyCookie = async function(feature_input) {
 
             // Count cookie types
             labels[clabel] += 1;
+            maxExpirationTimes[clabel] = Math.max(maxExpirationTimes[clabel], cookie.expirationDate);
 
         }
+
+        const mapRange = (x, min1, max1, min2, max2) => {
+            return clamp((x - min1) / (max1 - min1) * (max2 - min2) + min2, min2, max2);
+        }
+        const clamp = (x, min, max) => {
+            if (x > max) return max;
+            if (x < min) return min;
+            return x;
+        }
+
+        let thresholds = [0, 35, 65, 100];
+        let baseScore = 0;
+        let additionalScore = 0;
+        for (let i = 3; i >= 0; i--) {
+            if (labels[i] > 0) {
+                baseScore = thresholds[i-1];
+                additionalScore = mapRange(maxExpirationTimes[i], 5 * (24*60*60*1000), 31 * (24*60*60*1000), 0, thresholds[i]-thresholds[i-1]);
+                break;
+            }
+        }
+        let score = baseScore + additionalScore;
 
         console.log("[CLASSIFIER BACKGROUND] cookieClassification saved");
         console.log(labels);
 
-        // Save current tab's cookie repartition
+        // Save current tab's cookie score and repartition 
         chrome.storage.sync.set({"currentCookieTypes": labels});
+        chrome.storage.sync.set({"cookieScore": score});
 
         // Update gobal cookie types map
         newCookieTypes = {...prevCookieTypes, ...currCookieTypes};
@@ -226,11 +241,3 @@ const classifyCookie = async function(feature_input) {
     });
     
 }
-
-// Load the default configuration
-getExtensionFile(chrome.runtime.getURL("ext_data/default_config.json"), "json", (dConfig) => {
-    initDefaults(dConfig, false)
-});
-
-// retrieve the configuration
-getExtensionFile("ext_data/features.json", "json", setupFeatureResourcesCallback);

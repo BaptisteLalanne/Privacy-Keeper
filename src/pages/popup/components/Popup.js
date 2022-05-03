@@ -78,6 +78,7 @@ function Popup() {
   
   const [url, setUrl] = useState('');
   const [isChromeTab, setIsChromeTab] = useState(false);
+  const [isInWhitelist, setIsInWhitelist] = useState(false);
   let [score, setScore] = useState(100);
   let [cookieScore, setCookieScore] = useState(100);
   let [trackerScore, setTrackerScore] = useState(100);
@@ -107,6 +108,17 @@ function Popup() {
     chrome.tabs && chrome.tabs.query(queryInfo, tabs => {
       setUrl(tabs[0].url);
       setIsChromeTab(tabs[0].url.split(":")[0].includes("chrome"));
+
+      // Check if it's in whitelist
+      let domain = extractDomain(tabs[0].url);
+      chrome.storage.local.get("unused_cookies_wl", function (result) {
+        let whitelist = [];
+        if (result && result.unused_cookies_wl) {
+            whitelist = result.unused_cookies_wl
+        }
+        setIsInWhitelist(whitelist.includes(domain));
+      });
+    
     });
 
     // Fetch scores from storage
@@ -143,6 +155,31 @@ function Popup() {
     });
       
   }, []);
+
+  const toggleWhitelist = (url) => {
+    let domain = extractDomain(url);
+    chrome.storage.local.get("unused_cookies_wl", function (result) {
+      let whitelist = [];
+      if (result && result.unused_cookies_wl) {
+          whitelist = result.unused_cookies_wl
+      }
+      // Add to whitelist
+      if (!isInWhitelist) {
+        whitelist.push(domain);
+        chrome.storage.local.set({"unused_cookies_wl": whitelist});
+        setIsInWhitelist(true);
+      }
+      // Remove from whitelist
+      else {
+        const index = whitelist.indexOf(domain);
+        if (index > -1) {
+            whitelist.splice(index, 1);
+        }
+        chrome.storage.local.set({"unused_cookies_wl": whitelist});
+        setIsInWhitelist(false);
+      }
+    });
+  }
 
   // Generate and set the description sentences
   const generateDescriptionSentences = (cookieScore, trackerScore, score) => {
@@ -201,6 +238,11 @@ function Popup() {
 
         {/* Top banner */}
         <div className="top-component">
+          <div className="top-item" onClick={() => toggleWhitelist(url)}>
+            <Tooltip title={isInWhitelist ? "This website was marked as safe" : "Mark this website as safe"}>
+              {isInWhitelist ? <i className="bi bi-check-circle-fill"></i> : <i className="bi bi-check-circle"></i>}
+            </Tooltip>
+          </div>
           <div className="top-item" onClick={clickAbout}>
             <Tooltip title={"Learn more"}>
               <i className="bi bi-info-circle"></i>

@@ -20,7 +20,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
             blockTrackers: false,
             blockCookies: false,
         };
-        let default_expiration_time = 1//4 * (1000 * 60 * 60 * 24);
+        let default_expiration_time = 14 * (1000 * 60 * 60 * 24);
         let labels = [0, 0, 0, 0];
         let fingerPrintAnalyseResult = {
             "score": 0,
@@ -181,7 +181,6 @@ chrome.windows.onCreated.addListener(function () {
     });
 
 });
-
 
 // Load the default classifier configuration
 getExtensionFile(chrome.runtime.getURL("ext_data/default_config.json"), "json", (dConfig) => {

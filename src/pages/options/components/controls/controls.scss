@@ -97,3 +97,21 @@
 .type-filter-bar .MuiFormControl-root, .search-bar .MuiFormControl-root, .days-filter-bar .MuiFormControl-root {
     width: 100% !important;
 }
+
+.whitelist-table {
+    width: 50%;
+}
+.whitelist-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.whitelist-explanation {
+    font-size: $font-size;
+}
+.whitelist-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: $font-size;
+    width: 50%;
+}

@@ -221,7 +221,8 @@ const classifyCookie = async function(feature_input) {
         for (let i = 3; i >= 0; i--) {
             if (labels[i] > 0) {
                 baseScore = thresholds[i-1];
-                additionalScore = mapRange(maxExpirationTimes[i], 5 * (24*60*60*1000), 31 * (24*60*60*1000), 0, thresholds[i]-thresholds[i-1]);
+                //additionalScore = mapRange(maxExpirationTimes[i], 5 * (24*60*60*1000), 31 * (24*60*60*1000), 0, thresholds[i]-thresholds[i-1]);
+                additionalScore = mapRange(labels[i], 1, 5, 0, thresholds[i]-thresholds[i-1]);
                 break;
             }
         }

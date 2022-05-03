@@ -180,11 +180,7 @@ export default function CookieTable() {
                 data = res.manuallyDeletedCookies;
             }
             data[Date.now().toString()] = deleted;
-            chrome.storage.sync.set({ "manuallyDeletedCookies": data }, () => {
-                if (chrome.runtime.error) {
-                    console.log("Runtime error.");
-                }
-            });
+            chrome.storage.local.set({ "manuallyDeletedCookies": data });
         });
 
     }

@@ -400,7 +400,9 @@ export default function fingerprinterScript() {
                 if(fp_total < 0 || max_extern < 0){
                     final_score = 1;
                 } else {
-                    final_score = clamp(50, 0.7 * fp_total + 0.3 * max_extern, 200) / 200;
+                    const minVal = 50;
+                    const maxVal = 400;
+                    final_score = clamp(minVal, 0.7 * fp_total + 0.3 * max_extern, maxVal) - minVal / maxVal;
                 }
             }
 

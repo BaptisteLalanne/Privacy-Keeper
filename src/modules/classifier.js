@@ -319,6 +319,42 @@ const handleCookies = async function (newCookies, url) {
                     chrome.storage.local.set({ "currentCookieTypes": labels });
                     chrome.storage.local.set({ "cookieScore": score });
 
+                    // Alter score history
+                    chrome.storage.local.get("scoreHistory", function (res) {
+                        let scoreHistory = {};
+                        if (res && res.scoreHistory) { scoreHistory = res.scoreHistory; }
+                        let currTimestamp = new Date();
+                        let currDate = currTimestamp.getDate() + "/" + currTimestamp.getMonth() + "/" + currTimestamp.getFullYear();
+                        if (scoreHistory[currDate] == undefined) {
+                            scoreHistory[currDate] = {
+                                "trackerSum": 0,
+                                "cookieSum": score,
+                                "total": 1
+                            }
+                        }
+                        else {
+                            scoreHistory[currDate].cookieSum += score;
+                            scoreHistory[currDate].total += 1;
+                        }
+                        chrome.storage.local.set({ "scoreHistory": scoreHistory });
+                    });
+
+                    // Update stored scores
+                    chrome.storage.local.get("websiteScores", function (res) {
+                        let websiteScores = {};
+                        if (res && res.websiteScores) { websiteScores = res.websiteScores; }
+                        if (websiteScores[domain] == undefined) {
+                            websiteScores[domain] = {
+                                "cookie": score,
+                                "tracker": 0
+                            }
+                        }
+                        else {
+                            websiteScores[domain].cookie = score;
+                        }
+                        chrome.storage.local.set({ "websiteScores": websiteScores });
+                    });
+
                     // Update gobal cookie types map
                     chrome.storage.local.set({ "cookieTypes": newCookieTypes });
 

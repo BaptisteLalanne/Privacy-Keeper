@@ -45,7 +45,9 @@ chrome.runtime.onInstalled.addListener(function (details) {
             "fingerprintAnalyseResult": fingerPrintAnalyseResult,
             "unused_cookies_wl": [],
             "unusedCookieDeletedHistory": {},
-            "blockedCookies": {}
+            "blockedCookies": {},
+            "scoreHistory": {},
+            "websiteScores": {}
         };
         chrome.storage.local.set(default_params, function () {
             if (chrome.runtime.error) {

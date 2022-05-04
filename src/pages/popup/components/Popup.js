@@ -11,7 +11,7 @@ import IconButton from '@mui/material/IconButton';
 import ClearIcon from '@mui/icons-material/Clear';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import {cookieTypeLabels} from '../../../scripts/miscellaneous/common.js'
+import { cookieTypeLabels } from '../../../scripts/miscellaneous/common.js'
 import './popup.scss';
 
 // Opening dashboard on button clicks
@@ -88,7 +88,7 @@ function Popup() {
   let [trackerScoreDescription, setTrackerScoreDescription] = useState("This is how much we suspect this website tracks you.");
   let [generalScoreDescription, setGeneralScoreDescription] = useState("This website has some hardware trackers.");
   let [blocksCookies, setBlocksCookies] = useState(false);
- 
+
   const detailedCookiesIcons = [
     <ElectricBoltIcon />,
     <BuildIcon />,
@@ -129,6 +129,7 @@ function Popup() {
       let cookieScore = cookieScoreRes.cookieScore;
 
       chrome.storage.local.get(['fingerprintAnalyseResult'], function (fingerprintScoreRes) {
+        console.log("HHHHHHHHHHHHH" + fingerprintScoreRes.fingerprintAnalyseResult)
         let trackerScore = fingerprintScoreRes.fingerprintAnalyseResult.final_score;
         const fp_extern = fingerprintScoreRes.fingerprintAnalyseResult.fp_extern;
         const fp_page = fingerprintScoreRes.fingerprintAnalyseResult.fp_page;
@@ -136,7 +137,7 @@ function Popup() {
         let rounding = 5;
         cookieScore = Math.ceil(cookieScore / rounding) * rounding;
         trackerScore = Math.ceil(trackerScore / rounding) * rounding;
-        score = Math.max(cookieScore, trackerScore);
+        score = Math.ceil((cookieScore + trackerScore) / 2);
 
         // Save score states
         setScore(score);
@@ -153,7 +154,7 @@ function Popup() {
     });
 
     // Fetch cookie classificatins from storage
-    chrome.storage.local.get(['currentCookieTypes'], function(result) {
+    chrome.storage.local.get(['currentCookieTypes'], function (result) {
       let labels = result.currentCookieTypes;
       console.log(labels);
       setCookieDetails(labels);
@@ -271,7 +272,7 @@ function Popup() {
             </Tooltip>
           </div>
           <div className="top-item" onClick={clickIndex}>
-            <Tooltip style={{fontSize: "16px"}} title={<Typography fontSize={16}>Dashboard and settings</Typography>}>
+            <Tooltip style={{ fontSize: "16px" }} title={<Typography fontSize={16}>Dashboard and settings</Typography>}>
               <i className="bi bi-gear"></i>
             </Tooltip>
           </div>
@@ -346,19 +347,19 @@ function Popup() {
               <MuiAccordionDetails className="detailed-score-contents">
                 {[...Array(4)].map((x, i) =>
                   <div className="detailed-score-item" key={i}>
-                    <div className="detailed-cookies-score-item" style={{opacity: ((blocksCookies && !isInWhitelist && i > 1) || cookieDetails[i] == 0) ? 0.7 : 1}}>
-                      <div className="detailed-cookies-score-item-icon"> 
-                        {detailedCookiesIcons[i]} 
+                    <div className="detailed-cookies-score-item" style={{ opacity: ((blocksCookies && !isInWhitelist && i > 1) || cookieDetails[i] == 0) ? 0.7 : 1 }}>
+                      <div className="detailed-cookies-score-item-icon">
+                        {detailedCookiesIcons[i]}
                       </div>
-                      <div className="detailed-cookies-score-item-text"> 
-                        {cookieDetails[i] > 0 ? <div style={{fontWeight:"bold"}}>{cookieDetails[i]}</div> : <></>}
-                        <div>{((blocksCookies && !isInWhitelist && i > 1 && cookieDetails[i] > 0) ? "blocked " : (cookieDetails[i] == 0 ? "No " : "")) + cookieTypeLabels[i].toLowerCase() + " cookie" + (cookieDetails[i] == 1 ? "" : "s")}</div> 
+                      <div className="detailed-cookies-score-item-text">
+                        {cookieDetails[i] > 0 ? <div style={{ fontWeight: "bold" }}>{cookieDetails[i]}</div> : <></>}
+                        <div>{((blocksCookies && !isInWhitelist && i > 1 && cookieDetails[i] > 0) ? "blocked " : (cookieDetails[i] == 0 ? "No " : "")) + cookieTypeLabels[i].toLowerCase() + " cookie" + (cookieDetails[i] == 1 ? "" : "s")}</div>
                       </div>
                     </div>
                     <div>
-                    <Tooltip title={<Typography fontSize={16}>{detailedCookiesExplanations[i]}</Typography>}>
-                      <IconButton className="detailed-cookies-score-item-help-icon" size="small" onClick={clickAbout}> <HelpOutlineIcon/> </IconButton>
-                    </Tooltip>
+                      <Tooltip title={<Typography fontSize={16}>{detailedCookiesExplanations[i]}</Typography>}>
+                        <IconButton className="detailed-cookies-score-item-help-icon" size="small" onClick={clickAbout}> <HelpOutlineIcon /> </IconButton>
+                      </Tooltip>
                     </div>
                   </div>
                 )}
@@ -387,10 +388,10 @@ function Popup() {
               {/* Content */}
               <MuiAccordionDetails>
                 <span>
-                    {trackerScoreDescription}
-                    <Tooltip style={{fontSize: "16px"}} title={<Typography fontSize={16}>Fingerprints are little bits of information you leave online (such as your computer specs or your browser configuration). Thanks to these, websites can easily identify you as a unique individual.</Typography>}>
-                      <IconButton className="detailed-tracker-score-item-help-icon" size="small" onClick={clickAbout}> <HelpOutlineIcon/> </IconButton>
-                    </Tooltip>
+                  {trackerScoreDescription}
+                  <Tooltip style={{ fontSize: "16px" }} title={<Typography fontSize={16}>Fingerprints are little bits of information you leave online (such as your computer specs or your browser configuration). Thanks to these, websites can easily identify you as a unique individual.</Typography>}>
+                    <IconButton className="detailed-tracker-score-item-help-icon" size="small" onClick={clickAbout}> <HelpOutlineIcon /> </IconButton>
+                  </Tooltip>
                 </span>
               </MuiAccordionDetails>
 

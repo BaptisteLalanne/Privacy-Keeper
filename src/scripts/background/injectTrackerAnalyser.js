@@ -415,7 +415,6 @@ export default function fingerprinterScript() {
         }).catch((error) => {
             reject(error)
         })
-
     });
 
     computeScoreScript.then((fingerprintAnalyseResult) => {

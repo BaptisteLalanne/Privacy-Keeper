@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import MuiAccordion from '@mui/material/Accordion';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
-import Typography from '@mui/material/Typography';
 import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
 import BuildIcon from '@mui/icons-material/Build';
 import InsightsIcon from '@mui/icons-material/Insights';
 import CampaignIcon from '@mui/icons-material/Campaign';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import { cookieTypeLabels } from '../../../scripts/miscellaneous/common.js'
 import './popup.scss';
 
@@ -70,30 +72,32 @@ function updateCSS(node, score, cookieScore, trackerScore) {
 
 }
 
-// Generate blank popup
-function generateBlankPopup(node) {
-
-  node.innerHTML = "Nothing to see here...";
-
-}
-
-/* global chrome */
 function Popup() {
 
   let wrapperRef = React.useRef(null);
 
   const [url, setUrl] = useState('');
   const [isChromeTab, setIsChromeTab] = useState(false);
+  const [isInWhitelist, setIsInWhitelist] = useState(false);
   let [score, setScore] = useState(100);
   let [cookieScore, setCookieScore] = useState(100);
   let [trackerScore, setTrackerScore] = useState(100);
   let [cookieDetails, setCookieDetails] = useState([0, 0, 0, 0]);
+  let [trackerScoreDescription, setTrackerScoreDescription] = useState("This is how much we suspect this website tracks you.");
+  let [generalScoreDescription, setGeneralScoreDescription] = useState("This website has some hardware trackers.");
 
   const detailedCookiesIcons = [
     <ElectricBoltIcon />,
     <BuildIcon />,
     <InsightsIcon />,
     <CampaignIcon />
+  ];
+
+  const detailedCookiesExplanations = [
+    "These cookies are necessary for the site to run correctly",
+    "These cookies are used for certain functionalities of the site",
+    "These cookies are used to gather analytics about who visits the website and what they do on it",
+    "These cookies are used to gather information about your personal preferences in order to tailor displayed ads"
   ];
 
   // Main Hook
@@ -104,29 +108,45 @@ function Popup() {
     chrome.tabs && chrome.tabs.query(queryInfo, tabs => {
       setUrl(tabs[0].url);
       setIsChromeTab(tabs[0].url.split(":")[0].includes("chrome"));
+
+      // Check if it's in whitelist
+      let domain = extractDomain(tabs[0].url);
+      chrome.storage.local.get("unused_cookies_wl", function (result) {
+        let whitelist = [];
+        if (result && result.unused_cookies_wl) {
+          whitelist = result.unused_cookies_wl
+        }
+        setIsInWhitelist(whitelist.includes(domain));
+      });
+
     });
 
     // Fetch scores from storage
-    cookieScore = "??";
-    chrome.storage.sync.get(["fingerprintAnalyseResult"], function (result) {
+    chrome.storage.sync.get(['cookieScore'], function (cookieScoreRes) {
+      let cookieScore = cookieScoreRes.cookieScore;
 
-      fingerprintAnalyseResult = Math.round(result.fingerprintAnalyseResult);
-      console.log('[EXTENSION] Fingerprinter score : ' + result.fingerprintAnalyseResult);
+      chrome.storage.sync.get(['fingerprintAnalyseResult'], function (fingerprintScoreRes) {
+        let trackerScore = fingerprintScoreRes.fingerprintAnalyseResult.final_score;
+        const fp_extern = fingerprintScoreRes.fingerprintAnalyseResult.fp_extern;
+        const fp_page = fingerprintScoreRes.fingerprintAnalyseResult.fp_page;
 
-      //score = Math.max(cookieScore, trackerScore);
-      trackerScore = fingerprintAnalyseResult.final_score;
-      console.log("trackerScore" + trackerScore);
+        let rounding = 5;
+        cookieScore = Math.ceil(cookieScore / rounding) * rounding;
+        trackerScore = Math.ceil(trackerScore / rounding) * rounding;
+        score = Math.max(cookieScore, trackerScore);
 
-      score = trackerScore;
+        // Save score states
+        setScore(score);
+        setCookieScore(cookieScore);
+        setTrackerScore(trackerScore);
 
-      // Save score states
-      setScore(score);
-      setCookieScore(cookieScore);
-      setTrackerScore(trackerScore);
+        // Generate and set the description sentences
+        generateDescriptionSentences(cookieScore, trackerScore, fp_extern, fp_page, score);
 
-      // Update CSS
-      updateCSS(wrapperRef.current, score, cookieScore, trackerScore);
+        // Update CSS
+        updateCSS(wrapperRef.current, score, cookieScore, trackerScore);
 
+      });
     });
 
     // Fetch cookie classificatins from storage
@@ -137,6 +157,87 @@ function Popup() {
     });
 
   }, []);
+
+  const toggleWhitelist = (url) => {
+    let domain = extractDomain(url);
+    chrome.storage.local.get("unused_cookies_wl", function (result) {
+      let whitelist = [];
+      if (result && result.unused_cookies_wl) {
+        whitelist = result.unused_cookies_wl
+      }
+      // Add to whitelist
+      if (!isInWhitelist) {
+        whitelist.push(domain);
+        chrome.storage.local.set({ "unused_cookies_wl": whitelist });
+        setIsInWhitelist(true);
+      }
+      // Remove from whitelist
+      else {
+        const index = whitelist.indexOf(domain);
+        if (index > -1) {
+          whitelist.splice(index, 1);
+        }
+        chrome.storage.local.set({ "unused_cookies_wl": whitelist });
+        setIsInWhitelist(false);
+      }
+    });
+  }
+
+  // Generate and set the description sentences
+  const generateDescriptionSentences = (cookieScore, trackerScore, fp_extern, fp_page, score) => {
+
+    let trackerScoreDescription = "";
+    // Tracker score description
+    if (trackerScore < 25) {
+      trackerScoreDescription = "This website doesn't seem to track your fingerprints";
+    }
+    else if (trackerScore < 45) {
+      trackerScoreDescription = "This website most likely does not track your fingerprints";
+    }
+    else if (trackerScore < 70) {
+      trackerScoreDescription = "This website is likely tracking your fingerprints";
+    }
+    else if (trackerScore < 90) {
+      trackerScoreDescription = "This website is very likely tracking your fingerprints";
+    }
+    else {
+      trackerScoreDescription = "This website is certainly tracking your fingerprints";
+    }
+
+    if (fp_extern > 100) {
+      trackerScoreDescription += " using third parties";
+    }
+    trackerScoreDescription += ".";
+    console.log(trackerScoreDescription);
+    setTrackerScoreDescription(trackerScoreDescription);
+
+    // General description
+    // If nothing, "This website seems harmless"
+    // If cookie score ++, "This website uses cookies [somewhat / very] intrusively,"
+    // If tracker score ++, "This website has [some / many] trackers"
+    // If one of the scores is high or if both scores are medium, "Be careful!"
+    let cookieTier = (cookieScore >= 45) + (cookieScore >= 70);
+    let trackerTier = (trackerScore >= 35) + (trackerScore >= 60);
+    console.log(cookieTier + "; " + trackerTier);
+    let generalDesc = "";
+    if (cookieTier > 0 && trackerTier > 0) {
+      generalDesc = "This website uses cookies " + ((cookieTier > 1) ? "very" : "somewhat") + " intrusively, and has " + ((trackerTier > 1) ? "a lot of" : "a few") + " trackers.";
+    }
+    else if (trackerTier > 0) {
+      generalDesc = "This website might have " + ((trackerTier > 1) ? "a lot of" : "a few") + " trackers.";
+    }
+    else if (cookieTier > 0) {
+      generalDesc = "This website uses cookies " + ((cookieTier > 1) ? "very" : "somewhat") + " intrusively."
+    }
+    else {
+      generalDesc = "This website seems harmless."
+    }
+    if (cookieTier == 2 || trackerTier == 2 || (cookieTier > 0 && trackerTier > 0)) {
+      generalDesc += " Be careful!";
+    }
+    setGeneralScoreDescription(generalDesc);
+
+  }
 
   // Handle click on collapsable items
   const [expanded, setExpanded] = useState('');
@@ -150,11 +251,20 @@ function Popup() {
 
         {/* Top banner */}
         <div className="top-component">
+          <div className="top-item" onClick={() => toggleWhitelist(url)}>
+            <Tooltip title={isInWhitelist ? "This website was marked as safe" : "Mark this website as safe"}>
+              {isInWhitelist ? <i className="bi bi-check-circle-fill"></i> : <i className="bi bi-check-circle"></i>}
+            </Tooltip>
+          </div>
           <div className="top-item" onClick={clickAbout}>
-            <i className="bi bi-info-circle"></i>
+            <Tooltip title={"Learn more"}>
+              <i className="bi bi-info-circle"></i>
+            </Tooltip>
           </div>
           <div className="top-item" onClick={clickIndex}>
-            <i className="bi bi-gear"></i>
+            <Tooltip title={"Dashboard & settings"}>
+              <i className="bi bi-gear"></i>
+            </Tooltip>
           </div>
         </div>
 
@@ -197,7 +307,7 @@ function Popup() {
 
             {/* General score explanation (right side) */}
             <div className="general-score-right">
-              This website has some hardware trackers.
+              {generalScoreDescription}
             </div>
 
           </div>
@@ -226,11 +336,20 @@ function Popup() {
               {/* Content */}
               <MuiAccordionDetails className="detailed-score-contents">
                 {[...Array(4)].map((x, i) =>
-                  <div className="detailed-score-item" style={{ opacity: cookieDetails[i] > 0 ? 1 : 0.8 }}>
-                    <div className="detailed-cookies-score-item-icon"> {detailedCookiesIcons[i]} </div>
-                    <div className="detailed-cookies-score-item-text">
-                      {cookieDetails[i] > 0 ? <div style={{ fontWeight: "bold" }}>{cookieDetails[i]}</div> : <></>}
-                      <div>{(cookieDetails[i] == 0 ? "No " : "") + cookieTypeLabels[i].toLowerCase() + " cookie" + (cookieDetails[i] > 1 ? "s" : "")}</div>
+                  <div className="detailed-score-item" key={i}>
+                    <div className="detailed-cookies-score-item" style={{ opacity: cookieDetails[i] > 0 ? 1 : 0.8 }}>
+                      <div className="detailed-cookies-score-item-icon">
+                        {detailedCookiesIcons[i]}
+                      </div>
+                      <div className="detailed-cookies-score-item-text">
+                        {cookieDetails[i] > 0 ? <div style={{ fontWeight: "bold" }}>{cookieDetails[i]}</div> : <></>}
+                        <div>{(cookieDetails[i] == 0 ? "No " : "") + cookieTypeLabels[i].toLowerCase() + " cookie" + (cookieDetails[i] == 1 ? "" : "s")}</div>
+                      </div>
+                    </div>
+                    <div>
+                      <Tooltip title={detailedCookiesExplanations[i]}>
+                        <IconButton className="detailed-cookies-score-item-help-icon" size="small" onClick={clickAbout}> <HelpOutlineIcon /> </IconButton>
+                      </Tooltip>
                     </div>
                   </div>
                 )}
@@ -239,7 +358,7 @@ function Popup() {
             </MuiAccordion>
 
             {/* Tracker score */}
-            <MuiAccordion disableGutters elevation={0} expanded={expanded === 'trackerScoreAccordion'} onChange={handleChange('trackerScoreAccordion')}>
+            < MuiAccordion disableGutters elevation={0} expanded={expanded === 'trackerScoreAccordion'} onChange={handleChange('trackerScoreAccordion')}>
 
               {/* Header */}
               <MuiAccordionSummary expandIcon={<i className="bi bi-chevron-down"></i>} aria-controls="trackerScoreAccordion-content" id="trackerScoreAccordion-header">
@@ -258,12 +377,12 @@ function Popup() {
 
               {/* Content */}
               <MuiAccordionDetails>
-                <Typography className="detailed-score-contents">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                  malesuada lacus ex, sit amet blandit leo lobortis eget. Lorem ipsum dolor
-                  sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
-                  sit amet blandit leo lobortis eget.
-                </Typography>
+                <span>
+                  {trackerScoreDescription}
+                  <Tooltip title={"Fingerprints are little bits of information you leave online (such as your computer specs or your browser configuration). Thanks to these, websites can easily identify you as a unique individual."}>
+                    <IconButton className="detailed-tracker-score-item-help-icon" size="small" onClick={clickAbout}> <HelpOutlineIcon /> </IconButton>
+                  </Tooltip>
+                </span>
               </MuiAccordionDetails>
 
             </MuiAccordion>

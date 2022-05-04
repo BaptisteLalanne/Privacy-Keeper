@@ -419,7 +419,6 @@ export default function fingerprinterScript() {
     });
 
     computeScoreScript.then((fingerprintAnalyseResult) => {
-        console.log(fingerprintAnalyseResult.final_score)
         chrome.storage.sync.set({ "fingerprintAnalyseResult": fingerprintAnalyseResult }, function () {
         });
     }).catch((error) => {

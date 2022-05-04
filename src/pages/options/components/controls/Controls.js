@@ -4,6 +4,7 @@ import Switch from '@mui/material/Switch';
 import Input from '@mui/material/Input';
 import Fade from '@mui/material/Fade';
 import CookieTable from "./CookieTable.js";
+import Whitelist from "./Whitelist.js";
 import "./controls.scss";
 
 // Update switch CSS
@@ -41,7 +42,7 @@ export default function Controls() {
 
         // Retrieve option toggles
         let switchNodesList = document.getElementsByClassName("MuiSwitch-input");
-        chrome.storage.local.get(["toggle_options"], function (res) {
+        chrome.storage.sync.get(["toggle_options"], function (res) {
             let savedState = res.toggle_options;
             // Update state
             setState(savedState);
@@ -52,7 +53,7 @@ export default function Controls() {
         });
 
         // Retrieve expiration time
-        chrome.storage.local.get(["expiration_time"], function (res) {
+        chrome.storage.sync.get(["expiration_time"], function (res) {
             let savedTime = res.expiration_time / (1000 * 60 * 60 * 24);
             // Update DOM (necessary because a state variable is not enough: defaultValue only loaded once, before this hook, so we need to set the actual DOM value)
             expirationTimeInputRef.current.firstChild.value = savedTime;
@@ -62,14 +63,14 @@ export default function Controls() {
 
     // Local settings updaters
     const saveExpirationTime = (newTime) => {
-        chrome.storage.local.set({ "expiration_time": newTime * (1000 * 60 * 60 * 24) }, function () {
+        chrome.storage.sync.set({ "expiration_time": newTime * (1000 * 60 * 60 * 24) }, function () {
             if (chrome.runtime.error) {
                 console.log("Runtime error.");
             }
         });
     }
     const saveToggleOptions = (newState) => {
-        chrome.storage.local.set({ "toggle_options": newState }, function () {
+        chrome.storage.sync.set({ "toggle_options": newState }, function () {
             if (chrome.runtime.error) {
                 console.log("Runtime error.");
             }
@@ -78,6 +79,10 @@ export default function Controls() {
 
     // Change handlers
     const handleExpirationTimeChange = (event) => {
+        let newTime = event.target.value;
+        event.target.value = Math.max(newTime, 0);
+    }
+    const handleExpirationTimeUnfocus = (event) => {
         let newTime = event.target.value;
         // Update stored settings
         saveExpirationTime(newTime);
@@ -114,8 +119,9 @@ export default function Controls() {
                                 <Switch checked={state.autoDeleteOldCookies} onChange={handleToggleChange} name="autoDeleteOldCookies" size="small" />
                                 <div className="toggle-options-item-label">
                                     Delete cookies older than &nbsp;
-                                    <Input id="expirationTimeInput" type="number"
-                                        onBlur={handleExpirationTimeChange}
+                                    <Input id="expirationTimeInput" type="number" inputProps={{ min: 0 }}
+                                        onChange={handleExpirationTimeChange} 
+                                        onBlur={handleExpirationTimeUnfocus}
                                         ref={expirationTimeInputRef}
                                     />
                                     &nbsp; days each time the browser is launched
@@ -148,6 +154,18 @@ export default function Controls() {
                     </div>
                     <div className="controls-section-body">
                         <CookieTable/>
+                    </div>
+                </div>
+                </Fade>
+
+                {/* Manage whitelist */}
+                <Fade in={true} timeout={fadeDuration} style={{ transitionDelay: 2*fadeOffset+'ms' }}>
+                <div className="controls-section">
+                    <div className="controls-section-header">
+                        <Divider textAlign="left">Whitelisted websites</Divider>
+                    </div>
+                    <div className="controls-section-body">
+                        <Whitelist/>
                     </div>
                 </div>
                 </Fade>

@@ -167,7 +167,7 @@ chrome.windows.onCreated.addListener(function () {
                         historic[date_now] = nb_deleted_cookies
 
                         //database
-                        chrome.storage.local.set({"unusedCookieDeletedHistory": historic}, function () {
+                        chrome.storage.local.set({ "unusedCookieDeletedHistory": historic }, function () {
                             if (chrome.runtime.error) {
                                 console.log("Runtime error : unusedCookieDeletedHistory");
                             }
@@ -200,7 +200,7 @@ chrome.tabs.onUpdated.addListener(setInfos); //Listener to updated tabs (when th
 function setInfos() {
 
     //Query the active tab
-    let queryOptions = {active: true, currentWindow: true};
+    let queryOptions = { active: true, currentWindow: true };
     chrome.tabs.query(queryOptions, function (tabs) {
 
         if (tabs.length > 0 && tabs[0].url !== "") {
@@ -211,7 +211,7 @@ function setInfos() {
             }
 
             //Getting all the cookie whose url matches the active tab
-            chrome.cookies.getAll({"url": tabs[0].url}, function (cookies) {
+            chrome.cookies.getAll({ "url": tabs[0].url }, function (cookies) {
 
                 //Getting stored cookies' dates
                 chrome.storage.local.get("updateDateCookies", function (result) {
@@ -244,7 +244,7 @@ function setInfos() {
 
 const injectScripts = (idTab, script) => {
     chrome.scripting.executeScript({
-        target: {tabId: idTab},
+        target: { tabId: idTab },
         function: script
     });
 }
@@ -253,7 +253,7 @@ chrome.tabs.onActivated.addListener(function (tab, changeInfo) {
 
     console.log("[BACKGROUND] Tab activated");
     //Query the active tab
-    let queryOptions = {active: true, currentWindow: true};
+    let queryOptions = { active: true, currentWindow: true };
     chrome.tabs.query(queryOptions, function (tabs) {
         if (tabs.length > 0 && tabs[0].url !== "") {
 
@@ -279,7 +279,6 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 
         // Otherwise inject analysis scripts
         injectScripts(tabId, fingerprinterScript);
-
     }
 });
 

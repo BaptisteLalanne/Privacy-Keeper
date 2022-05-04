@@ -52,7 +52,7 @@ function updateCSS(node, score, cookieScore, trackerScore) {
 
   // Vars
   let posColor = "#7DDE6D";
-  let negColor = "#fd6500"; 
+  let negColor = "#fd6500";
   let doc = node.ownerDocument;
 
   // Update cookie score color
@@ -77,10 +77,10 @@ function updateCSS(node, score, cookieScore, trackerScore) {
 function Popup() {
 
   let wrapperRef = React.useRef(null);
-  
-  let [url, setUrl] = useState('');
-  let [isChromeTab, setIsChromeTab] = useState(false);
-  let [isInWhitelist, setIsInWhitelist] = useState(false);
+
+  const [url, setUrl] = useState('');
+  const [isChromeTab, setIsChromeTab] = useState(false);
+  const [isInWhitelist, setIsInWhitelist] = useState(false);
   let [score, setScore] = useState(100);
   let [cookieScore, setCookieScore] = useState(0);
   let [trackerScore, setTrackerScore] = useState(0);
@@ -90,10 +90,10 @@ function Popup() {
   let [blocksCookies, setBlocksCookies] = useState(false);
  
   const detailedCookiesIcons = [
-    <ElectricBoltIcon/>,
-    <BuildIcon/>,
-    <InsightsIcon/>,
-    <CampaignIcon/>
+    <ElectricBoltIcon />,
+    <BuildIcon />,
+    <InsightsIcon />,
+    <CampaignIcon />
   ];
 
   const detailedCookiesExplanations = [
@@ -117,33 +117,35 @@ function Popup() {
       chrome.storage.local.get("unused_cookies_wl", function (result) {
         let whitelist = [];
         if (result && result.unused_cookies_wl) {
-            whitelist = result.unused_cookies_wl
+          whitelist = result.unused_cookies_wl
         }
         setIsInWhitelist(whitelist.includes(domain));
       });
-    
+
     });
 
     // Fetch scores from storage
-    chrome.storage.local.get(['cookieScore'], function(cookieScoreRes) {
+    chrome.storage.local.get(['cookieScore'], function (cookieScoreRes) {
       let cookieScore = cookieScoreRes.cookieScore;
 
-      chrome.storage.local.get(['fingerprintScore'], function(fingerprintScoreRes) {
-        let trackerScore = fingerprintScoreRes.fingerprintScore;
+      chrome.storage.local.get(['fingerprintAnalyseResult'], function (fingerprintScoreRes) {
+        let trackerScore = fingerprintScoreRes.fingerprintAnalyseResult.final_score;
+        const fp_extern = fingerprintScoreRes.fingerprintAnalyseResult.fp_extern;
+        const fp_page = fingerprintScoreRes.fingerprintAnalyseResult.fp_page;
 
         let rounding = 5;
-        cookieScore = Math.ceil(cookieScore/rounding)*rounding; 
-        trackerScore = Math.ceil(trackerScore/rounding)*rounding; 
+        cookieScore = Math.ceil(cookieScore / rounding) * rounding;
+        trackerScore = Math.ceil(trackerScore / rounding) * rounding;
         score = Math.max(cookieScore, trackerScore);
-        
+
         // Save score states
         setScore(score);
         setCookieScore(cookieScore);
         setTrackerScore(trackerScore);
 
         // Generate and set the description sentences
-        generateDescriptionSentences(cookieScore, trackerScore, score);
-        
+        generateDescriptionSentences(cookieScore, trackerScore, fp_extern, fp_page, score);
+
         // Update CSS
         updateCSS(wrapperRef.current, score, cookieScore, trackerScore);
 
@@ -171,42 +173,53 @@ function Popup() {
     chrome.storage.local.get("unused_cookies_wl", function (result) {
       let whitelist = [];
       if (result && result.unused_cookies_wl) {
-          whitelist = result.unused_cookies_wl
+        whitelist = result.unused_cookies_wl
       }
       // Add to whitelist
       if (!isInWhitelist) {
         whitelist.push(domain);
-        chrome.storage.local.set({"unused_cookies_wl": whitelist});
+        chrome.storage.local.set({ "unused_cookies_wl": whitelist });
         setIsInWhitelist(true);
       }
       // Remove from whitelist
       else {
         const index = whitelist.indexOf(domain);
         if (index > -1) {
-            whitelist.splice(index, 1);
+          whitelist.splice(index, 1);
         }
-        chrome.storage.local.set({"unused_cookies_wl": whitelist});
+        chrome.storage.local.set({ "unused_cookies_wl": whitelist });
         setIsInWhitelist(false);
       }
     });
   }
 
   // Generate and set the description sentences
-  const generateDescriptionSentences = (cookieScore, trackerScore, score) => {
-    
+  const generateDescriptionSentences = (cookieScore, trackerScore, fp_extern, fp_page, score) => {
+
+    let trackerScoreDescription = "";
     // Tracker score description
-    if (trackerScore == 0) {
-      setTrackerScoreDescription("This website doesn't seem to track your fingerprints.");
+    if (trackerScore < 25) {
+      trackerScoreDescription = "This website doesn't seem to track your fingerprints";
     }
-    else if (trackerScore < 10) {
-      setTrackerScoreDescription("This website lightly tracks some of your fingerprints.");
+    else if (trackerScore < 45) {
+      trackerScoreDescription = "This website most likely does not track your fingerprints";
     }
-    else if (trackerScore < 66) {
-      setTrackerScoreDescription("This website goes out of its way to track several of your fingerprints.")
+    else if (trackerScore < 70) {
+      trackerScoreDescription = "This website is likely tracking your fingerprints";
+    }
+    else if (trackerScore < 90) {
+      trackerScoreDescription = "This website is very likely tracking your fingerprints";
     }
     else {
-      setTrackerScoreDescription("This website actively seeks to track as many of your fingerprints as possible.");
+      trackerScoreDescription = "This website is certainly tracking your fingerprints";
     }
+
+    if (fp_extern > 100) {
+      trackerScoreDescription += " using third parties";
+    }
+    trackerScoreDescription += ".";
+    console.log(trackerScoreDescription);
+    setTrackerScoreDescription(trackerScoreDescription);
 
     // General description
     // If nothing, "This website seems harmless"
@@ -220,7 +233,7 @@ function Popup() {
       generalDesc = "This website uses cookies " + ((cookieTier > 1) ? "very" : "somewhat") + " intrusively, and has " + ((trackerTier > 1) ? "a lot of" : "a few") + " trackers.";
     }
     else if (trackerTier > 0) {
-      generalDesc = "This website has " + ((trackerTier > 1) ? "a lot of" : "a few") + " trackers.";
+      generalDesc = "This website might have " + ((trackerTier > 1) ? "a lot of" : "a few") + " trackers.";
     }
     else if (cookieTier > 0) {
       generalDesc = "This website uses cookies " + ((cookieTier > 1) ? "very" : "somewhat") + " intrusively."
@@ -275,7 +288,7 @@ function Popup() {
           <div className="horizontal-line"></div>
 
           {/* General score */}
-          <div className="body-item card general-score-container" style={{display: isChromeTab ? 'none' : 'flex'}}>
+          <div className="body-item card general-score-container" style={{ display: isChromeTab ? 'none' : 'flex' }}>
 
             {/* General score graphic (left side) */}
             <div className="general-score-left">
@@ -309,7 +322,7 @@ function Popup() {
           </div>
 
           {/* Detailed scores */}
-          <div className="body-item card detailed-scores" style={{display: isChromeTab ? 'none' : 'flex'}}>
+          <div className="body-item card detailed-scores" style={{ display: isChromeTab ? 'none' : 'flex' }}>
 
             {/* Cookie score */}
             <MuiAccordion disableGutters elevation={0} expanded={expanded === 'cookieScoreAccordion'} onChange={handleChange('cookieScoreAccordion')}>
@@ -348,13 +361,13 @@ function Popup() {
                     </Tooltip>
                     </div>
                   </div>
-                )}  
+                )}
               </MuiAccordionDetails>
 
             </MuiAccordion>
 
             {/* Tracker score */}
-            <MuiAccordion disableGutters elevation={0} expanded={expanded === 'trackerScoreAccordion'} onChange={handleChange('trackerScoreAccordion')}>
+            < MuiAccordion disableGutters elevation={0} expanded={expanded === 'trackerScoreAccordion'} onChange={handleChange('trackerScoreAccordion')}>
 
               {/* Header */}
               <MuiAccordionSummary expandIcon={<i className="bi bi-chevron-down"></i>} aria-controls="trackerScoreAccordion-content" id="trackerScoreAccordion-header">

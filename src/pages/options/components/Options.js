@@ -43,6 +43,10 @@ export default function Options() {
             }
         }
 
+        // Request full classification
+        let port = chrome.runtime.connect({name: "requests"});
+        port.postMessage({do: "classification"});
+
     }, []);
 
     const clickItem = (index) => {

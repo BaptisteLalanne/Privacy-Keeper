@@ -8,7 +8,9 @@ import InsightsIcon from '@mui/icons-material/Insights';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import IconButton from '@mui/material/IconButton';
+import ClearIcon from '@mui/icons-material/Clear';
 import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
 import {cookieTypeLabels} from '../../../scripts/miscellaneous/common.js'
 import './popup.scss';
 
@@ -76,16 +78,17 @@ function Popup() {
 
   let wrapperRef = React.useRef(null);
   
-  const [url, setUrl] = useState('');
-  const [isChromeTab, setIsChromeTab] = useState(false);
-  const [isInWhitelist, setIsInWhitelist] = useState(false);
+  let [url, setUrl] = useState('');
+  let [isChromeTab, setIsChromeTab] = useState(false);
+  let [isInWhitelist, setIsInWhitelist] = useState(false);
   let [score, setScore] = useState(100);
-  let [cookieScore, setCookieScore] = useState(100);
-  let [trackerScore, setTrackerScore] = useState(100);
+  let [cookieScore, setCookieScore] = useState(0);
+  let [trackerScore, setTrackerScore] = useState(0);
   let [cookieDetails, setCookieDetails] = useState([0, 0, 0, 0]);
   let [trackerScoreDescription, setTrackerScoreDescription] = useState("This is how much we suspect this website tracks you.");
   let [generalScoreDescription, setGeneralScoreDescription] = useState("This website has some hardware trackers.");
-
+  let [blocksCookies, setBlocksCookies] = useState(false);
+ 
   const detailedCookiesIcons = [
     <ElectricBoltIcon/>,
     <BuildIcon/>,
@@ -122,10 +125,10 @@ function Popup() {
     });
 
     // Fetch scores from storage
-    chrome.storage.sync.get(['cookieScore'], function(cookieScoreRes) {
+    chrome.storage.local.get(['cookieScore'], function(cookieScoreRes) {
       let cookieScore = cookieScoreRes.cookieScore;
 
-      chrome.storage.sync.get(['fingerprintScore'], function(fingerprintScoreRes) {
+      chrome.storage.local.get(['fingerprintScore'], function(fingerprintScoreRes) {
         let trackerScore = fingerprintScoreRes.fingerprintScore;
 
         let rounding = 5;
@@ -148,12 +151,19 @@ function Popup() {
     });
 
     // Fetch cookie classificatins from storage
-    chrome.storage.sync.get(['currentCookieTypes'], function(result) {
+    chrome.storage.local.get(['currentCookieTypes'], function(result) {
       let labels = result.currentCookieTypes;
       console.log(labels);
       setCookieDetails(labels);
     });
-      
+
+    // Fetch options from storage
+    chrome.storage.local.get("toggle_options", async function (result) {
+      if (result && result.toggle_options) {
+        setBlocksCookies(result.toggle_options.blockCookies);
+      }
+    });
+
   }, []);
 
   const toggleWhitelist = (url) => {
@@ -205,7 +215,6 @@ function Popup() {
     // If one of the scores is high or if both scores are medium, "Be careful!"
     let cookieTier = (cookieScore >= 45) + (cookieScore >= 70);
     let trackerTier = (trackerScore >= 35) + (trackerScore >= 60);
-    console.log(cookieTier + "; " + trackerTier);
     let generalDesc = "";
     if (cookieTier > 0 && trackerTier > 0) {
       generalDesc = "This website uses cookies " + ((cookieTier > 1) ? "very" : "somewhat") + " intrusively, and has " + ((trackerTier > 1) ? "a lot of" : "a few") + " trackers.";
@@ -239,17 +248,17 @@ function Popup() {
         {/* Top banner */}
         <div className="top-component">
           <div className="top-item" onClick={() => toggleWhitelist(url)}>
-            <Tooltip title={isInWhitelist ? "This website was marked as safe" : "Mark this website as safe"}>
+            <Tooltip title={isInWhitelist ? <Typography fontSize={16}>This website was marked as safe</Typography> : <Typography fontSize={16}>Mark this website as safe</Typography>}>
               {isInWhitelist ? <i className="bi bi-check-circle-fill"></i> : <i className="bi bi-check-circle"></i>}
             </Tooltip>
           </div>
           <div className="top-item" onClick={clickAbout}>
-            <Tooltip title={"Learn more"}>
+            <Tooltip title={<Typography fontSize={16}>Learn more</Typography>}>
               <i className="bi bi-info-circle"></i>
             </Tooltip>
           </div>
           <div className="top-item" onClick={clickIndex}>
-            <Tooltip title={"Dashboard & settings"}>
+            <Tooltip style={{fontSize: "16px"}} title={<Typography fontSize={16}>Dashboard and settings</Typography>}>
               <i className="bi bi-gear"></i>
             </Tooltip>
           </div>
@@ -324,17 +333,17 @@ function Popup() {
               <MuiAccordionDetails className="detailed-score-contents">
                 {[...Array(4)].map((x, i) =>
                   <div className="detailed-score-item" key={i}>
-                    <div className="detailed-cookies-score-item" style={{opacity: cookieDetails[i] > 0 ? 1 : 0.8}}>
+                    <div className="detailed-cookies-score-item" style={{opacity: ((blocksCookies && !isInWhitelist && i > 1) || cookieDetails[i] == 0) ? 0.7 : 1}}>
                       <div className="detailed-cookies-score-item-icon"> 
                         {detailedCookiesIcons[i]} 
                       </div>
                       <div className="detailed-cookies-score-item-text"> 
                         {cookieDetails[i] > 0 ? <div style={{fontWeight:"bold"}}>{cookieDetails[i]}</div> : <></>}
-                        <div>{(cookieDetails[i] == 0 ? "No " : "") + cookieTypeLabels[i].toLowerCase() + " cookie" + (cookieDetails[i] == 1 ? "" : "s")}</div> 
+                        <div>{((blocksCookies && !isInWhitelist && i > 1 && cookieDetails[i] > 0) ? "blocked " : (cookieDetails[i] == 0 ? "No " : "")) + cookieTypeLabels[i].toLowerCase() + " cookie" + (cookieDetails[i] == 1 ? "" : "s")}</div> 
                       </div>
                     </div>
                     <div>
-                    <Tooltip title={detailedCookiesExplanations[i]}>
+                    <Tooltip title={<Typography fontSize={16}>{detailedCookiesExplanations[i]}</Typography>}>
                       <IconButton className="detailed-cookies-score-item-help-icon" size="small" onClick={clickAbout}> <HelpOutlineIcon/> </IconButton>
                     </Tooltip>
                     </div>
@@ -366,7 +375,7 @@ function Popup() {
               <MuiAccordionDetails>
                 <span>
                     {trackerScoreDescription}
-                    <Tooltip title={"Fingerprints are little bits of information you leave online (such as your computer specs or your browser configuration). Thanks to these, websites can easily identify you as a unique individual."}>
+                    <Tooltip style={{fontSize: "16px"}} title={<Typography fontSize={16}>Fingerprints are little bits of information you leave online (such as your computer specs or your browser configuration). Thanks to these, websites can easily identify you as a unique individual.</Typography>}>
                       <IconButton className="detailed-tracker-score-item-help-icon" size="small" onClick={clickAbout}> <HelpOutlineIcon/> </IconButton>
                     </Tooltip>
                 </span>

@@ -79,6 +79,6 @@ export default function fingerprinterScript() {
         
     //console.log("Score : " + score);
 
-    chrome.storage.sync.set({'fingerprintScore': score}, function() {});
+    chrome.storage.local.set({'fingerprintScore': score}, function() {});
 
 }

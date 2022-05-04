@@ -344,6 +344,7 @@ export default function fingerprinterScript() {
                 let analysedScripts = 0;
                 for (let i = 0; i < nbScript; i++) {
                     promiseList.push(new Promise((resolve, reject) => {
+                        //When the cript references an external one
                         if (scripts[i].src) {
                             let externalSourceLink = scripts[i].src;
                             // Fetch file with blob
@@ -418,7 +419,7 @@ export default function fingerprinterScript() {
     });
 
     computeScoreScript.then((fingerprintAnalyseResult) => {
-        chrome.storage.sync.set({ "fingerprintAnalyseResult": fingerprintAnalyseResult }, function () {
+        chrome.storage.local.set({ "fingerprintAnalyseResult": fingerprintAnalyseResult }, function () {
         });
     }).catch((error) => {
         throw (error)

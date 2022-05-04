@@ -7,7 +7,7 @@ import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
 import BuildIcon from '@mui/icons-material/Build';
 import InsightsIcon from '@mui/icons-material/Insights';
 import CampaignIcon from '@mui/icons-material/Campaign';
-import {cookieTypeLabels} from '../../../scripts/miscellaneous/common.js'
+import { cookieTypeLabels } from '../../../scripts/miscellaneous/common.js'
 import './popup.scss';
 
 // Opening dashboard on button clicks
@@ -48,7 +48,7 @@ function updateCSS(node, score, cookieScore, trackerScore) {
 
   // Vars
   let posColor = "#7DDE6D";
-  let negColor = "#fd6500"; 
+  let negColor = "#fd6500";
   let doc = node.ownerDocument;
 
   // Update cookie score color
@@ -81,7 +81,7 @@ function generateBlankPopup(node) {
 function Popup() {
 
   let wrapperRef = React.useRef(null);
-  
+
   const [url, setUrl] = useState('');
   const [isChromeTab, setIsChromeTab] = useState(false);
   let [score, setScore] = useState(100);
@@ -90,10 +90,10 @@ function Popup() {
   let [cookieDetails, setCookieDetails] = useState([0, 0, 0, 0]);
 
   const detailedCookiesIcons = [
-    <ElectricBoltIcon/>,
-    <BuildIcon/>,
-    <InsightsIcon/>,
-    <CampaignIcon/>
+    <ElectricBoltIcon />,
+    <BuildIcon />,
+    <InsightsIcon />,
+    <CampaignIcon />
   ];
 
   // Main Hook
@@ -108,31 +108,34 @@ function Popup() {
 
     // Fetch scores from storage
     cookieScore = "??";
-    chrome.storage.sync.get(['fingerprintScore'], function(result) {
-      
-      trackerScore = Math.round(result.fingerprintScore);
-      console.log('[EXTENSION] Fingerprinter score : ' + result.fingerprintScore);
-      
+    chrome.storage.sync.get(["fingerprintAnalyseResult"], function (result) {
+
+      fingerprintAnalyseResult = Math.round(result.fingerprintAnalyseResult);
+      console.log('[EXTENSION] Fingerprinter score : ' + result.fingerprintAnalyseResult);
+
       //score = Math.max(cookieScore, trackerScore);
+      trackerScore = fingerprintAnalyseResult.final_score;
+      console.log("trackerScore" + trackerScore);
+
       score = trackerScore;
-      
+
       // Save score states
       setScore(score);
       setCookieScore(cookieScore);
       setTrackerScore(trackerScore);
-      
+
       // Update CSS
       updateCSS(wrapperRef.current, score, cookieScore, trackerScore);
 
     });
 
     // Fetch cookie classificatins from storage
-    chrome.storage.sync.get(['currentCookieTypes'], function(result) {
+    chrome.storage.sync.get(['currentCookieTypes'], function (result) {
       let labels = result.currentCookieTypes;
       console.log(labels);
       setCookieDetails(labels);
     });
-      
+
   }, []);
 
   // Handle click on collapsable items
@@ -166,7 +169,7 @@ function Popup() {
           <div className="horizontal-line"></div>
 
           {/* General score */}
-          <div className="body-item card general-score-container" style={{display: isChromeTab ? 'none' : 'flex'}}>
+          <div className="body-item card general-score-container" style={{ display: isChromeTab ? 'none' : 'flex' }}>
 
             {/* General score graphic (left side) */}
             <div className="general-score-left">
@@ -200,7 +203,7 @@ function Popup() {
           </div>
 
           {/* Detailed scores */}
-          <div className="body-item card detailed-scores" style={{display: isChromeTab ? 'none' : 'flex'}}>
+          <div className="body-item card detailed-scores" style={{ display: isChromeTab ? 'none' : 'flex' }}>
 
             {/* Cookie score */}
             <MuiAccordion disableGutters elevation={0} expanded={expanded === 'cookieScoreAccordion'} onChange={handleChange('cookieScoreAccordion')}>
@@ -223,14 +226,14 @@ function Popup() {
               {/* Content */}
               <MuiAccordionDetails className="detailed-score-contents">
                 {[...Array(4)].map((x, i) =>
-                  <div className="detailed-score-item" style={{opacity: cookieDetails[i] > 0 ? 1 : 0.8}}>
+                  <div className="detailed-score-item" style={{ opacity: cookieDetails[i] > 0 ? 1 : 0.8 }}>
                     <div className="detailed-cookies-score-item-icon"> {detailedCookiesIcons[i]} </div>
-                    <div className="detailed-cookies-score-item-text"> 
-                      {cookieDetails[i] > 0 ? <div style={{fontWeight:"bold"}}>{cookieDetails[i]}</div> : <></>}
-                      <div>{(cookieDetails[i] == 0 ? "No " : "") + cookieTypeLabels[i].toLowerCase() + " cookie" + (cookieDetails[i] > 1 ? "s" : "")}</div> 
+                    <div className="detailed-cookies-score-item-text">
+                      {cookieDetails[i] > 0 ? <div style={{ fontWeight: "bold" }}>{cookieDetails[i]}</div> : <></>}
+                      <div>{(cookieDetails[i] == 0 ? "No " : "") + cookieTypeLabels[i].toLowerCase() + " cookie" + (cookieDetails[i] > 1 ? "s" : "")}</div>
                     </div>
                   </div>
-                )}  
+                )}
               </MuiAccordionDetails>
 
             </MuiAccordion>

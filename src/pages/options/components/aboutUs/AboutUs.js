@@ -11,7 +11,7 @@ export default function AboutUs() {
         <Fade in={true} timeout={fadeDuration} style={{ transitionDelay: 50+0*fadeOffset+'ms' }}>
             <div className="au-wrapper">
                 <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam ligula risus, pellentesque id faucibus congue, tincidunt ut elit. Nam facilisis mollis mi. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; In malesuada condimentum tellus quis venenatis. Cras in condimentum mauris. Ut eget justo condimentum, cursus orci scelerisque, mattis risus. Morbi elit tellus, placerat non enim nec, dapibus tempus enim. Pellentesque sapien orci, rutrum at rutrum quis, pellentesque eu augue. Praesent non diam augue. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae;
+                At Privacy Keeper, we value privacy. We developed a state of the art cookies and tracker detection technology using machine learning. Our team of computer scientists built the  Privacy Keeper add-on based on our in-house technology to place our knowledge at your service. Entirely free and open source, you can  learn more <a href="/learn-more">here</a>.
                 </p>
             </div>
         </Fade>

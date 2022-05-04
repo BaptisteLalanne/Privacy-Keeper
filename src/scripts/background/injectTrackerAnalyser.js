@@ -10,7 +10,7 @@ export default function fingerprinterScript() {
             let val = obj[key];
             let count = text.split(key).length - 1;
             if (count > 0) {
-                score += parseInt(val) ;
+                score += parseInt(val);
             }
         }
         return score;
@@ -330,7 +330,7 @@ export default function fingerprinterScript() {
         return res;
     }
 
-    function computeScoreScript() {
+    const computeScoreScript = new Promise((res, reject) => {
         // This class implements all methods to analyse trackers whithin a web page
         const scripts = document.scripts;
         let fp_inf = 0;
@@ -342,7 +342,6 @@ export default function fingerprinterScript() {
             let promiseList = [];
             return new Promise((resolve, reject) => {
                 let analysedScripts = 0;
-                console.log("BEFORE______________")
                 for (let i = 0; i < nbScript; i++) {
                     promiseList.push(new Promise((resolve, reject) => {
                         if (scripts[i].src) {
@@ -384,51 +383,46 @@ export default function fingerprinterScript() {
                         }
                     }));
                 }
-                Promise.all(promiseList).then((res)=> {
-                    console.log("AFTER_____________________" + promiseList.length) 
+                Promise.all(promiseList).then((res) => {
                     resolve();
                 })
             })
         }
         loopScripts().then(() => {
             let final_score = 0;
-            console.log("AFTER_AFTER_____________________" ) 
-
             // When there is an infinite score
             if (fp_inf != 0) {
                 fp_total = fp_inf;
                 final_score = Math.min(0.9 + 3 * (1 - fp_total), 1);
             } else {
                 // fp_total: Internal script absolute score - max_extern: External script absolute score
-                if(fp_total < 0 || max_extern < 0){
+                if (fp_total < 0 || max_extern < 0) {
                     final_score = 1;
                 } else {
-                    const minVal = 50;
-                    const maxVal = 400;
+                    const minVal = 30;
+                    const maxVal = 300;
                     final_score = (clamp(minVal, 0.7 * fp_total + 0.3 * max_extern, maxVal) - minVal) / maxVal;
                 }
             }
 
-            console.log("EXTERN: " + max_extern);
-            console.log("FP_TOTAL: " + fp_total);
-            console.log("final_score: " + final_score);
             final_score *= 100;
-            return [fp_total,max_extern,final_score];
+            const fingerprintAnalyseResult = {
+                "fp_page": fp_total,
+                "fp_extern": max_extern,
+                "final_score": final_score
+            }
+            res(fingerprintAnalyseResult);
         }).catch((error) => {
-          console.log(error)  
+            reject(error)
         })
 
+    });
 
-
-    }
-
-
-    const [fp_page,fp_extern,final_score] = computeScoreScript();
-    const result = {
-        "fp_page": fp_page,
-        "fp_extern": fp_extern,
-        "final_score": final_score
-    }
-    chrome.storage.sync.set(result, function () {
+    computeScoreScript.then((fingerprintAnalyseResult) => {
+        console.log(fingerprintAnalyseResult.final_score)
+        chrome.storage.sync.set({ "fingerprintAnalyseResult": fingerprintAnalyseResult }, function () {
+        });
+    }).catch((error) => {
+        throw (error)
     });
 }

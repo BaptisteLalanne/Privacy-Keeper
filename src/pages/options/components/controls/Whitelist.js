@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useCallback, useState, useEffect } from 'react'
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import Tooltip from '@mui/material/Tooltip';
@@ -28,30 +28,15 @@ export default function CookieTable() {
 
     }, []);
 
-    const deleteItem = (toBeDeleted) => {
+    const deleteCookies = useCallback((index) => {
+        let copy = [...rows];
+        copy.splice(index, 1);
+        setRows(copy);
 
-        // Filter and unselect table row
-        const index = rows.indexOf(toBeDeleted);
-        if (index > -1) {
-            rows.splice(index, 1);
-        }
-        console.log(rows);
-        setRows(rows);
-        
         // Remove from storage
-        chrome.storage.local.get(["unused_cookies_wl"], res => {
-            let whitelist = {};
-            if (res && res.unused_cookies_wl) {
-                whitelist = res.unused_cookies_wl;
-            }
-            const index = whitelist.indexOf(toBeDeleted);
-            if (index > -1) {
-                whitelist.splice(index, 1);
-            }
-            chrome.storage.local.set({ "unused_cookies_wl": whitelist });
-        });
+        chrome.storage.local.set({ "unused_cookies_wl": copy });
+    }, [setRows]);
 
-    };
 
     return (
         <div className="whitelist-wrapper">
@@ -70,7 +55,7 @@ export default function CookieTable() {
                                             <div className="whitelist-row">
                                                 {row}
                                                 <Tooltip title={"Remove from whitelist"} placement="right">
-                                                    <IconButton className="whitelist-delete-icon" onClick={() => deleteItem(row)}> <CloseIcon /> </IconButton>
+                                                    <IconButton className="whitelist-delete-icon" onClick={() => deleteCookies(index)}> <CloseIcon /> </IconButton>
                                                 </Tooltip>
                                             </div>
                                         </TableCell>

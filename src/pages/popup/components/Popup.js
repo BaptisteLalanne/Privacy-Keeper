@@ -129,7 +129,6 @@ function Popup() {
       let cookieScore = cookieScoreRes.cookieScore;
 
       chrome.storage.local.get(['fingerprintAnalyseResult'], function (fingerprintScoreRes) {
-        console.log("HHHHHHHHHHHHH" + fingerprintScoreRes.fingerprintAnalyseResult)
         let trackerScore = fingerprintScoreRes.fingerprintAnalyseResult.final_score;
         const fp_extern = fingerprintScoreRes.fingerprintAnalyseResult.fp_extern;
         const fp_page = fingerprintScoreRes.fingerprintAnalyseResult.fp_page;

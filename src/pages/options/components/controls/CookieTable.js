@@ -26,7 +26,7 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import {cookieTypeLabels} from '../../../../scripts/miscellaneous/common.js'
+import { cookieTypeLabels } from '../../../../scripts/miscellaneous/common.js'
 import "./controls.scss";
 
 function descendingComparator(a, b, orderBy) {
@@ -82,10 +82,10 @@ export default function CookieTable() {
 
                 // Retreive cookie type
                 let type = "Unknown";
-                if (cookieTypes[key]) {
+                if (cookieTypes[key] != undefined) {
                     type = cookieTypeLabels[cookieTypes[key]];
                 }
-                
+
                 // Compute cookie storage size (WIP: idk how to do it yet)
                 let size = getCookieSize(cookie);
 
@@ -139,7 +139,7 @@ export default function CookieTable() {
                 chrome.cookies.remove({ "url": url, "name": cookie.name });
 
                 // Store number of deleted cookies by type
-                if (deleted[selection.type] == null) {
+                if (deleted[selection.type] == undefined) {
                     deleted[selection.type] = selection.cookies;
                 }
                 else {
@@ -188,6 +188,7 @@ export default function CookieTable() {
             let lastCookieUpdateDates = res1.updateDateCookies;
             chrome.storage.local.get(["cookieTypes"], function (res2) {
                 let cookieTypes = res2.cookieTypes;
+                console.log(cookieTypes)
                 constructData(lastCookieUpdateDates, cookieTypes);
             });
         });

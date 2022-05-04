@@ -1,14 +1,12 @@
 // LISTENERS
 const classifyCookiesTab = (activeInfo) => {
 
-    console.log("[CLASSIFIER BACKGROUND] Tab activated")
-
     const queryOptions = {
         active: true,
         currentWindow: true
     };
     chrome.tabs.query(queryOptions, async function (tabs) {
-        if (tabs.length > 0 && tabs[0].url !== "") {
+        if (tabs.length > 0 && tabs[0].url !== "" && !tabs[0].url.split(":")[0].includes("chrome")) {
             chrome.storage.local.set({ "currentCookieTypes": [0, 0, 0, 0] }, function () {
                 //Get all the cookie whose url matches the active tab
                 chrome.cookies.getAll({ "url": tabs[0].url }, function (cookies) {
@@ -177,8 +175,8 @@ const handleCookies = async function (newCookies, url) {
     let labels = [0, 0, 0, 0];
     let maxExpirationTimes = [0, 0, 0, 0];
     let currCookieTypes = {};
-    const MAX_DURATION = 365 * (24*60*60);
-    const MAX_DATE = Date.now()/1000 + MAX_DURATION;
+    const MAX_DURATION = 365 * (24 * 60 * 60);
+    const MAX_DATE = Date.now() / 1000 + MAX_DURATION;
 
     // Get already stored classifications
     chrome.storage.local.get(["cookieTypes"], async (res) => {
@@ -224,11 +222,11 @@ const handleCookies = async function (newCookies, url) {
                         let getClassification =
 
                             // If cookie has already been classified,
-                            prevCookieTypes[key] ?
+                            prevCookieTypes[key] != undefined ?
 
                                 async () => {
 
-                                    // Fetch stored classiification
+                                    // Fetch stored classification
                                     return prevCookieTypes[key];
 
                                 }
@@ -251,11 +249,11 @@ const handleCookies = async function (newCookies, url) {
                             ;
 
                         let ctype = await getClassification();
-                        
+
                         // Block cookies
                         let hasBeenBlocked = false;
                         if (blockCookies) {
-                
+
                             // Check if it's not in whitelist
                             let found = false;
                             for (let whitelistedDomain of whitelist) {
@@ -291,7 +289,6 @@ const handleCookies = async function (newCookies, url) {
                     }
 
                     // Count in previously blocked cookies
-                    console.log(blockedCookies[domain]);
                     if (blockCookies && !isInWhitelist && blockedCookies[domain]) {
                         for (const [name, cookie] of Object.entries(blockedCookies[domain])) {
                             let key = "domain" + cookie.domain + "name" + cookie.name;
@@ -309,19 +306,19 @@ const handleCookies = async function (newCookies, url) {
                     for (let i = 3; i >= 0; i--) {
                         if (labels[i] > 0) {
                             baseScore = thresholds[i];
-                            additionalScore = mapRange(maxExpirationTimes[i]-Date.now()/1000, 5 * (24*60*60), MAX_DURATION, 0, thresholds[i+1]-thresholds[i]);
+                            additionalScore = mapRange(maxExpirationTimes[i] - Date.now() / 1000, 5 * (24 * 60 * 60), MAX_DURATION, 0, thresholds[i + 1] - thresholds[i]);
                             break;
                         }
                     }
                     let score = baseScore + additionalScore;
-                
-                    console.log("[CLASSIFIER BACKGROUND] cookieClassification saved");
+
+                    console.log("[CLASSIFIER BACKGROUND] cookieClassification done");
                     console.log(labels);
-                
+
                     // Save current tab's cookie score and repartition 
                     chrome.storage.local.set({ "currentCookieTypes": labels });
                     chrome.storage.local.set({ "cookieScore": score });
-                
+
                     // Update gobal cookie types map
                     chrome.storage.local.set({ "cookieTypes": newCookieTypes });
 
@@ -355,11 +352,11 @@ function updateCookieClassification(cookies) {
             let getClassification =
 
                 // If cookie has already been classified,
-                prevCookieTypes[key] ?
+                prevCookieTypes[key] != undefined ?
 
                     async () => {
 
-                        // Fetch stored classiification
+                        // Fetch stored classification
                         return prevCookieTypes[key];
 
                     }
@@ -382,14 +379,14 @@ function updateCookieClassification(cookies) {
                 ;
 
             await getClassification();
-            
+
         }
 
         newCookieTypes = { ...prevCookieTypes, ...currCookieTypes };
-    
+
         console.log("[CLASSIFIER BACKGROUND] cookieClassification updated");
         console.log(newCookieTypes);
-    
+
         // Update gobal cookie types map
         chrome.storage.local.set({ "cookieTypes": newCookieTypes });
 

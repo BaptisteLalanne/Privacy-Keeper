@@ -215,10 +215,9 @@ function Popup() {
     }
 
     if (fp_extern > 100) {
-      trackerScoreDescription += " using third parties";
+      trackerScoreDescription += " using third party services";
     }
     trackerScoreDescription += ".";
-    console.log(trackerScoreDescription);
     setTrackerScoreDescription(trackerScoreDescription);
 
     // General description
@@ -230,10 +229,10 @@ function Popup() {
     let trackerTier = (trackerScore >= 35) + (trackerScore >= 60);
     let generalDesc = "";
     if (cookieTier > 0 && trackerTier > 0) {
-      generalDesc = "This website uses cookies " + ((cookieTier > 1) ? "very" : "somewhat") + " intrusively, and has " + ((trackerTier > 1) ? "a lot of" : "a few") + " trackers.";
+      generalDesc = "This website uses cookies " + ((cookieTier > 1) ? "very" : "somewhat") + " intrusively, and " + ((trackerTier > 1) ? "probably" : "likely") + " has trackers.";
     }
     else if (trackerTier > 0) {
-      generalDesc = "This website might have " + ((trackerTier > 1) ? "a lot of" : "a few") + " trackers.";
+      generalDesc = "This website " + ((trackerTier > 1) ? "probably" : "likely") + " has trackers.";
     }
     else if (cookieTier > 0) {
       generalDesc = "This website uses cookies " + ((cookieTier > 1) ? "very" : "somewhat") + " intrusively."

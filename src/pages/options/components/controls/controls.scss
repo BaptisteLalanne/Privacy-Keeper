@@ -22,7 +22,7 @@
 }
 
 .controls-section-header .MuiDivider-root {
-    width: 50%;
+    max-width: 960px;
 }
 
 .controls-section-header .MuiDivider-wrapper {
@@ -63,7 +63,7 @@
 }
 
 .cookie-table {
-    width: 50%;
+    max-width: 960px;
 }
 
 .cookie-table .MuiTableCell-root {
@@ -99,7 +99,7 @@
 }
 
 .whitelist-table {
-    width: 50%;
+    max-width: 960px;
 }
 .whitelist-row {
     display: flex;

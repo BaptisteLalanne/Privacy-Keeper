@@ -10,6 +10,7 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import IconButton from '@mui/material/IconButton';
 import ClearIcon from '@mui/icons-material/Clear';
 import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
 import {cookieTypeLabels} from '../../../scripts/miscellaneous/common.js'
 import './popup.scss';
 
@@ -124,10 +125,10 @@ function Popup() {
     });
 
     // Fetch scores from storage
-    chrome.storage.sync.get(['cookieScore'], function(cookieScoreRes) {
+    chrome.storage.local.get(['cookieScore'], function(cookieScoreRes) {
       let cookieScore = cookieScoreRes.cookieScore;
 
-      chrome.storage.sync.get(['fingerprintScore'], function(fingerprintScoreRes) {
+      chrome.storage.local.get(['fingerprintScore'], function(fingerprintScoreRes) {
         let trackerScore = fingerprintScoreRes.fingerprintScore;
 
         let rounding = 5;
@@ -150,14 +151,14 @@ function Popup() {
     });
 
     // Fetch cookie classificatins from storage
-    chrome.storage.sync.get(['currentCookieTypes'], function(result) {
+    chrome.storage.local.get(['currentCookieTypes'], function(result) {
       let labels = result.currentCookieTypes;
       console.log(labels);
       setCookieDetails(labels);
     });
 
     // Fetch options from storage
-    chrome.storage.sync.get("toggle_options", async function (result) {
+    chrome.storage.local.get("toggle_options", async function (result) {
       if (result && result.toggle_options) {
         setBlocksCookies(result.toggle_options.blockCookies);
       }
@@ -214,7 +215,6 @@ function Popup() {
     // If one of the scores is high or if both scores are medium, "Be careful!"
     let cookieTier = (cookieScore >= 45) + (cookieScore >= 70);
     let trackerTier = (trackerScore >= 35) + (trackerScore >= 60);
-    console.log(cookieTier + "; " + trackerTier);
     let generalDesc = "";
     if (cookieTier > 0 && trackerTier > 0) {
       generalDesc = "This website uses cookies " + ((cookieTier > 1) ? "very" : "somewhat") + " intrusively, and has " + ((trackerTier > 1) ? "a lot of" : "a few") + " trackers.";
@@ -248,17 +248,17 @@ function Popup() {
         {/* Top banner */}
         <div className="top-component">
           <div className="top-item" onClick={() => toggleWhitelist(url)}>
-            <Tooltip title={isInWhitelist ? "This website was marked as safe" : "Mark this website as safe"}>
+            <Tooltip title={isInWhitelist ? <Typography fontSize={16}>This website was marked as safe</Typography> : <Typography fontSize={16}>Mark this website as safe</Typography>}>
               {isInWhitelist ? <i className="bi bi-check-circle-fill"></i> : <i className="bi bi-check-circle"></i>}
             </Tooltip>
           </div>
           <div className="top-item" onClick={clickAbout}>
-            <Tooltip title={"Learn more"}>
+            <Tooltip title={<Typography fontSize={16}>Learn more</Typography>}>
               <i className="bi bi-info-circle"></i>
             </Tooltip>
           </div>
           <div className="top-item" onClick={clickIndex}>
-            <Tooltip title={"Dashboard & settings"}>
+            <Tooltip style={{fontSize: "16px"}} title={<Typography fontSize={16}>Dashboard and settings</Typography>}>
               <i className="bi bi-gear"></i>
             </Tooltip>
           </div>
@@ -333,18 +333,17 @@ function Popup() {
               <MuiAccordionDetails className="detailed-score-contents">
                 {[...Array(4)].map((x, i) =>
                   <div className="detailed-score-item" key={i}>
-                    <div className="detailed-cookies-score-item" style={{opacity: ((blocksCookies && i > 1) || cookieDetails[i] == 0) ? 0.7 : 1}}>
+                    <div className="detailed-cookies-score-item" style={{opacity: ((blocksCookies && !isInWhitelist && i > 1) || cookieDetails[i] == 0) ? 0.7 : 1}}>
                       <div className="detailed-cookies-score-item-icon"> 
                         {detailedCookiesIcons[i]} 
-                        {/*<div className="detailed-cookies-cross-icon">{blocksCookies ? <ClearIcon/> : <></>}</div>*/}
                       </div>
                       <div className="detailed-cookies-score-item-text"> 
                         {cookieDetails[i] > 0 ? <div style={{fontWeight:"bold"}}>{cookieDetails[i]}</div> : <></>}
-                        <div>{((blocksCookies && i > 1 && cookieDetails[i] > 0) ? "blocked " : (cookieDetails[i] == 0 ? "No " : "")) + cookieTypeLabels[i].toLowerCase() + " cookie" + (cookieDetails[i] == 1 ? "" : "s")}</div> 
+                        <div>{((blocksCookies && !isInWhitelist && i > 1 && cookieDetails[i] > 0) ? "blocked " : (cookieDetails[i] == 0 ? "No " : "")) + cookieTypeLabels[i].toLowerCase() + " cookie" + (cookieDetails[i] == 1 ? "" : "s")}</div> 
                       </div>
                     </div>
                     <div>
-                    <Tooltip title={detailedCookiesExplanations[i]}>
+                    <Tooltip title={<Typography fontSize={16}>{detailedCookiesExplanations[i]}</Typography>}>
                       <IconButton className="detailed-cookies-score-item-help-icon" size="small" onClick={clickAbout}> <HelpOutlineIcon/> </IconButton>
                     </Tooltip>
                     </div>
@@ -376,7 +375,7 @@ function Popup() {
               <MuiAccordionDetails>
                 <span>
                     {trackerScoreDescription}
-                    <Tooltip title={"Fingerprints are little bits of information you leave online (such as your computer specs or your browser configuration). Thanks to these, websites can easily identify you as a unique individual."}>
+                    <Tooltip style={{fontSize: "16px"}} title={<Typography fontSize={16}>Fingerprints are little bits of information you leave online (such as your computer specs or your browser configuration). Thanks to these, websites can easily identify you as a unique individual.</Typography>}>
                       <IconButton className="detailed-tracker-score-item-help-icon" size="small" onClick={clickAbout}> <HelpOutlineIcon/> </IconButton>
                     </Tooltip>
                 </span>

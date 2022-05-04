@@ -47,7 +47,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
             "unusedCookieDeletedHistory": {},
             "blockedCookies": {}
         };
-        chrome.storage.sync.set(default_params, function () {
+        chrome.storage.local.set(default_params, function () {
             if (chrome.runtime.error) {
                 console.log("Runtime error : default parameters");
             }
@@ -61,20 +61,20 @@ chrome.windows.onCreated.addListener(function () {
     console.log("[BROWSER OPENED]");
 
     //Getting toggle options
-    chrome.storage.sync.get("toggle_options", async function (result) {
+    chrome.storage.local.get("toggle_options", async function (result) {
 
         if (result && result.toggle_options && result.toggle_options.autoDeleteOldCookies) {
 
             let whitelist
             //Getting whitelist
-            await chrome.storage.sync.get("unused_cookies_wl", function (result) {
+            await chrome.storage.local.get("unused_cookies_wl", function (result) {
                 if (result && result.unused_cookies_wl) {
                     whitelist = result.unused_cookies_wl
                 }
             });
 
             //Getting data
-            await chrome.storage.sync.get("updateDateCookies", async function (result) {
+            await chrome.storage.local.get("updateDateCookies", async function (result) {
 
                 // Fetch data
                 if (result && result["updateDateCookies"])
@@ -83,13 +83,13 @@ chrome.windows.onCreated.addListener(function () {
                     result = {};
 
                 // Fetch cookie types
-                let res = await chrome.storage.sync.get("cookieTypes");
+                let res = await chrome.storage.local.get("cookieTypes");
                 let cookieTypes = res.cookieTypes;
 
                 let nb_deleted_cookies = [0, 0, 0, 0, 0]
 
                 //Time after which unused cookies are deleted
-                let max_diff = await chrome.storage.sync.get("expiration_time") // Retrieving cookie expiration time -> default is 1000 * 60 * 60 * 24 * 7 * 2; //2 weeks
+                let max_diff = await chrome.storage.local.get("expiration_time") // Retrieving cookie expiration time -> default is 1000 * 60 * 60 * 24 * 7 * 2; //2 weeks
                 max_diff = max_diff.expiration_time
 
                 let value = {};
@@ -101,11 +101,11 @@ chrome.windows.onCreated.addListener(function () {
                     let key;
                     cookies.forEach(cookie => {
 
-                        let found = false
+                        let found = false;
                         for (let domain of whitelist) {
-                            if (cookie.domain.includes(domain)) {
-                                found = true
-                                break
+                            if (cookie.domain.includes(domain) || domain.includes(cookie.domain)) {
+                                found = true;
+                                break;
                             }
                         }
 
@@ -148,7 +148,7 @@ chrome.windows.onCreated.addListener(function () {
                 }).catch(err => console.log(err));
 
                 //We put the now upodated cookies' date in the storage
-                await chrome.storage.sync.set({"updateDateCookies": value}).then(() => {
+                await chrome.storage.local.set({"updateDateCookies": value}).then(() => {
                     if (chrome.runtime.error) {
                         console.log("Runtime error.");
                     }
@@ -214,7 +214,7 @@ function setInfos() {
             chrome.cookies.getAll({"url": tabs[0].url}, function (cookies) {
 
                 //Getting stored cookies' dates
-                chrome.storage.sync.get("updateDateCookies", function (result) {
+                chrome.storage.local.get("updateDateCookies", function (result) {
 
                     // Getting them only if they exist
                     let value = {};
@@ -231,7 +231,7 @@ function setInfos() {
                     });
 
                     //Putting the new date into the sync storage
-                    chrome.storage.sync.set({"updateDateCookies": value}, function () {
+                    chrome.storage.local.set({"updateDateCookies": value}, function () {
                         if (chrome.runtime.error) {
                             console.log("Runtime error.");
                         }
@@ -291,8 +291,25 @@ chrome.runtime.onConnect.addListener(function (port) {
             case "beacons":
                 console.log("[BACKGROUND] received nb beacons: " + msg.nb)
                 // save nb beacons
-                chrome.storage.sync.set({beacons: msg.nb});
+                chrome.storage.local.set({beacons: msg.nb});
                 break;
         }
     });
+});
+
+// Listen to when the options page asks us to do a full classification
+chrome.runtime.onConnect.addListener(function(port) {
+    port.onMessage.addListener(function(msg) {
+        switch (port.name) {
+            case "requests":
+                if (msg.do === "classification") {
+                    chrome.cookies.getAll({}, function (cookies) {
+                        updateCookieClassification(cookies);
+                    });
+                    port.postMessage({status: "done"});
+                }
+                break;
+        }
+    });
+    
 });

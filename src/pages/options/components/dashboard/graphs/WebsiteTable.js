@@ -74,8 +74,8 @@ export default function WebsiteTable() {
           </TableHead>
           <TableBody>
             {data.map((row, index) => (
-              <TableRow key={row["pos-nom"]}>
-                <TableCell align="center"
+              <TableRow key={index}>
+                <TableCell align="left"
                   className={
                     "table-right-border-cell " + ((index == 0) ? "table-top-padding-cell" : "")
                   }
@@ -83,11 +83,11 @@ export default function WebsiteTable() {
                     color: mixColors(style.graphcol1, "#000000", mapRange(index, 0, 5, 0.1, 0.9))
                   }}>
                   <div className="table-content-cell">
-                    <div>{row["neg-nom"]}</div>
+                    <div>&bull; {row["neg-nom"]}</div>
                     <div>{row["neg-score"]}</div>
                   </div>
                 </TableCell>
-                <TableCell align="center"
+                <TableCell align="left"
                   className={
                     (index == 0) ? "table-top-padding-cell" : ""
                   }
@@ -95,6 +95,7 @@ export default function WebsiteTable() {
                     color: mixColors(style.graphcol2, "#000000", mapRange(index, 0, 5, 0.1, 0.9))
                   }}>
                   <div className="table-content-cell" >
+                    <div>{row["pos-nom"] == "..." ? <></> : <>&bull;</>}</div>
                     <div>{row["pos-nom"]}</div>
                     <div>{row["pos-score"]}</div>
                   </div>

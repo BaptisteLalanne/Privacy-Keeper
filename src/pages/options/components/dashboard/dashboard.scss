@@ -78,9 +78,8 @@
 .dashboard-box .table-content-cell {
     margin: auto;
     display: flex;
-    gap: $font-size;
-    justify-content: center;
-    justify-items: center;
+    gap: 0.5*$font-size;
+    margin-left: $font-size;
 }
 
 .dashboard-box .table-right-border-cell {

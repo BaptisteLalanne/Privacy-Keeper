@@ -10,6 +10,7 @@ export default function AboutUs() {
     return (
         <Fade in={true} timeout={fadeDuration} style={{ transitionDelay: 50 + 0 * fadeOffset + 'ms' }}>
             <div className="au-wrapper">
+                <div className='top-part'>
                 <p>
                     Here at Privacy Keeper, we value privacy.
                 </p>
@@ -22,11 +23,25 @@ export default function AboutUs() {
                 <p>
                     Entirely free and open source, you can learn more <a href="options.html?page=learn-more">here</a>.
                 </p>
+                </div>
+                <div className='bottom-part'>
+                <p>
+                    Acknowledgement:
+                </p>
+                <p>
+                    Privacy Keeper is based in part on the work of the open-source projects <a href="https://github.com/uiowa-irl/FP-Inspector">FP-Inspector</a> and <a href="https://github.com/dibollinger/CookieBlock">CookieBlock</a>.
+                </p>
+                <br />
+                <br />
+                <p>
+                    If you want to contribute to the project, feel free to join our <a href="https://github.com/BaptisteLalanne/Privacy-Keeper">Github</a>.
+                </p>
                 <br />
                 <br />
                 <p style={{ fontSize: "12px" }}>
                     Privacy Keeper v0.1 - Ⓒ 2022
                 </p>
+                </div>
             </div>
         </Fade>
     )

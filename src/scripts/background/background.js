@@ -196,6 +196,65 @@ chrome.tabs.onUpdated.addListener(classifyCookiesTab);
 chrome.tabs.onActivated.addListener(setInfos); //Listen to new tabs / switching tabs / reloading tabs
 chrome.tabs.onUpdated.addListener(setInfos); //Listener to updated tabs (when the url is modifies for instance)
 
+//To rendomize the user argent
+chrome.tabs.onActivated.addListener(randomizeUA); //Listen to new tabs / switching tabs / reloading tabs
+chrome.tabs.onUpdated.addListener(randomizeUA); //Listener to updated tabs (when the url is modifies for instance)
+
+function randomizeUA() { // Chrome specific randomization
+
+    let platformWindowsP1 = ["Windows NT 10.0", "Windows NT 6.3", "Windows NT 6.2", "Windows NT 6.1", "Windows NT 6.0"];
+    let platformLinux = ["Linux x86_64"]
+    let platformMacP1 = ["Macintosh"]
+    let platformMacP2 = ["Intel Mac OS X 10_11_6", "Intel Mac OS X 10_6_6", "Intel Mac OS X 10_10_5", "Intel Mac OS X 10_6_8", "Intel Mac OS X 10_9_3", "Intel Mac OS X 10_10", "Intel Mac OS X 10_11_6", "Intel Mac OS X 10_5_4"]
+    let platformWindowsP2 = ["Win64; x64", "Win32; x86", "WOW64", "WOW86"]
+
+    let exploitSys = Math.floor(Math.random() * 3); // Choose between Linux, Windows or Mac
+    let platform = "";
+
+    let chromeVersionUE = /Chrome\/([0-9.]+)/.exec(navigator.userAgent)[1].split('.', 4);
+    chromeVersionUE[3] = Math.floor(Math.random() * (parseInt(chromeVersionUE[3], 10) + 1))
+    chromeVersionUE[2] = Math.floor(Math.random() * (parseInt(chromeVersionUE[2], 10) + 1))
+
+    switch (exploitSys) {
+        case 0:
+            platform = platformLinux[0];
+            break;
+        case 1:
+            let windowsVer = Math.floor(Math.random() * platformWindowsP1.length);
+            platform = platformWindowsP1[windowsVer];
+            if (Math.floor(Math.random() * 2)) {
+                windowsVer = Math.floor(Math.random() * platformWindowsP2.length);
+                platform.concat("; ", platformWindowsP2[windowsVer]);
+            }
+            break;
+        case 2:
+            let macVer = Math.floor(Math.random() * platformMacP1.length);
+            platform = platformMacP1[macVer];
+            macVer = Math.floor(Math.random() * platformMacP2.length);
+            platform.concat("; ", platformMacP1[macVer]);
+    }
+
+    let fakeUserAgent = "Mozilla/5.0 (" + platform + ") AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0." + chromeVersionUE[2] + "." +chromeVersionUE[3] + " Safari/537.36";
+
+    chrome.declarativeNetRequest.updateSessionRules(
+      {
+          addRules: [{
+              "id": 1,
+              "priority": 1,
+              "action": {
+                  "type": "modifyHeaders",
+                  "requestHeaders": [
+                      { "header": "user-agent", "operation": "set", "value": fakeUserAgent }
+                  ]
+              },
+              "condition": { "urlFilter": "*", "resourceTypes": ["main_frame"] }
+          }
+          ],
+          removeRuleIds: [1]
+       },
+    ).then(r => {});
+}
+
 function setInfos() {
 
     //Query the active tab

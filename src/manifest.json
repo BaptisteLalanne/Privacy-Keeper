@@ -28,12 +28,5 @@
     "<all_urls>",
     "*://*.google.com/"
   ],
-  "options_page": "./options.html",
-  "declarative_net_request": {
-    "rule_resources": [{
-      "id": "1",
-      "enabled": true,
-      "path": "rules.json"
-    }]
-  }
+  "options_page": "./options.html"
 }

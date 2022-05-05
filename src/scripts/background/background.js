@@ -232,11 +232,12 @@ function randomizeUA() { // Chrome specific randomization
             platform = platformMacP1[macVer];
             macVer = Math.floor(Math.random() * platformMacP2.length);
             platform.concat("; ", platformMacP1[macVer]);
+            break;
     }
 
     let fakeUserAgent = "Mozilla/5.0 (" + platform + ") AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0." + chromeVersionUE[2] + "." +chromeVersionUE[3] + " Safari/537.36";
 
-    chrome.declarativeNetRequest.updateSessionRules(
+    chrome.declarativeNetRequest.updateDynamicRules(
       {
           addRules: [{
               "id": 1,

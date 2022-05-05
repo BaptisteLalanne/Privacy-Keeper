@@ -135,8 +135,14 @@ function Popup() {
 
         let rounding = 5;
         cookieScore = Math.ceil(cookieScore / rounding) * rounding;
+        if (isNaN(cookieScore))
+          cookieScore = "??"
         trackerScore = Math.round(trackerScore / rounding) * rounding;
+        if (isNaN(trackerScore))
+          cookieScore = "??"
         score = Math.ceil((cookieScore + trackerScore) / 2);
+        if (isNaN(score))
+          score = "??"
 
         // Save score states
         setScore(score);

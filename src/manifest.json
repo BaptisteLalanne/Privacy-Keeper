@@ -22,7 +22,7 @@
     "default_icon": "icon_128.png"
   },
   "permissions": [
-    "storage",  "activeTab", "scripting", "unlimitedStorage", "cookies", "tabs", "webNavigation", "webRequest"
+    "storage",  "activeTab", "scripting", "unlimitedStorage", "cookies", "tabs", "webNavigation", "webRequest", "declarativeNetRequest", "declarativeNetRequestFeedback"
   ],
   "host_permissions": [
     "<all_urls>",

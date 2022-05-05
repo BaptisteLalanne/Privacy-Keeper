@@ -114,10 +114,10 @@ function Popup() {
 
       // Check if it's in whitelist
       let domain = extractDomain(tabs[0].url);
-      chrome.storage.local.get("unused_cookies_wl", function (result) {
+      chrome.storage.local.get("whitelist", function (result) {
         let whitelist = [];
-        if (result && result.unused_cookies_wl) {
-          whitelist = result.unused_cookies_wl
+        if (result && result.whitelist) {
+          whitelist = result.whitelist
         }
         setIsInWhitelist(whitelist.includes(domain));
       });
@@ -170,15 +170,15 @@ function Popup() {
 
   const toggleWhitelist = (url) => {
     let domain = extractDomain(url);
-    chrome.storage.local.get("unused_cookies_wl", function (result) {
+    chrome.storage.local.get("whitelist", function (result) {
       let whitelist = [];
-      if (result && result.unused_cookies_wl) {
-        whitelist = result.unused_cookies_wl
+      if (result && result.whitelist) {
+        whitelist = result.whitelist
       }
       // Add to whitelist
       if (!isInWhitelist) {
         whitelist.push(domain);
-        chrome.storage.local.set({ "unused_cookies_wl": whitelist });
+        chrome.storage.local.set({ "whitelist": whitelist });
         setIsInWhitelist(true);
       }
       // Remove from whitelist
@@ -187,7 +187,7 @@ function Popup() {
         if (index > -1) {
           whitelist.splice(index, 1);
         }
-        chrome.storage.local.set({ "unused_cookies_wl": whitelist });
+        chrome.storage.local.set({ "whitelist": whitelist });
         setIsInWhitelist(false);
       }
     });
@@ -215,10 +215,9 @@ function Popup() {
     }
 
     if (fp_extern > 100) {
-      trackerScoreDescription += " using third parties";
+      trackerScoreDescription += " using third party services";
     }
     trackerScoreDescription += ".";
-    console.log(trackerScoreDescription);
     setTrackerScoreDescription(trackerScoreDescription);
 
     // General description
@@ -230,10 +229,10 @@ function Popup() {
     let trackerTier = (trackerScore >= 35) + (trackerScore >= 60);
     let generalDesc = "";
     if (cookieTier > 0 && trackerTier > 0) {
-      generalDesc = "This website uses cookies " + ((cookieTier > 1) ? "very" : "somewhat") + " intrusively, and has " + ((trackerTier > 1) ? "a lot of" : "a few") + " trackers.";
+      generalDesc = "This website uses cookies " + ((cookieTier > 1) ? "very" : "somewhat") + " intrusively, and " + ((trackerTier > 1) ? "probably" : "likely") + " has trackers.";
     }
     else if (trackerTier > 0) {
-      generalDesc = "This website might have " + ((trackerTier > 1) ? "a lot of" : "a few") + " trackers.";
+      generalDesc = "This website " + ((trackerTier > 1) ? "probably" : "likely") + " has trackers.";
     }
     else if (cookieTier > 0) {
       generalDesc = "This website uses cookies " + ((cookieTier > 1) ? "very" : "somewhat") + " intrusively."

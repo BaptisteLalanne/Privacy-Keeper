@@ -15,30 +15,48 @@ export default function WebsiteTable() {
 
   useEffect(() => {
 
-    const meilleursSites = [
-      { "nom": "meilleur-site-1.com", "score": 0 },
-      { "nom": "meilleur-site-2.com", "score": 2 },
-      { "nom": "meilleur-site-3.com", "score": 5 },
-      { "nom": "meilleur-site-4.com", "score": 6 },
-      { "nom": "meilleur-site-5.com", "score": 8 },
-    ]
-    const piresSites = [
-      { "nom": "pire-site-1.com", "score": 99 },
-      { "nom": "pire-site-2.com", "score": 95 },
-      { "nom": "pire-site-3.com", "score": 92 },
-      { "nom": "pire-site-4.com", "score": 87 },
-      { "nom": "pire-site-5.com", "score": 86 },
-    ]
-    let _data = [];
-    for (let i = 0; i < 5; i++) {
-      _data.push({
-        "neg-nom": piresSites[i].nom,
-        "neg-score": piresSites[i].score,
-        "pos-nom": meilleursSites[i].nom,
-        "pos-score": meilleursSites[i].score
+    chrome.storage.local.get("websiteScores", function (res) {
+      let websiteScores = {};
+      if (res && res.websiteScores) { websiteScores = res.websiteScores; }
+      console.log(websiteScores);
+
+      let sortable = [];
+      for (const [key, value] of Object.entries(websiteScores)) {
+        sortable.push({ "nom": key, "score": (value.cookie + value.tracker) / 2 });
+      }
+      sortable.sort(function (a, b) {
+        return a.score - b.score;
       });
-    }
-    setData(_data);
+
+      let meilleursSites = sortable;
+      let piresSites = sortable;
+      let n = sortable.length;
+      if (n >= 10) {
+        meilleursSites = sortable.slice(0, 5);
+        piresSites = sortable.slice(n - 5, n);
+      }
+      else if (n >= 5) {
+        meilleursSites = sortable.slice(0, n - 5);
+        piresSites = sortable.slice(n - 5, n);
+      }
+      else {
+        piresSites = sortable;
+        meilleursSites = [];
+      }
+      piresSites = piresSites.reverse();
+
+      let _data = [];
+      for (let i = 0; i < 5; i++) {
+        _data.push({
+          "neg-nom": ((i < piresSites.length) ? (piresSites[i].nom + " :") : ("...")),
+          "neg-score": ((i < piresSites.length) ? (Math.round(piresSites[i].score) + "%") : ("")),
+          "pos-nom": ((i < meilleursSites.length) ? (meilleursSites[i].nom + " :") : ("...")),
+          "pos-score": ((i < meilleursSites.length) ? (Math.round(meilleursSites[i].score) + "%") : (""))
+        });
+      }
+      setData(_data);
+
+    });
 
   }, []);
 
@@ -51,14 +69,14 @@ export default function WebsiteTable() {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell align="center" className="table-right-border-cell table-header-cell" style={{color: style.graphcol1}}>Riskiest websites</TableCell>
-              <TableCell align="center" className="table-header-cell" style={{color: style.graphcol2}}>Safest websites</TableCell>
+              <TableCell align="center" className="table-right-border-cell table-header-cell" style={{ color: style.graphcol1 }}>Riskiest websites</TableCell>
+              <TableCell align="center" className="table-header-cell" style={{ color: style.graphcol2 }}>Safest websites</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {data.map((row, index) => (
-              <TableRow key={row["pos-nom"]}>
-                <TableCell align="center" 
+              <TableRow key={index}>
+                <TableCell align="left"
                   className={
                     "table-right-border-cell " + ((index == 0) ? "table-top-padding-cell" : "")
                   }
@@ -66,11 +84,12 @@ export default function WebsiteTable() {
                     color: mixColors(style.graphcol1, "#000000", mapRange(index, 0, 5, 0.1, 0.9))
                   }}>
                   <div className="table-content-cell">
-                    <div>{row["neg-nom"] + " :"}</div>
-                    <div>{row["neg-score"] + "%"}</div>
+                    <div>{row["neg-nom"] == "..." ? <></> : <>&bull;</>}</div>
+                    <div>{row["neg-nom"]}</div>
+                    <div>{row["neg-score"]}</div>
                   </div>
                 </TableCell>
-                <TableCell align="center" 
+                <TableCell align="left"
                   className={
                     (index == 0) ? "table-top-padding-cell" : ""
                   }
@@ -78,8 +97,9 @@ export default function WebsiteTable() {
                     color: mixColors(style.graphcol2, "#000000", mapRange(index, 0, 5, 0.1, 0.9))
                   }}>
                   <div className="table-content-cell" >
-                    <div>{row["pos-nom"] + " :"}</div>
-                    <div>{row["pos-score"] + "%"}</div>
+                    <div>{row["pos-nom"] == "..." ? <></> : <>&bull;</>}</div>
+                    <div>{row["pos-nom"]}</div>
+                    <div>{row["pos-score"]}</div>
                   </div>
                 </TableCell>
               </TableRow>

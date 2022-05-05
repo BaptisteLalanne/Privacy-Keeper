@@ -1,5 +1,5 @@
 export function lerp(min, max, percentage) {
-    return min + (max-min)*percentage;
+    return min + (max - min) * percentage;
 }
 
 export function mapRange(x, min1, max1, min2, max2) {
@@ -25,6 +25,10 @@ export function mixColors(color1, color2, percent) {
     let cm = [];
     c1.forEach((c, i) => cm.push(parseInt(lerp(c1[i], c2[i], percent))));
     return rgbToHex(cm);
+}
+
+export function getCookieKey(cookie) {
+    return "domain" + cookie.domain + "name" + cookie.name;
 }
 
 export var cookieTypeLabels = ["Necessary", "Functional", "Analytics", "Advertising"];

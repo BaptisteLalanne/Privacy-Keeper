@@ -43,9 +43,12 @@ chrome.runtime.onInstalled.addListener(function (details) {
             "cookieTypes": {},
             "currentCookieTypes": labels,
             "fingerprintAnalyseResult": fingerPrintAnalyseResult,
-            "unused_cookies_wl": [],
+            "whitelist": [],
             "unusedCookieDeletedHistory": {},
-            "blockedCookies": {}
+            "blockedCookies": {},
+            "blockedCookiesHistory": {},
+            "scoreHistory": {},
+            "websiteScores": {}
         };
         chrome.storage.local.set(default_params, function () {
             if (chrome.runtime.error) {
@@ -67,9 +70,9 @@ chrome.windows.onCreated.addListener(function () {
 
             let whitelist
             //Getting whitelist
-            await chrome.storage.local.get("unused_cookies_wl", function (result) {
-                if (result && result.unused_cookies_wl) {
-                    whitelist = result.unused_cookies_wl
+            await chrome.storage.local.get("whitelist", function (result) {
+                if (result && result.whitelist) {
+                    whitelist = result.whitelist
                 }
             });
 
@@ -123,7 +126,7 @@ chrome.windows.onCreated.addListener(function () {
 
                                 //Add stats
                                 let type = cookieTypes[key];
-                                if (!type) type = 4;
+                                if (type == undefined) type = 4;
                                 nb_deleted_cookies[type] += 1;
 
                                 //Delete cookie
@@ -148,7 +151,7 @@ chrome.windows.onCreated.addListener(function () {
                 }).catch(err => console.log(err));
 
                 //We put the now upodated cookies' date in the storage
-                await chrome.storage.local.set({"updateDateCookies": value}).then(() => {
+                await chrome.storage.local.set({ "updateDateCookies": value }).then(() => {
                     if (chrome.runtime.error) {
                         console.log("Runtime error.");
                     }
@@ -194,8 +197,8 @@ chrome.tabs.onActivated.addListener(classifyCookiesTab);
 chrome.tabs.onUpdated.addListener(classifyCookiesTab);
 
 //To update the last time a cookie was used
-chrome.tabs.onActivated.addListener(setInfos); //Listen to new tabs / switching tabs / reloading tabs
-chrome.tabs.onUpdated.addListener(setInfos); //Listener to updated tabs (when the url is modifies for instance)
+chrome.tabs.onActivated.addListener(setInfos); //Listen to switching tabs / reloading tabs
+chrome.tabs.onUpdated.addListener(setInfos); //Listen to updated tabs (when the url is modifies for instance)
 
 function setInfos() {
 
@@ -231,7 +234,7 @@ function setInfos() {
                     });
 
                     //Putting the new date into the sync storage
-                    chrome.storage.local.set({"updateDateCookies": value}, function () {
+                    chrome.storage.local.set({ "updateDateCookies": value }, function () {
                         if (chrome.runtime.error) {
                             console.log("Runtime error.");
                         }
@@ -250,9 +253,6 @@ const injectScripts = (idTab, script) => {
 }
 
 chrome.tabs.onActivated.addListener(function (tab, changeInfo) {
-
-    console.log("[BACKGROUND] Tab activated");
-    //Query the active tab
     let queryOptions = { active: true, currentWindow: true };
     chrome.tabs.query(queryOptions, function (tabs) {
         if (tabs.length > 0 && tabs[0].url !== "") {
@@ -267,9 +267,7 @@ chrome.tabs.onActivated.addListener(function (tab, changeInfo) {
         }
     });
 });
-
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-    console.log("[BACKGROUND] Tab updated");
     if (changeInfo.status === 'complete' && tab.url) {
 
         // Exit if this is a chrome tab
@@ -284,31 +282,29 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 
 // Background listener
 chrome.runtime.onConnect.addListener(function (port) {
-    console.log("[BACKGROUND] Port name: " + port.name);
     port.onMessage.addListener(function (msg) {
         switch (port.name) {
             case "beacons":
-                console.log("[BACKGROUND] received nb beacons: " + msg.nb)
-                // save nb beacons
-                chrome.storage.local.set({beacons: msg.nb});
+                chrome.storage.local.set({ beacons: msg.nb });
                 break;
         }
     });
 });
 
 // Listen to when the options page asks us to do a full classification
-chrome.runtime.onConnect.addListener(function(port) {
-    port.onMessage.addListener(function(msg) {
-        switch (port.name) {
-            case "requests":
-                if (msg.do === "classification") {
-                    chrome.cookies.getAll({}, function (cookies) {
-                        updateCookieClassification(cookies);
-                    });
-                    port.postMessage({status: "done"});
-                }
-                break;
+chrome.tabs.onActivated.addListener(relaunchClassificationInOptions);
+chrome.tabs.onUpdated.addListener(relaunchClassificationInOptions);
+
+function relaunchClassificationInOptions() {
+    let queryOptions = { active: true, currentWindow: true };
+    chrome.tabs.query(queryOptions, function (tabs) {
+        if (tabs.length > 0 && tabs[0].url !== "") {
+            let url = tabs[0].url;
+            if (url.includes("chrome-extension://") && url.includes("options.html?page=")) {
+                chrome.cookies.getAll({}, function (cookies) {
+                    updateCookieClassification(cookies);
+                });
+            }
         }
     });
-    
-});
+}

@@ -65,6 +65,7 @@ Open the settings menu, then go the "Extensions" section. On the top right of th
 
 ```
 Copyright (C) 2022  Privacy Keeper
+https://github.com/BaptisteLalanne/Privacy-Keeper
 This is free software, and you are welcome to redistribute it
 under certain conditions
 ```

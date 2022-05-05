@@ -9,7 +9,7 @@
     "start": "node utils/webserver.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "PrivacyKeeper",
   "license": "GPL",
   "dependencies": {
     "@babel/runtime": "^7.17.9",

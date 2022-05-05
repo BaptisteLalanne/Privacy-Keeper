@@ -24,6 +24,7 @@ export default function fingerprinterScript() {
 
     const clamp = (min, num, max) => Math.min(Math.max(num, min), max);
 
+    // Copyright (c) 2020 The University of Iowa - Internet Research Lab
     function findKeywordsOccurences(text_script) {
         const infinity_keywords = {
             "onpointerleave": "-1",

@@ -59,14 +59,12 @@ Open the settings menu, then go the "Extensions" section. On the top right of th
 
 - [Cookie Block](https://github.com/dibollinger/CookieBlock)
 
-- [Privacy Badger](https://github.com/EFForg/privacybadger)
-
 - [FP-Inspector](https://github.com/uiowa-irl/FP-Inspector)
 
 ## Contributors
 
 ```
-Privacy Keeper Copyright (C) 2022  Bastien BARBE, Arthur DURAND, Laetitia DODO, Baptiste LALANNE, Loann LARGERON, Amine LBATH, Tom PERRILLAT-COLLOMB, David-Marcus TOMA
+Copyright (C) 2022  Privacy Keeper
 This is free software, and you are welcome to redistribute it
 under certain conditions
 ```

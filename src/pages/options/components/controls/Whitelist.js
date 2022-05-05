@@ -18,10 +18,10 @@ export default function CookieTable() {
     useEffect(() => {
 
         // Fetch whitelist
-        chrome.storage.local.get("unused_cookies_wl", function (result) {
+        chrome.storage.local.get("whitelist", function (result) {
             let whitelist = [];
-            if (result && result.unused_cookies_wl) {
-                whitelist = result.unused_cookies_wl;
+            if (result && result.whitelist) {
+                whitelist = result.whitelist;
             }
             setRows(whitelist);
         });
@@ -32,11 +32,8 @@ export default function CookieTable() {
         let copy = [...rows];
         copy.splice(index, 1);
         setRows(copy);
-
-        // Remove from storage
-        chrome.storage.local.set({ "unused_cookies_wl": copy });
+        chrome.storage.local.set({ "whitelist": copy });
     }, [setRows]);
-
 
     return (
         <div className="whitelist-wrapper">
@@ -44,30 +41,30 @@ export default function CookieTable() {
                 PrivacyKeeper won't automatically block or delete any cookies coming from these whitelisted websites. If you wish to add a website to this list, please visit it and mark it as safe from the popup menu.
             </div>
             <div className="whitelist-table">
-            <Box sx={{ width: '100%' }}>
-                <Paper sx={{ width: '100%', mb: 2 }}>
-                    <TableContainer>
-                        <Table size="small">
-                            <TableBody>
-                                {rows.map((row, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell>
-                                            <div className="whitelist-row">
-                                                {row}
-                                                <Tooltip title={"Remove from whitelist"} placement="right">
-                                                    <IconButton className="whitelist-delete-icon" onClick={() => deleteCookies(index)}> <CloseIcon /> </IconButton>
-                                                </Tooltip>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
+                <Box sx={{ width: '100%' }}>
+                    <Paper sx={{ width: '100%', mb: 2 }}>
+                        <TableContainer>
+                            <Table size="small">
+                                <TableBody>
+                                    {rows.map((row, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell>
+                                                <div className="whitelist-row">
+                                                    {row}
+                                                    <Tooltip title={"Remove from whitelist"} placement="right">
+                                                        <IconButton className="whitelist-delete-icon" onClick={() => deleteCookies(index)}> <CloseIcon /> </IconButton>
+                                                    </Tooltip>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
                                     )
-                                )}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </Paper>
-            </Box>
-        </div>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Paper>
+                </Box>
+            </div>
         </div>
     );
 

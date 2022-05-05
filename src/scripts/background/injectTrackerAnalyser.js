@@ -16,6 +16,12 @@ export default function fingerprinterScript() {
         return score;
     }
 
+    const cleanDomainName = (domain) => {
+        if (domain[0] == '.') domain = domain.substr(1);
+        if (domain.substr(0, 4) == "www.") domain = domain.substr(4);
+        return domain;
+    }
+
     const clamp = (min, num, max) => Math.min(Math.max(num, min), max);
 
     function findKeywordsOccurences(text_script) {
@@ -419,8 +425,47 @@ export default function fingerprinterScript() {
     });
 
     computeScoreScript.then((fingerprintAnalyseResult) => {
-        chrome.storage.local.set({ "fingerprintAnalyseResult": fingerprintAnalyseResult }, function () {
+
+        // Set current fingerprint score
+        chrome.storage.local.set({ "fingerprintAnalyseResult": fingerprintAnalyseResult });
+
+        // Alter score history
+        chrome.storage.local.get("scoreHistory", function (res) {
+            let scoreHistory = {};
+            if (res && res.scoreHistory) { scoreHistory = res.scoreHistory; }
+            let currTimestamp = new Date();
+            let currDate = currTimestamp.getDate() + "/" + currTimestamp.getMonth() + "/" + currTimestamp.getFullYear();
+            if (scoreHistory[currDate] == undefined) {
+                scoreHistory[currDate] = {
+                    "trackerSum": fingerprintAnalyseResult.final_score,
+                    "cookieSum": 0,
+                    "total": 1
+                }
+            }
+            else {
+                scoreHistory[currDate].trackerSum += fingerprintAnalyseResult.final_score;
+                scoreHistory[currDate].total += 1;
+            }
+            chrome.storage.local.set({ "scoreHistory": scoreHistory });
         });
+
+        // Update stored scores
+        chrome.storage.local.get("websiteScores", function (res) {
+            let websiteScores = {};
+            if (res && res.websiteScores) { websiteScores = res.websiteScores; }
+            let domain = cleanDomainName(window.location.hostname);
+            if (websiteScores[domain] == undefined) {
+                websiteScores[domain] = {
+                    "tracker": fingerprintAnalyseResult.final_score,
+                    "cookie": 0,
+                }
+            }
+            else {
+                websiteScores[domain].tracker = fingerprintAnalyseResult.final_score;
+            }
+            chrome.storage.local.set({ "websiteScores": websiteScores });
+        });
+
     }).catch((error) => {
         throw (error)
     });

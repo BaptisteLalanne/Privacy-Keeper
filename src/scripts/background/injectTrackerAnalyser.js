@@ -400,9 +400,10 @@ export default function fingerprinterScript() {
                 if (fp_total < 0 || max_extern < 0) {
                     final_score = 1;
                 } else {
-                    const minVal = 30;
-                    const maxVal = 300;
-                    final_score = (clamp(minVal, 0.7 * fp_total + 0.3 * max_extern, maxVal) - minVal) / maxVal;
+                    const minVal = 10;
+                    const maxVal = 200;
+                    const x = (clamp(minVal, 0.4 * fp_total + 0.3 * max_extern, maxVal) - minVal) / (maxVal - minVal);
+                    final_score = 1 / (1 + Math.exp((-15 * x + 401 / 100) * 1.03 - 0.015))
                 }
             }
 
@@ -412,6 +413,7 @@ export default function fingerprinterScript() {
                 "fp_extern": max_extern,
                 "final_score": final_score
             }
+            console.log("fp_total = " + fp_total, ", max_extern = " + max_extern + ", final_score" + final_score)
             res(fingerprintAnalyseResult);
         }).catch((error) => {
             reject(error)

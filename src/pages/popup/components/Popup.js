@@ -135,7 +135,7 @@ function Popup() {
 
         let rounding = 5;
         cookieScore = Math.ceil(cookieScore / rounding) * rounding;
-        trackerScore = Math.ceil(trackerScore / rounding) * rounding;
+        trackerScore = Math.round(trackerScore / rounding) * rounding;
         score = Math.ceil((cookieScore + trackerScore) / 2);
 
         // Save score states

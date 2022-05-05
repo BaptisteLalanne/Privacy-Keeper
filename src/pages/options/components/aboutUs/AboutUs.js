@@ -20,7 +20,7 @@ export default function AboutUs() {
                 </p>
                 <br />
                 <p>
-                    Entirely free and open source, you can learn more <a href="/learn-more">here</a>.
+                    Entirely free and open source, you can learn more <a href="options.html?page=learn-more">here</a>.
                 </p>
                 <br />
                 <br />

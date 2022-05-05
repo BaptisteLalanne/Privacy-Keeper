@@ -26,7 +26,7 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import {cookieTypeLabels} from '../../../../scripts/miscellaneous/common.js'
+import { cookieTypeLabels } from '../../../../scripts/miscellaneous/common.js'
 import "./controls.scss";
 
 function descendingComparator(a, b, orderBy) {
@@ -80,16 +80,12 @@ export default function CookieTable() {
                 let lastUsed = lastCookieUpdateDates[key];
                 if (!lastUsed) lastUsed = Date.now().toString();
 
-                // Compute type (WIP: might be stored in local storage and passed as param)
-                let type = "Third-party";
-                if (cookieTypes[key]) {
+                // Retreive cookie type
+                let type = "Unknown";
+                if (cookieTypes[key] != undefined) {
                     type = cookieTypeLabels[cookieTypes[key]];
                 }
-                else {
-                    //let clabel = await classifyCookie(createFEInput(cookie));
-                    //type = cookieTypeLabels[clabel];
-                }
-                
+
                 // Compute cookie storage size (WIP: idk how to do it yet)
                 let size = getCookieSize(cookie);
 
@@ -143,7 +139,7 @@ export default function CookieTable() {
                 chrome.cookies.remove({ "url": url, "name": cookie.name });
 
                 // Store number of deleted cookies by type
-                if (deleted[selection.type] == null) {
+                if (deleted[selection.type] == undefined) {
                     deleted[selection.type] = selection.cookies;
                 }
                 else {
@@ -174,7 +170,7 @@ export default function CookieTable() {
         });
 
         // Store deleted cookies
-        chrome.storage.sync.get(["manuallyDeletedCookies"], res => {
+        chrome.storage.local.get(["manuallyDeletedCookies"], res => {
             let data = {};
             if (res && res.manuallyDeletedCookies) {
                 data = res.manuallyDeletedCookies;
@@ -188,10 +184,11 @@ export default function CookieTable() {
     useEffect(() => {
 
         // Fetch last used date map, construct data using it
-        chrome.storage.sync.get(["updateDateCookies"], function (res1) {
+        chrome.storage.local.get(["updateDateCookies"], function (res1) {
             let lastCookieUpdateDates = res1.updateDateCookies;
-            chrome.storage.sync.get(["cookieTypes"], function (res2) {
-                let cookieTypes = res2.cookieTypes;               
+            chrome.storage.local.get(["cookieTypes"], function (res2) {
+                let cookieTypes = res2.cookieTypes;
+                console.log(cookieTypes)
                 constructData(lastCookieUpdateDates, cookieTypes);
             });
         });
@@ -275,7 +272,6 @@ export default function CookieTable() {
     }
 
     const filterRows = (domainSearch, typeFilter, daysFilter) => {
-        console.log(domainSearch + "; " + typeFilter + "; " + daysFilter)
         let searchDomain = domainSearch.length > 0;
         let filterType = typeFilter.length > 0 && typeFilter != "Any";
         let filterDays = daysFilter > 0;

@@ -8,8 +8,10 @@ import InsightsIcon from '@mui/icons-material/Insights';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import IconButton from '@mui/material/IconButton';
+import ClearIcon from '@mui/icons-material/Clear';
 import Tooltip from '@mui/material/Tooltip';
-import {cookieTypeLabels} from '../../../scripts/miscellaneous/common.js'
+import Typography from '@mui/material/Typography';
+import { cookieTypeLabels } from '../../../scripts/miscellaneous/common.js'
 import './popup.scss';
 
 // Opening dashboard on button clicks
@@ -50,7 +52,7 @@ function updateCSS(node, score, cookieScore, trackerScore) {
 
   // Vars
   let posColor = "#7DDE6D";
-  let negColor = "#fd6500"; 
+  let negColor = "#fd6500";
   let doc = node.ownerDocument;
 
   // Update cookie score color
@@ -75,22 +77,23 @@ function updateCSS(node, score, cookieScore, trackerScore) {
 function Popup() {
 
   let wrapperRef = React.useRef(null);
-  
+
   const [url, setUrl] = useState('');
   const [isChromeTab, setIsChromeTab] = useState(false);
   const [isInWhitelist, setIsInWhitelist] = useState(false);
   let [score, setScore] = useState(100);
-  let [cookieScore, setCookieScore] = useState(100);
-  let [trackerScore, setTrackerScore] = useState(100);
+  let [cookieScore, setCookieScore] = useState(0);
+  let [trackerScore, setTrackerScore] = useState(0);
   let [cookieDetails, setCookieDetails] = useState([0, 0, 0, 0]);
   let [trackerScoreDescription, setTrackerScoreDescription] = useState("This is how much we suspect this website tracks you.");
   let [generalScoreDescription, setGeneralScoreDescription] = useState("This website has some hardware trackers.");
+  let [blocksCookies, setBlocksCookies] = useState(false);
 
   const detailedCookiesIcons = [
-    <ElectricBoltIcon/>,
-    <BuildIcon/>,
-    <InsightsIcon/>,
-    <CampaignIcon/>
+    <ElectricBoltIcon />,
+    <BuildIcon />,
+    <InsightsIcon />,
+    <CampaignIcon />
   ];
 
   const detailedCookiesExplanations = [
@@ -111,36 +114,38 @@ function Popup() {
 
       // Check if it's in whitelist
       let domain = extractDomain(tabs[0].url);
-      chrome.storage.local.get("unused_cookies_wl", function (result) {
+      chrome.storage.local.get("whitelist", function (result) {
         let whitelist = [];
-        if (result && result.unused_cookies_wl) {
-            whitelist = result.unused_cookies_wl
+        if (result && result.whitelist) {
+          whitelist = result.whitelist
         }
         setIsInWhitelist(whitelist.includes(domain));
       });
-    
+
     });
 
     // Fetch scores from storage
-    chrome.storage.sync.get(['cookieScore'], function(cookieScoreRes) {
+    chrome.storage.local.get(['cookieScore'], function (cookieScoreRes) {
       let cookieScore = cookieScoreRes.cookieScore;
 
-      chrome.storage.sync.get(['fingerprintScore'], function(fingerprintScoreRes) {
-        let trackerScore = fingerprintScoreRes.fingerprintScore;
+      chrome.storage.local.get(['fingerprintAnalyseResult'], function (fingerprintScoreRes) {
+        let trackerScore = fingerprintScoreRes.fingerprintAnalyseResult.final_score;
+        const fp_extern = fingerprintScoreRes.fingerprintAnalyseResult.fp_extern;
+        const fp_page = fingerprintScoreRes.fingerprintAnalyseResult.fp_page;
 
         let rounding = 5;
-        cookieScore = Math.ceil(cookieScore/rounding)*rounding; 
-        trackerScore = Math.ceil(trackerScore/rounding)*rounding; 
-        score = Math.max(cookieScore, trackerScore);
-        
+        cookieScore = Math.ceil(cookieScore / rounding) * rounding;
+        trackerScore = Math.round(trackerScore / rounding) * rounding;
+        score = Math.ceil((cookieScore + trackerScore) / 2);
+
         // Save score states
         setScore(score);
         setCookieScore(cookieScore);
         setTrackerScore(trackerScore);
 
         // Generate and set the description sentences
-        generateDescriptionSentences(cookieScore, trackerScore, score);
-        
+        generateDescriptionSentences(cookieScore, trackerScore, fp_extern, fp_page, score);
+
         // Update CSS
         updateCSS(wrapperRef.current, score, cookieScore, trackerScore);
 
@@ -148,55 +153,72 @@ function Popup() {
     });
 
     // Fetch cookie classificatins from storage
-    chrome.storage.sync.get(['currentCookieTypes'], function(result) {
+    chrome.storage.local.get(['currentCookieTypes'], function (result) {
       let labels = result.currentCookieTypes;
       console.log(labels);
       setCookieDetails(labels);
     });
-      
+
+    // Fetch options from storage
+    chrome.storage.local.get("toggle_options", async function (result) {
+      if (result && result.toggle_options) {
+        setBlocksCookies(result.toggle_options.blockCookies);
+      }
+    });
+
   }, []);
 
   const toggleWhitelist = (url) => {
     let domain = extractDomain(url);
-    chrome.storage.local.get("unused_cookies_wl", function (result) {
+    chrome.storage.local.get("whitelist", function (result) {
       let whitelist = [];
-      if (result && result.unused_cookies_wl) {
-          whitelist = result.unused_cookies_wl
+      if (result && result.whitelist) {
+        whitelist = result.whitelist
       }
       // Add to whitelist
       if (!isInWhitelist) {
         whitelist.push(domain);
-        chrome.storage.local.set({"unused_cookies_wl": whitelist});
+        chrome.storage.local.set({ "whitelist": whitelist });
         setIsInWhitelist(true);
       }
       // Remove from whitelist
       else {
         const index = whitelist.indexOf(domain);
         if (index > -1) {
-            whitelist.splice(index, 1);
+          whitelist.splice(index, 1);
         }
-        chrome.storage.local.set({"unused_cookies_wl": whitelist});
+        chrome.storage.local.set({ "whitelist": whitelist });
         setIsInWhitelist(false);
       }
     });
   }
 
   // Generate and set the description sentences
-  const generateDescriptionSentences = (cookieScore, trackerScore, score) => {
-    
+  const generateDescriptionSentences = (cookieScore, trackerScore, fp_extern, fp_page, score) => {
+
+    let trackerScoreDescription = "";
     // Tracker score description
-    if (trackerScore == 0) {
-      setTrackerScoreDescription("This website doesn't seem to track your fingerprints.");
+    if (trackerScore < 25) {
+      trackerScoreDescription = "This website doesn't seem to track your fingerprints";
     }
-    else if (trackerScore < 10) {
-      setTrackerScoreDescription("This website lightly tracks some of your fingerprints.");
+    else if (trackerScore < 45) {
+      trackerScoreDescription = "This website most likely does not track your fingerprints";
     }
-    else if (trackerScore < 66) {
-      setTrackerScoreDescription("This website goes out of its way to track several of your fingerprints.")
+    else if (trackerScore < 70) {
+      trackerScoreDescription = "This website is likely tracking your fingerprints";
+    }
+    else if (trackerScore < 90) {
+      trackerScoreDescription = "This website is very likely tracking your fingerprints";
     }
     else {
-      setTrackerScoreDescription("This website actively seeks to track as many of your fingerprints as possible.");
+      trackerScoreDescription = "This website is certainly tracking your fingerprints";
     }
+
+    if (fp_extern > 100) {
+      trackerScoreDescription += " using third party services";
+    }
+    trackerScoreDescription += ".";
+    setTrackerScoreDescription(trackerScoreDescription);
 
     // General description
     // If nothing, "This website seems harmless"
@@ -205,13 +227,12 @@ function Popup() {
     // If one of the scores is high or if both scores are medium, "Be careful!"
     let cookieTier = (cookieScore >= 45) + (cookieScore >= 70);
     let trackerTier = (trackerScore >= 35) + (trackerScore >= 60);
-    console.log(cookieTier + "; " + trackerTier);
     let generalDesc = "";
     if (cookieTier > 0 && trackerTier > 0) {
-      generalDesc = "This website uses cookies " + ((cookieTier > 1) ? "very" : "somewhat") + " intrusively, and has " + ((trackerTier > 1) ? "a lot of" : "a few") + " trackers.";
+      generalDesc = "This website uses cookies " + ((cookieTier > 1) ? "very" : "somewhat") + " intrusively, and " + ((trackerTier > 1) ? "probably" : "likely") + " has trackers.";
     }
     else if (trackerTier > 0) {
-      generalDesc = "This website has " + ((trackerTier > 1) ? "a lot of" : "a few") + " trackers.";
+      generalDesc = "This website " + ((trackerTier > 1) ? "probably" : "likely") + " has trackers.";
     }
     else if (cookieTier > 0) {
       generalDesc = "This website uses cookies " + ((cookieTier > 1) ? "very" : "somewhat") + " intrusively."
@@ -239,17 +260,17 @@ function Popup() {
         {/* Top banner */}
         <div className="top-component">
           <div className="top-item" onClick={() => toggleWhitelist(url)}>
-            <Tooltip title={isInWhitelist ? "This website was marked as safe" : "Mark this website as safe"}>
+            <Tooltip title={isInWhitelist ? <Typography fontSize={16}>This website was marked as safe</Typography> : <Typography fontSize={16}>Mark this website as safe</Typography>}>
               {isInWhitelist ? <i className="bi bi-check-circle-fill"></i> : <i className="bi bi-check-circle"></i>}
             </Tooltip>
           </div>
           <div className="top-item" onClick={clickAbout}>
-            <Tooltip title={"Learn more"}>
+            <Tooltip title={<Typography fontSize={16}>Learn more</Typography>}>
               <i className="bi bi-info-circle"></i>
             </Tooltip>
           </div>
           <div className="top-item" onClick={clickIndex}>
-            <Tooltip title={"Dashboard & settings"}>
+            <Tooltip style={{ fontSize: "16px" }} title={<Typography fontSize={16}>Dashboard and settings</Typography>}>
               <i className="bi bi-gear"></i>
             </Tooltip>
           </div>
@@ -266,7 +287,7 @@ function Popup() {
           <div className="horizontal-line"></div>
 
           {/* General score */}
-          <div className="body-item card general-score-container" style={{display: isChromeTab ? 'none' : 'flex'}}>
+          <div className="body-item card general-score-container" style={{ display: isChromeTab ? 'none' : 'flex' }}>
 
             {/* General score graphic (left side) */}
             <div className="general-score-left">
@@ -300,7 +321,7 @@ function Popup() {
           </div>
 
           {/* Detailed scores */}
-          <div className="body-item card detailed-scores" style={{display: isChromeTab ? 'none' : 'flex'}}>
+          <div className="body-item card detailed-scores" style={{ display: isChromeTab ? 'none' : 'flex' }}>
 
             {/* Cookie score */}
             <MuiAccordion disableGutters elevation={0} expanded={expanded === 'cookieScoreAccordion'} onChange={handleChange('cookieScoreAccordion')}>
@@ -324,28 +345,28 @@ function Popup() {
               <MuiAccordionDetails className="detailed-score-contents">
                 {[...Array(4)].map((x, i) =>
                   <div className="detailed-score-item" key={i}>
-                    <div className="detailed-cookies-score-item" style={{opacity: cookieDetails[i] > 0 ? 1 : 0.8}}>
-                      <div className="detailed-cookies-score-item-icon"> 
-                        {detailedCookiesIcons[i]} 
+                    <div className="detailed-cookies-score-item" style={{ opacity: ((blocksCookies && !isInWhitelist && i > 1) || cookieDetails[i] == 0) ? 0.7 : 1 }}>
+                      <div className="detailed-cookies-score-item-icon">
+                        {detailedCookiesIcons[i]}
                       </div>
-                      <div className="detailed-cookies-score-item-text"> 
-                        {cookieDetails[i] > 0 ? <div style={{fontWeight:"bold"}}>{cookieDetails[i]}</div> : <></>}
-                        <div>{(cookieDetails[i] == 0 ? "No " : "") + cookieTypeLabels[i].toLowerCase() + " cookie" + (cookieDetails[i] == 1 ? "" : "s")}</div> 
+                      <div className="detailed-cookies-score-item-text">
+                        {cookieDetails[i] > 0 ? <div style={{ fontWeight: "bold" }}>{cookieDetails[i]}</div> : <></>}
+                        <div>{((blocksCookies && !isInWhitelist && i > 1 && cookieDetails[i] > 0) ? "blocked " : (cookieDetails[i] == 0 ? "No " : "")) + cookieTypeLabels[i].toLowerCase() + " cookie" + (cookieDetails[i] == 1 ? "" : "s")}</div>
                       </div>
                     </div>
                     <div>
-                    <Tooltip title={detailedCookiesExplanations[i]}>
-                      <IconButton className="detailed-cookies-score-item-help-icon" size="small" onClick={clickAbout}> <HelpOutlineIcon/> </IconButton>
-                    </Tooltip>
+                      <Tooltip title={<Typography fontSize={16}>{detailedCookiesExplanations[i]}</Typography>}>
+                        <IconButton className="detailed-cookies-score-item-help-icon" size="small" onClick={clickAbout}> <HelpOutlineIcon /> </IconButton>
+                      </Tooltip>
                     </div>
                   </div>
-                )}  
+                )}
               </MuiAccordionDetails>
 
             </MuiAccordion>
 
             {/* Tracker score */}
-            <MuiAccordion disableGutters elevation={0} expanded={expanded === 'trackerScoreAccordion'} onChange={handleChange('trackerScoreAccordion')}>
+            < MuiAccordion disableGutters elevation={0} expanded={expanded === 'trackerScoreAccordion'} onChange={handleChange('trackerScoreAccordion')}>
 
               {/* Header */}
               <MuiAccordionSummary expandIcon={<i className="bi bi-chevron-down"></i>} aria-controls="trackerScoreAccordion-content" id="trackerScoreAccordion-header">
@@ -365,10 +386,10 @@ function Popup() {
               {/* Content */}
               <MuiAccordionDetails>
                 <span>
-                    {trackerScoreDescription}
-                    <Tooltip title={"Fingerprints are little bits of information you leave online (such as your computer specs or your browser configuration). Thanks to these, websites can easily identify you as a unique individual."}>
-                      <IconButton className="detailed-tracker-score-item-help-icon" size="small" onClick={clickAbout}> <HelpOutlineIcon/> </IconButton>
-                    </Tooltip>
+                  {trackerScoreDescription}
+                  <Tooltip style={{ fontSize: "16px" }} title={<Typography fontSize={16}>Fingerprints are little bits of information you leave online (such as your computer specs or your browser configuration). Thanks to these, websites can easily identify you as a unique individual.</Typography>}>
+                    <IconButton className="detailed-tracker-score-item-help-icon" size="small" onClick={clickAbout}> <HelpOutlineIcon /> </IconButton>
+                  </Tooltip>
                 </span>
               </MuiAccordionDetails>
 

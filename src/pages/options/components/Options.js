@@ -18,17 +18,17 @@ function urlify(label) {
 
 export default function Options() {
 
+    let [currentComponent, setCurrentComponent] = useState(0);
+    let [cookieTypes, setCookieTypes] = useState({});
+
+    const itemRefs = [React.useRef(null), React.useRef(null), React.useRef(null), React.useRef(null)];
     const itemList = [
-        {"name": "Dashboard",       "icon": <SpeedIcon/>,       "component": <Dashboard/>},
-        {"name": "Learn more",      "icon": <MenuBookIcon/>,    "component": <LearnMore/>}, 
-        {"name": "Controls",        "icon": <BuildIcon/>,       "component": <Controls/>}, 
-        {"name": "About us",        "icon": <InfoIcon/>,        "component": <AboutUs/>}
+        { "name": "Dashboard", "icon": <SpeedIcon />, "component": <Dashboard /> },
+        { "name": "Learn more", "icon": <MenuBookIcon />, "component": <LearnMore /> },
+        { "name": "Controls", "icon": <BuildIcon />, "component": <Controls /> },
+        { "name": "About us", "icon": <InfoIcon />, "component": <AboutUs /> }
     ];
 
-    const itemRefs = [React.useRef(null), React.useRef(null), React.useRef(null), React.useRef(null), React.useRef(null)];
-
-    let [currentComponent, setCurrentComponent] = useState(0);
-    
     useEffect(() => {
 
         // Redirect to appropriate page based on window param
@@ -51,7 +51,7 @@ export default function Options() {
         setCurrentComponent(index);
 
         // Update window param
-        window.history.replaceState(null, null, "?page="+urlify(itemList[index].name));
+        window.history.replaceState(null, null, "?page=" + urlify(itemList[index].name));
 
         // Update item CSS
         for (let i = 0; i < itemList.length; i++) {
@@ -81,14 +81,14 @@ export default function Options() {
 
                     {/* Navigation items */}
                     <List>
-                    {
-                        itemList.map((item, index) => (
-                            <ListItem button key={item.name} onClick={() => { clickItem(index); }} ref={itemRefs[index]} className="nav-item">
-                                <div className="nav-icon">{item.icon}</div>
-                                {item.name}
-                            </ListItem>
-                        ))
-                    }
+                        {
+                            itemList.map((item, index) => (
+                                <ListItem button key={item.name} onClick={() => { clickItem(index); }} ref={itemRefs[index]} className="nav-item">
+                                    <div className="nav-icon">{item.icon}</div>
+                                    {item.name}
+                                </ListItem>
+                            ))
+                        }
                     </List>
 
                 </div>
@@ -98,14 +98,14 @@ export default function Options() {
             <div className="content-wrapper">
 
 
-                 {/* Page header */}
+                {/* Page header */}
                 <div className="content-header">
                     <div className="content-header-title">
                         {itemList[currentComponent].name}
                     </div>
                 </div>
-                
-                 {/* Page body */}
+
+                {/* Page body */}
                 <div className="content-body">
                     <div>{itemList[currentComponent].component}</div>
                 </div>

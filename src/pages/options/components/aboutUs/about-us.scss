@@ -9,4 +9,19 @@
 
 .au-wrapper {
     max-width: 680px;
+    height: 85vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+a{
+    font-weight: bold;
+    transition: color 0.3s;
+    &:hover{
+        color: $logo-col0;
+    }
+}
+
+.acknowledgement {
+    margin-top: 150px;
 }

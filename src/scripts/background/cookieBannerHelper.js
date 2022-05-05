@@ -3,8 +3,8 @@ export default function cookieBannerHelper() {
 	good_matches = []
 	bad_matches = []
 
-	good_sentences = ["CONTINUER SANS ACCEPTER", "TOUT REFUSER", "REJETER", "REFUSER", "REFUSER LES COOKIES", "JE REFUSE"]
-	bad_sentences = ["ACCEPTER ET CONTINUER", "TOUT ACCEPTER", "ACCEPTER LES COOKIES", "ACCEPTER","J'ACCEPTE","TOUT AUTORISER"]
+	good_sentences = ["CONTINUER SANS ACCEPTER", "TOUT REFUSER", "REJETER", "REFUSER", "REFUSER LES COOKIES", "JE REFUSE", "UNIQUEMENT AUTORISER LES COOKIES ESSENTIELS"]
+	bad_sentences = ["ACCEPTER ET CONTINUER", "TOUT ACCEPTER", "ACCEPTER LES COOKIES", "ACCEPTER","J'ACCEPTE","TOUT AUTORISER", "AUTORISER LES COOKIES ESSENTIELS ET OPTIONNELS"]
 
 	max_length = 0
 
@@ -26,7 +26,7 @@ export default function cookieBannerHelper() {
 
 		if (elem && elem.innerText){
 			good_sentences.forEach((sentence) => {
-				if(elem.innerText.toUpperCase().includes(sentence) && elem.innerText.length < max_length * 1.5){
+				if(elem.innerText.toUpperCase().includes(sentence) && elem.innerText.length < max_length){
 					let found = false;
 					for(let i=0 ; i<elem.childNodes.length ; i++){
 						let childNode = elem.childNodes[i]
@@ -49,7 +49,7 @@ export default function cookieBannerHelper() {
 				}
 			})
 			bad_sentences.forEach((sentence) => {
-				if(elem.innerText.toUpperCase().includes(sentence) && elem.innerText.length < max_length * 1.5){
+				if(elem.innerText.toUpperCase().includes(sentence) && elem.innerText.length < max_length){
 					let found = false;
 					for(let i=0 ; i<elem.childNodes.length ; i++){
 						let childNode = elem.childNodes[i]

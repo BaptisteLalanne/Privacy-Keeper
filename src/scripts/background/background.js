@@ -9,6 +9,7 @@ importScripts('./modules/classifier.js');
 
 // Other imports
 import fingerprinterScript from "./injectTrackerAnalyser.js"
+import cookieBannerHelper from "./cookieBannerHelper.js"
 
 // When the app is first installed, write default settings
 chrome.runtime.onInstalled.addListener(function (details) {
@@ -278,6 +279,9 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 
         // Otherwise inject analysis scripts
         injectScripts(tabId, fingerprinterScript);
+
+        // Also inject cookie banner helper
+        injectScripts(tabId, cookieBannerHelper);
 
     }
 });

@@ -43,9 +43,10 @@ chrome.runtime.onInstalled.addListener(function (details) {
             "cookieTypes": {},
             "currentCookieTypes": labels,
             "fingerprintAnalyseResult": fingerPrintAnalyseResult,
-            "unused_cookies_wl": [],
+            "whitelist": [],
             "unusedCookieDeletedHistory": {},
             "blockedCookies": {},
+            "blockedCookiesHistory": {},
             "scoreHistory": {},
             "websiteScores": {}
         };
@@ -69,9 +70,9 @@ chrome.windows.onCreated.addListener(function () {
 
             let whitelist
             //Getting whitelist
-            await chrome.storage.local.get("unused_cookies_wl", function (result) {
-                if (result && result.unused_cookies_wl) {
-                    whitelist = result.unused_cookies_wl
+            await chrome.storage.local.get("whitelist", function (result) {
+                if (result && result.whitelist) {
+                    whitelist = result.whitelist
                 }
             });
 

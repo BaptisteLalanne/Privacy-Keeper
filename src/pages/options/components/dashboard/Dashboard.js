@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import ScoreLineChart from './graphs/ScoreLineChart.js';
-import CookieLineChart from './graphs/CookieLineChart.js';
+import BlockedCookiesLineChart from './graphs/BlockedCookiesLineChart.js';
 import CookieHisto from './graphs/CookieHisto.js';
 import WebsiteTable from './graphs/WebsiteTable.js';
 import Zoom from '@mui/material/Zoom';
@@ -18,7 +18,7 @@ export default function Dashboard() {
                 <div><ScoreLineChart /></div>
             </Zoom>
             <Zoom in={true} style={{ transitionDelay: 2 * zoomOffset + 'ms' }} timeout={zoomDuration} >
-                <div><CookieLineChart /></div>
+                <div><BlockedCookiesLineChart /></div>
             </Zoom>
             <Zoom in={true} style={{ transitionDelay: 1 * zoomOffset + 'ms' }} timeout={zoomDuration} >
                 <div><WebsiteTable /></div>

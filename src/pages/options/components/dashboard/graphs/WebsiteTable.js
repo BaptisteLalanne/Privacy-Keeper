@@ -40,7 +40,8 @@ export default function WebsiteTable() {
         piresSites = sortable.slice(n - 5, n);
       }
       else {
-        meilleursSites = sortable.slice(0, n);
+        piresSites = sortable;
+        meilleursSites = [];
       }
       piresSites = piresSites.reverse();
 
@@ -83,7 +84,8 @@ export default function WebsiteTable() {
                     color: mixColors(style.graphcol1, "#000000", mapRange(index, 0, 5, 0.1, 0.9))
                   }}>
                   <div className="table-content-cell">
-                    <div>&bull; {row["neg-nom"]}</div>
+                    <div>{row["neg-nom"] == "..." ? <></> : <>&bull;</>}</div>
+                    <div>{row["neg-nom"]}</div>
                     <div>{row["neg-score"]}</div>
                   </div>
                 </TableCell>

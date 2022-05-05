@@ -196,11 +196,11 @@ const handleCookies = async function (newCookies, url) {
             }
 
             // Get whitelist
-            chrome.storage.local.get("unused_cookies_wl", async function (res) {
+            chrome.storage.local.get("whitelist", async function (res) {
 
                 let whitelist = [];
-                if (res && res.unused_cookies_wl) {
-                    whitelist = res.unused_cookies_wl;
+                if (res && res.whitelist) {
+                    whitelist = res.whitelist;
                 }
 
                 // Get blocked cookies
@@ -214,153 +214,174 @@ const handleCookies = async function (newCookies, url) {
                         }
                     }
 
-                    // Iterate through cookies
-                    for (let cookie of newCookies) {
+                    // Get blocked cookies
+                    chrome.storage.local.get("blockedCookiesHistory", async function (result) {
 
-                        let key = "domain" + cookie.domain + "name" + cookie.name;
-
-                        let getClassification =
-
-                            // If cookie has already been classified,
-                            prevCookieTypes[key] != undefined ?
-
-                                async () => {
-
-                                    // Fetch stored classification
-                                    return prevCookieTypes[key];
-
-                                }
-
-                                // If cookie has not alreayd been classified,
-                                :
-
-                                async () => {
-
-                                    // Classify it
-                                    let serializedCookie = createFEInput(cookie);
-                                    let res = await classifyCookie(serializedCookie);
-
-                                    // Store the result
-                                    currCookieTypes[key] = res;
-
-                                    return res;
-                                }
-
-                            ;
-
-                        let ctype = await getClassification();
-
-                        // Block cookies
-                        let hasBeenBlocked = false;
-                        if (blockCookies) {
-
-                            // Check if it's not in whitelist
-                            let found = false;
-                            for (let whitelistedDomain of whitelist) {
-                                if (cookie.domain.includes(whitelistedDomain) || whitelistedDomain.includes(cookie.domain)) {
-                                    found = true;
-                                    isInWhitelist = true;
-                                    break;
-                                }
-                            }
-                            if (!found) {
-                                if (ctype > 1 && cookie.value != "") {
-
-                                    let cookieUrl = "http" + (cookie.secure ? "s" : "") + "://" + cookie.domain + cookie.path;
-                                    // Remove cookie right away
-                                    chrome.cookies.remove({ url: cookieUrl, name: cookie.name });
-                                    hasBeenBlocked = true;
-
-                                    // Store numbers of removed cookies
-                                    blockedCookies[domain][cookie.name] = cookie;
-
-                                }
-                            }
-                        }
-                        newCookieTypes = { ...prevCookieTypes, ...currCookieTypes };
-
-                        // Count cookie types, keep track of longest expiration date
-                        if (!hasBeenBlocked) {
-                            labels[ctype] += 1;
-                            if (!cookie.expirationDate) { maxExpirationTimes[ctype] = MAX_DATE; }
-                            else { maxExpirationTimes[ctype] = Math.max(maxExpirationTimes[ctype], cookie.expirationDate); }
+                        let blockedCookiesHistory = {};
+                        if (result && result.blockedCookiesHistory) {
+                            blockedCookiesHistory = result.blockedCookiesHistory;
                         }
 
-                    }
+                        // Iterate through cookies
+                        for (let cookie of newCookies) {
 
-                    // Count in previously blocked cookies
-                    if (blockCookies && !isInWhitelist && blockedCookies[domain]) {
-                        for (const [name, cookie] of Object.entries(blockedCookies[domain])) {
                             let key = "domain" + cookie.domain + "name" + cookie.name;
-                            let type = newCookieTypes[key];
-                            labels[type] += 1;
-                            if (!cookie.expirationDate) { maxExpirationTimes[type] = MAX_DATE; }
-                            else { maxExpirationTimes[type] = Math.max(maxExpirationTimes[type], cookie.expirationDate); }
+
+                            let getClassification =
+
+                                // If cookie has already been classified,
+                                prevCookieTypes[key] != undefined ?
+
+                                    async () => {
+
+                                        // Fetch stored classification
+                                        return prevCookieTypes[key];
+
+                                    }
+
+                                    // If cookie has not alreayd been classified,
+                                    :
+
+                                    async () => {
+
+                                        // Classify it
+                                        let serializedCookie = createFEInput(cookie);
+                                        let res = await classifyCookie(serializedCookie);
+
+                                        // Store the result
+                                        currCookieTypes[key] = res;
+
+                                        return res;
+                                    }
+
+                                ;
+
+                            let ctype = await getClassification();
+
+                            // Block cookies
+                            let hasBeenBlocked = false;
+                            if (blockCookies) {
+
+                                // Check if it's not in whitelist
+                                let found = false;
+                                for (let whitelistedDomain of whitelist) {
+                                    if (cookie.domain.includes(whitelistedDomain) || whitelistedDomain.includes(cookie.domain)) {
+                                        found = true;
+                                        isInWhitelist = true;
+                                        break;
+                                    }
+                                }
+                                if (!found) {
+                                    if (ctype > 1 && cookie.value != "") {
+
+                                        let cookieUrl = "http" + (cookie.secure ? "s" : "") + "://" + cookie.domain + cookie.path;
+                                        // Remove cookie right away
+                                        chrome.cookies.remove({ url: cookieUrl, name: cookie.name });
+                                        hasBeenBlocked = true;
+
+                                        // Store removed cookies
+                                        blockedCookies[domain][cookie.name] = cookie;
+
+                                        // Store number of removed cookies
+                                        let currTimestamp = new Date();
+                                        let currDate = currTimestamp.getDate() + "/" + currTimestamp.getMonth() + "/" + currTimestamp.getFullYear();
+                                        if (blockedCookiesHistory[currDate] == undefined) {
+                                            blockedCookiesHistory[currDate] = [0, 0];
+                                            blockedCookiesHistory[currDate][ctype - 2] = 1;
+                                        }
+                                        else {
+                                            blockedCookiesHistory[currDate][ctype - 2] += 1;
+                                        }
+
+                                    }
+                                }
+                            }
+                            newCookieTypes = { ...prevCookieTypes, ...currCookieTypes };
+
+                            // Count cookie types, keep track of longest expiration date
+                            if (!hasBeenBlocked) {
+                                labels[ctype] += 1;
+                                if (!cookie.expirationDate) { maxExpirationTimes[ctype] = MAX_DATE; }
+                                else { maxExpirationTimes[ctype] = Math.max(maxExpirationTimes[ctype], cookie.expirationDate); }
+                            }
+
                         }
-                    }
 
-                    // Compute score
-                    let thresholds = [0, 2, 35, 65, 100];
-                    let baseScore = 0;
-                    let additionalScore = 0;
-                    for (let i = 3; i >= 0; i--) {
-                        if (labels[i] > 0) {
-                            baseScore = thresholds[i];
-                            additionalScore = mapRange(maxExpirationTimes[i] - Date.now() / 1000, 5 * (24 * 60 * 60), MAX_DURATION, 0, thresholds[i + 1] - thresholds[i]);
-                            break;
-                        }
-                    }
-                    let score = baseScore + additionalScore;
-
-                    console.log("[CLASSIFIER BACKGROUND] cookieClassification done");
-                    console.log(labels);
-
-                    // Save current tab's cookie score and repartition 
-                    chrome.storage.local.set({ "currentCookieTypes": labels });
-                    chrome.storage.local.set({ "cookieScore": score });
-
-                    // Alter score history
-                    chrome.storage.local.get("scoreHistory", function (res) {
-                        let scoreHistory = {};
-                        if (res && res.scoreHistory) { scoreHistory = res.scoreHistory; }
-                        let currTimestamp = new Date();
-                        let currDate = currTimestamp.getDate() + "/" + currTimestamp.getMonth() + "/" + currTimestamp.getFullYear();
-                        if (scoreHistory[currDate] == undefined) {
-                            scoreHistory[currDate] = {
-                                "trackerSum": 0,
-                                "cookieSum": score,
-                                "total": 1
+                        // Count in previously blocked cookies
+                        if (blockCookies && !isInWhitelist && blockedCookies[domain]) {
+                            for (const [name, cookie] of Object.entries(blockedCookies[domain])) {
+                                let key = "domain" + cookie.domain + "name" + cookie.name;
+                                let type = newCookieTypes[key];
+                                labels[type] += 1;
+                                if (!cookie.expirationDate) { maxExpirationTimes[type] = MAX_DATE; }
+                                else { maxExpirationTimes[type] = Math.max(maxExpirationTimes[type], cookie.expirationDate); }
                             }
                         }
-                        else {
-                            scoreHistory[currDate].cookieSum += score;
-                            scoreHistory[currDate].total += 1;
-                        }
-                        chrome.storage.local.set({ "scoreHistory": scoreHistory });
-                    });
 
-                    // Update stored scores
-                    chrome.storage.local.get("websiteScores", function (res) {
-                        let websiteScores = {};
-                        if (res && res.websiteScores) { websiteScores = res.websiteScores; }
-                        if (websiteScores[domain] == undefined) {
-                            websiteScores[domain] = {
-                                "cookie": score,
-                                "tracker": 0
+                        // Compute score
+                        let thresholds = [0, 2, 35, 65, 100];
+                        let baseScore = 0;
+                        let additionalScore = 0;
+                        for (let i = 3; i >= 0; i--) {
+                            if (labels[i] > 0) {
+                                baseScore = thresholds[i];
+                                additionalScore = mapRange(maxExpirationTimes[i] - Date.now() / 1000, 5 * (24 * 60 * 60), MAX_DURATION, 0, thresholds[i + 1] - thresholds[i]);
+                                break;
                             }
                         }
-                        else {
-                            websiteScores[domain].cookie = score;
-                        }
-                        chrome.storage.local.set({ "websiteScores": websiteScores });
+                        let score = baseScore + additionalScore;
+
+                        console.log("[CLASSIFIER BACKGROUND] cookieClassification done");
+                        console.log(labels);
+
+                        // Save current tab's cookie score and repartition 
+                        chrome.storage.local.set({ "currentCookieTypes": labels });
+                        chrome.storage.local.set({ "cookieScore": score });
+
+                        // Alter score history
+                        chrome.storage.local.get("scoreHistory", function (res) {
+                            let scoreHistory = {};
+                            if (res && res.scoreHistory) { scoreHistory = res.scoreHistory; }
+                            let currTimestamp = new Date();
+                            let currDate = currTimestamp.getDate() + "/" + currTimestamp.getMonth() + "/" + currTimestamp.getFullYear();
+                            if (scoreHistory[currDate] == undefined) {
+                                scoreHistory[currDate] = {
+                                    "trackerSum": 0,
+                                    "cookieSum": score,
+                                    "total": 1
+                                }
+                            }
+                            else {
+                                scoreHistory[currDate].cookieSum += score;
+                                scoreHistory[currDate].total += 1;
+                            }
+                            chrome.storage.local.set({ "scoreHistory": scoreHistory });
+                        });
+
+                        // Update stored scores
+                        chrome.storage.local.get("websiteScores", function (res) {
+                            let websiteScores = {};
+                            if (res && res.websiteScores) { websiteScores = res.websiteScores; }
+                            if (websiteScores[domain] == undefined) {
+                                websiteScores[domain] = {
+                                    "cookie": score,
+                                    "tracker": 0
+                                }
+                            }
+                            else {
+                                websiteScores[domain].cookie = score;
+                            }
+                            chrome.storage.local.set({ "websiteScores": websiteScores });
+                        });
+
+                        // Update gobal cookie types map
+                        chrome.storage.local.set({ "cookieTypes": newCookieTypes });
+
+                        // Save the deleted cookies
+                        chrome.storage.local.set({ "blockedCookies": blockedCookies });
+                        chrome.storage.local.set({ "blockedCookiesHistory": blockedCookiesHistory });
+
                     });
-
-                    // Update gobal cookie types map
-                    chrome.storage.local.set({ "cookieTypes": newCookieTypes });
-
-                    // Save the deleted cookies
-                    chrome.storage.local.set({ "blockedCookies": blockedCookies });
-
                 });
             });
         });

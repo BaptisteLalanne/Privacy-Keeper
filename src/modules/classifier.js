@@ -331,8 +331,6 @@ const handleCookies = async function (newCookies, url) {
                         }
                         let score = baseScore + additionalScore;
 
-                        console.log("[CLASSIFIER BACKGROUND] cookieClassification done");
-                        console.log(labels);
 
                         // Save current tab's cookie score and repartition 
                         chrome.storage.local.set({ "currentCookieTypes": labels });
@@ -441,8 +439,6 @@ function updateCookieClassification(cookies) {
 
         newCookieTypes = { ...prevCookieTypes, ...currCookieTypes };
 
-        console.log("[CLASSIFIER BACKGROUND] cookieClassification updated");
-        console.log(newCookieTypes);
 
         // Update gobal cookie types map
         chrome.storage.local.set({ "cookieTypes": newCookieTypes });

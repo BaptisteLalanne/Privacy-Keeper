@@ -269,8 +269,6 @@ const setupFunctions = {
 */
 const setupFeatureResourcesCallback = function(fconfig) {
 
-    console.log("[EXTRACTOR BACKGROUND] feature config");
-    console.log(fconfig)
 
     feature_config = fconfig;
 

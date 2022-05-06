@@ -420,7 +420,6 @@ export default function fingerprinterScript() {
                 "fp_extern": max_extern,
                 "final_score": final_score
             }
-            console.log("fp_total = " + fp_total, ", max_extern = " + max_extern + ", final_score" + final_score)
             res(fingerprintAnalyseResult);
         }).catch((error) => {
             reject(error)

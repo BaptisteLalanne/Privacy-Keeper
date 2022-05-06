@@ -188,7 +188,6 @@ export default function CookieTable() {
             let lastCookieUpdateDates = res1.updateDateCookies;
             chrome.storage.local.get(["cookieTypes"], function (res2) {
                 let cookieTypes = res2.cookieTypes;
-                console.log(cookieTypes)
                 constructData(lastCookieUpdateDates, cookieTypes);
             });
         });

@@ -65,14 +65,12 @@ export default function Controls() {
     const saveExpirationTime = (newTime) => {
         chrome.storage.local.set({ "expiration_time": newTime * (1000 * 60 * 60 * 24) }, function () {
             if (chrome.runtime.error) {
-                console.log("Runtime error.");
             }
         });
     }
     const saveToggleOptions = (newState) => {
         chrome.storage.local.set({ "toggle_options": newState }, function () {
             if (chrome.runtime.error) {
-                console.log("Runtime error.");
             }
         });
     }

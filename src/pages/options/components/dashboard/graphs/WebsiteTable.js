@@ -18,7 +18,6 @@ export default function WebsiteTable() {
     chrome.storage.local.get("websiteScores", function (res) {
       let websiteScores = {};
       if (res && res.websiteScores) { websiteScores = res.websiteScores; }
-      console.log(websiteScores);
 
       let sortable = [];
       for (const [key, value] of Object.entries(websiteScores)) {

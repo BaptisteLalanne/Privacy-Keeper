@@ -161,7 +161,6 @@ function Popup() {
     // Fetch cookie classificatins from storage
     chrome.storage.local.get(['currentCookieTypes'], function (result) {
       let labels = result.currentCookieTypes;
-      console.log(labels);
       setCookieDetails(labels);
     });
 

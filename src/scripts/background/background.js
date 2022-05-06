@@ -51,7 +51,6 @@ chrome.runtime.onInstalled.addListener(function (details) {
         };
         chrome.storage.local.set(default_params, function () {
             if (chrome.runtime.error) {
-                console.log("Runtime error : default parameters");
             }
         });
     }
@@ -60,7 +59,6 @@ chrome.runtime.onInstalled.addListener(function (details) {
 //Listen when the browser is opened
 chrome.windows.onCreated.addListener(function () {
 
-    console.log("[BROWSER OPENED]");
 
     //Getting toggle options
     chrome.storage.local.get("toggle_options", async function (result) {
@@ -136,7 +134,6 @@ chrome.windows.onCreated.addListener(function () {
                                 }, function () {
                                     delete result[key]
                                     if (chrome.runtime.lastError) {
-                                        console.log("Runtime error.");
                                     }
                                 });
                             }
@@ -147,14 +144,13 @@ chrome.windows.onCreated.addListener(function () {
                         }
 
                     })
-                }).catch(err => console.log(err));
+                })
 
                 //We put the now upodated cookies' date in the storage
                 await chrome.storage.local.set({ "updateDateCookies": value }).then(() => {
                     if (chrome.runtime.error) {
-                        console.log("Runtime error.");
                     }
-                }).catch(err => console.log(err));
+                })
 
                 //Set stats nb deleted cookies
                 await chrome.storage.local.get("unusedCookieDeletedHistory", function (historic) {
@@ -171,7 +167,6 @@ chrome.windows.onCreated.addListener(function () {
                         //database
                         chrome.storage.local.set({ "unusedCookieDeletedHistory": historic }, function () {
                             if (chrome.runtime.error) {
-                                console.log("Runtime error : unusedCookieDeletedHistory");
                             }
                         });
                     }
@@ -304,7 +299,6 @@ function setInfos() {
                     //Putting the new date into the sync storage
                     chrome.storage.local.set({ "updateDateCookies": value }, function () {
                         if (chrome.runtime.error) {
-                            console.log("Runtime error.");
                         }
                     });
                 });

@@ -24,7 +24,6 @@ export default function ScoreLineChart() {
 
   useEffect(() => {
 
-
     // Generate random data
     /*let _data = [];
     const today = new Date();
@@ -40,11 +39,11 @@ export default function ScoreLineChart() {
       });
     }
     setData(_data);*/
+
     // Retrieve history of scores
     chrome.storage.local.get("scoreHistory", function (res) {
       let scoreHistory = {};
       if (res && res.scoreHistory) { scoreHistory = res.scoreHistory; }
-      console.log(scoreHistory)
       let _data = [];
       const today = new Date();
       for (let i = 31; i >= 0; i--) {
@@ -52,11 +51,7 @@ export default function ScoreLineChart() {
         let date_i = timestamp_i.getDate() + "/" + timestamp_i.getMonth() + "/" + timestamp_i.getFullYear();
         if (scoreHistory[date_i] != undefined) {
           let formatted_date_i = timestamp_i.getDate().toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false }) + "/" +
-            console.log(scoreHistory);
-          console.log(scoreHistory[date_i].trackerSum);
-          console.log(scoreHistory[date_i].totalTracker);
-          console.log(scoreHistory[date_i].totalCookie);
-          timestamp_i.getMonth().toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false });
+            timestamp_i.getMonth().toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false });
           _data.push({
             "Time": formatted_date_i,
             "Cookie intrusiveness": Math.min(Math.round(scoreHistory[date_i].cookieSum / (scoreHistory[date_i].totalCookie == 0 ? 1 : scoreHistory[date_i].totalCookie))),

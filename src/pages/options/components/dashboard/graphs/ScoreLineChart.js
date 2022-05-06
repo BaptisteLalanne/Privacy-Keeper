@@ -26,7 +26,7 @@ export default function ScoreLineChart() {
 
 
     // Generate random data
-    let _data = [];
+    /*let _data = [];
     const today = new Date();
     for (let i = 31; i >= 0; i--) {
       let slope = mapRange(i, 31, 0, 1, 0.5);
@@ -39,7 +39,33 @@ export default function ScoreLineChart() {
         "Tracking suspicion": Math.round(nonPeriodicSine(i - 100, 20) * slope)
       });
     }
-    setData(_data);
+    setData(_data);*/
+    // Retrieve history of scores
+    chrome.storage.local.get("scoreHistory", function (res) {
+      let scoreHistory = {};
+      if (res && res.scoreHistory) { scoreHistory = res.scoreHistory; }
+      console.log(scoreHistory)
+      let _data = [];
+      const today = new Date();
+      for (let i = 31; i >= 0; i--) {
+        let timestamp_i = new Date(today); timestamp_i.setDate(today.getDate() - i);
+        let date_i = timestamp_i.getDate() + "/" + timestamp_i.getMonth() + "/" + timestamp_i.getFullYear();
+        if (scoreHistory[date_i] != undefined) {
+          let formatted_date_i = timestamp_i.getDate().toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false }) + "/" +
+            console.log(scoreHistory);
+          console.log(scoreHistory[date_i].trackerSum);
+          console.log(scoreHistory[date_i].totalTracker);
+          console.log(scoreHistory[date_i].totalCookie);
+          timestamp_i.getMonth().toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false });
+          _data.push({
+            "Time": formatted_date_i,
+            "Cookie intrusiveness": Math.min(Math.round(scoreHistory[date_i].cookieSum / (scoreHistory[date_i].totalCookie == 0 ? 1 : scoreHistory[date_i].totalCookie))),
+            "Tracking suspicion": Math.min(Math.round(scoreHistory[date_i].trackerSum / (scoreHistory[date_i].totalTracker == 0 ? 1 : scoreHistory[date_i].totalTracker)))
+          });
+        }
+      }
+      setData(_data);
+    });
 
   }, []);
 

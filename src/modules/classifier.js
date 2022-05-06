@@ -346,12 +346,13 @@ const handleCookies = async function (newCookies, url) {
                                 scoreHistory[currDate] = {
                                     "trackerSum": 0,
                                     "cookieSum": score,
-                                    "total": 1
+                                    "totalCookie": 1,
+                                    "totalTracker": 0
                                 }
                             }
                             else {
                                 scoreHistory[currDate].cookieSum += score;
-                                scoreHistory[currDate].total += 1;
+                                scoreHistory[currDate].totalCookie += 1;
                             }
                             chrome.storage.local.set({ "scoreHistory": scoreHistory });
                         });

@@ -24,7 +24,6 @@ export default function BlockedCookiesLineChart() {
 
   useEffect(() => {
 
-    /*
     // Retrieve history of blocked cookies
     chrome.storage.local.get("blockedCookiesHistory", function (res) {
       let blockedCookiesHistory = {};
@@ -46,23 +45,6 @@ export default function BlockedCookiesLineChart() {
       }
       setData(_data);
     });
-    */
-
-    // Generate random data
-    let _data = [];
-    const today = new Date();
-    for (let i = 31; i >= 0; i--) {
-      let slope = mapRange(i, 31, 0, 1, 0.25);
-      let key = new Date(today); key.setDate(today.getDate() - i);
-      let formattedKey = key.getDate().toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false }) + "/" +
-        key.getMonth().toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false });
-      _data.push({
-        "Time": formattedKey,
-        "Analytics": Math.round(nonPeriodicSine(i - 200, 2500) * slope),
-        "Advertising": Math.round(nonPeriodicSine(i - 300, 3000) * slope)
-      });
-    }
-    setData(_data);
 
   }, []);
 

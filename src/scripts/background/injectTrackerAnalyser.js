@@ -441,12 +441,13 @@ export default function fingerprinterScript() {
                 scoreHistory[currDate] = {
                     "trackerSum": fingerprintAnalyseResult.final_score,
                     "cookieSum": 0,
-                    "total": 1
+                    "totalCookie": 1,
+                    "totalTracker": 0
                 }
             }
             else {
                 scoreHistory[currDate].trackerSum += fingerprintAnalyseResult.final_score;
-                scoreHistory[currDate].total += 1;
+                scoreHistory[currDate].totalTracker += 1;
             }
             chrome.storage.local.set({ "scoreHistory": scoreHistory });
         });

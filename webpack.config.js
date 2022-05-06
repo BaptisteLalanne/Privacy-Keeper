@@ -30,6 +30,20 @@ var fileExtensions = [
 
 var options = {
   mode: process.env.NODE_ENV || 'development',
+  optimization: {
+    minimize: true,
+    minimizer: [
+    	new TerserPlugin({
+        parallel: true,
+        extractComments: 'all',
+        terserOptions: {          
+           compress: {
+               drop_console: true,
+           },
+		}
+      }),
+    ],
+  },
   entry: {
     options: path.join(__dirname, 'src', 'pages', 'options', 'index.js'),
     popup: path.join(__dirname, 'src', 'pages', 'popup', 'index.js'),

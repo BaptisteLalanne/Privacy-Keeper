@@ -107,13 +107,14 @@ function Popup() {
   useEffect(() => {
 
     // Fetch URL
+    let domain = "";
     const queryInfo = { active: true, lastFocusedWindow: true };
     chrome.tabs && chrome.tabs.query(queryInfo, tabs => {
       setUrl(tabs[0].url);
       setIsChromeTab(tabs[0].url.split(":")[0].includes("chrome"));
 
       // Check if it's in whitelist
-      let domain = extractDomain(tabs[0].url);
+      domain = extractDomain(tabs[0].url);
       chrome.storage.local.get("whitelist", function (result) {
         let whitelist = [];
         if (result && result.whitelist) {
@@ -132,17 +133,24 @@ function Popup() {
         let trackerScore = fingerprintScoreRes.fingerprintAnalyseResult.final_score;
         const fp_extern = fingerprintScoreRes.fingerprintAnalyseResult.fp_extern;
         const fp_page = fingerprintScoreRes.fingerprintAnalyseResult.fp_page;
+        const trackerScore_url = fingerprintScoreRes.fingerprintAnalyseResult.url;
 
         let rounding = 5;
         cookieScore = Math.ceil(cookieScore / rounding) * rounding;
         if (isNaN(cookieScore))
-          cookieScore = "??"
-        trackerScore = Math.round(trackerScore / rounding) * rounding;
-        if (isNaN(trackerScore))
-          cookieScore = "??"
-        score = Math.ceil((cookieScore + trackerScore) / 2);
-        if (isNaN(score))
-          score = "??"
+          cookieScore = "??";
+        //Check whether the tracker score was updated
+        if (trackerScore_url == domain) {
+          trackerScore = Math.round(trackerScore / rounding) * rounding;
+          if (isNaN(trackerScore))
+            trackerScore = "??";
+          score = Math.ceil((cookieScore + trackerScore) / 2);
+          if (isNaN(score))
+            score = "??";
+        } else {
+          trackerScore = "..";
+          score = "..";
+        }
 
         // Save score states
         setScore(score);
